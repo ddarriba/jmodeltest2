@@ -1,0 +1,270 @@
+
+
+
+
+
+
+                                 ..........................                                      
+ ooooooooooooooooooooooooooooo        CURRENT SETTINGS        ooooooooooooooooooooooooooooooooooo
+                                 ..........................                                      
+
+                . Sequence filename : 				 data.phy
+                . Data type :             			 dna
+                . Sequence format : 				 interleaved
+                . Number of data sets : 			 1
+                . Nb of bootstrapped data sets : 		 0
+                . Model name : 					 custom
+                . Proportion of invariable sites :		 0.000000
+                . Number of subst. rate categs : 		 1
+                . Gamma distribution parameter : 		 1.000000
+                . Nucleotide equilibrium frequencies : 		 empirical
+                . Optimise tree topology : 			 yes
+                . Tree topology search : 			 NNIs
+                . Starting tree : 				 BioNJ
+                . Add random input tree : 			 no
+                . Optimise branch lengths : 			 yes
+                . Optimise substitution model parameters : 	 yes
+                . Run ID : 					 none
+
+ oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+
+
+. 17 sites are made from completely undetermined states ('X', '-', '?' or 'N')...
+
+. Compressing sequences...
+
+. 271 patterns found. (out of a total of 708 sites) 
+
+. 340 sites without polymorphism (48.02%).
+
+. Computing pairwise distances...
+
+. Building BioNJ tree...
+
+. This analysis requires at least 0 Mo of memory space.
+
+. (((Cow:0.1047397518,Whale:0.0835658909):0.0205613988,(Chicken:0.2022653611,(Frog:0.1421084814,Trout:0.1833234205):0.0211796646):0.0555346469):0.0414874468,Mouse:0.0859565549,Rat:0.0803314601);
+. Maximizing likelihood (using NNI moves)...
+
+. (    0 sec) [     -3801.8844] [Topology           ]
+. (    0 sec) [     -3785.5661] [Topology           ]
+. (    0 sec) [     -3784.6925] [Topology           ]
+. (    0 sec) [     -3784.6064] [Topology           ]
+. (    0 sec) [     -3784.5920] [Topology           ]
+. (    0 sec) [     -3784.5895] [Topology           ]
+. (    0 sec) [     -3784.5890] [Topology           ]
+
+. Checking for NNIs, optimizing five branches...
+
+. (    0 sec) [     -3784.5890] [Topology           ]
+. (    0 sec) [     -3784.5889] [Topology           ]
+
+. Checking for NNIs, optimizing five branches...
+
+
+. Checking for NNIs, optimizing five branches...
+
+
+. Log likelihood of the current tree: -3784.588910.
+
+. Printing the most likely tree in file 'data.phy_phyml_tree.txt'...
+
+
+. Time used 0h0m1s
+
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+Command line used for settings above =  -i data.phy -d nt -n 1 -b 0 -m 000000 -f 0.25 0.25 0.25 0.25 -c 1 -s NNI -o tlr
+
+
+
+
+
+
+                                 ..........................                                      
+ ooooooooooooooooooooooooooooo        CURRENT SETTINGS        ooooooooooooooooooooooooooooooooooo
+                                 ..........................                                      
+
+                . Sequence filename : 				 data.phy
+                . Data type :             			 dna
+                . Sequence format : 				 interleaved
+                . Number of data sets : 			 1
+                . Nb of bootstrapped data sets : 		 0
+                . Model name : 					 custom
+                . Proportion of invariable sites :		 estimated
+                . Number of subst. rate categs : 		 1
+                . Gamma distribution parameter : 		 1.000000
+                . Nucleotide equilibrium frequencies : 		 empirical
+                . Optimise tree topology : 			 yes
+                . Tree topology search : 			 NNIs
+                . Starting tree : 				 BioNJ
+                . Add random input tree : 			 no
+                . Optimise branch lengths : 			 yes
+                . Optimise substitution model parameters : 	 yes
+                . Run ID : 					 none
+
+ oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+
+
+. 17 sites are made from completely undetermined states ('X', '-', '?' or 'N')...
+
+. Compressing sequences...
+
+. 271 patterns found. (out of a total of 708 sites) 
+
+. 340 sites without polymorphism (48.02%).
+
+. Computing pairwise distances...
+
+. Building BioNJ tree...
+
+. This analysis requires at least 0 Mo of memory space.
+
+. (((Cow:0.1309246898,Whale:0.1044573636):0.0257017485,(Chicken:0.2528317014,(Frog:0.1776356018,Trout:0.2291542757):0.0264745807):0.0694183086):0.0518593085,Mouse:0.1074456937,Rat:0.1004143251);
+. Maximizing likelihood (using NNI moves)...
+
+. (    0 sec) [     -3745.8318] [P-inv              ][  0.265169]
+. (    0 sec) [     -3745.8318] [Topology           ]
+. (    0 sec) [     -3706.2752] [Topology           ]
+. (    0 sec) [     -3705.1688] [Topology           ]
+. (    0 sec) [     -3705.0415] [Topology           ]
+. (    0 sec) [     -3705.0238] [Topology           ]
+. (    0 sec) [     -3705.0211] [Topology           ]
+. (    0 sec) [     -3705.0207] [Topology           ]
+
+. Checking for NNIs, optimizing five branches...
+
+. (    0 sec) [     -3692.8226] [P-inv              ][  0.375008]
+. (    0 sec) [     -3692.8226] [Topology           ]
+. (    0 sec) [     -3688.8482] [Topology           ]
+. (    0 sec) [     -3688.5304] [Topology           ]
+. (    0 sec) [     -3688.4877] [Topology           ]
+. (    0 sec) [     -3688.4805] [Topology           ]
+. (    0 sec) [     -3688.4790] [Topology           ]
+. (    0 sec) [     -3688.4786] [Topology           ]
+
+. Checking for NNIs, optimizing five branches...
+
+. (    0 sec) [     -3687.5946] [P-inv              ][  0.403531]
+. (    0 sec) [     -3687.5946] [Topology           ]
+. (    0 sec) [     -3687.4507] [Topology           ]
+. (    0 sec) [     -3687.4393] [Topology           ]
+. (    0 sec) [     -3687.4376] [Topology           ]
+. (    0 sec) [     -3687.4373] [Topology           ]
+
+. Checking for NNIs, optimizing five branches...
+
+. (    0 sec) [     -3687.4141] [P-inv              ][  0.408158]
+. (    0 sec) [     -3687.4141] [Topology           ]
+. (    0 sec) [     -3687.4104] [Topology           ]
+. (    0 sec) [     -3687.4100] [Topology           ]
+
+. Checking for NNIs, optimizing five branches...
+
+. (    0 sec) [     -3687.4096] [P-inv              ][  0.408678]
+. (    0 sec) [     -3687.4096] [Topology           ]
+. (    0 sec) [     -3687.4094] [Topology           ]
+
+. Checking for NNIs, optimizing five branches...
+
+
+. Checking for NNIs, optimizing five branches...
+
+
+. Log likelihood of the current tree: -3687.409445.
+
+. Printing the most likely tree in file 'data.phy_phyml_tree.txt'...
+
+
+. Time used 0h0m1s
+
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+Command line used for settings above =  -i data.phy -d nt -n 1 -b 0 -m 000000 -f 0.25 0.25 0.25 0.25 -v e -c 1 -s NNI -o tlr
+
+
+
+
+
+
+                                 ..........................                                      
+ ooooooooooooooooooooooooooooo        CURRENT SETTINGS        ooooooooooooooooooooooooooooooooooo
+                                 ..........................                                      
+
+                . Sequence filename : 				 data.phy
+                . Data type :             			 dna
+                . Sequence format : 				 interleaved
+                . Number of data sets : 			 1
+                . Nb of bootstrapped data sets : 		 0
+                . Model name : 					 custom
+                . Proportion of invariable sites :		 0.000000
+                . Number of subst. rate categs : 		 4
+                . Gamma distribution parameter : 		 estimated
+                . 'Middle' of each rate class  : 		 mean
+                . Nucleotide equilibrium frequencies : 		 empirical
+                . Optimise tree topology : 			 yes
+                . Tree topology search : 			 NNIs
+                . Starting tree : 				 BioNJ
+                . Add random input tree : 			 no
+                . Optimise branch lengths : 			 yes
+                . Optimise substitution model parameters : 	 yes
+                . Run ID : 					 none
+
+ oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+
+
+. 17 sites are made from completely undetermined states ('X', '-', '?' or 'N')...
+
+. Compressing sequences...
+
+. 271 patterns found. (out of a total of 708 sites) 
+
+. 340 sites without polymorphism (48.02%).
+
+. Computing pairwise distances...
+
+. Building BioNJ tree...
+
+. This analysis requires at least 1 Mo of memory space.
+
+. (((Cow:0.1047397518,Whale:0.0835658909):0.0205613988,(Chicken:0.2022653611,(Frog:0.1421084814,Trout:0.1833234205):0.0211796646):0.0555346469):0.0414874468,Mouse:0.0859565549,Rat:0.0803314601);
+. Maximizing likelihood (using NNI moves)...
+
+. (    0 sec) [     -3701.5085] [Alpha              ][  0.514463]
+. (    0 sec) [     -3701.5085] [Topology           ]
+. (    0 sec) [     -3680.5317] [Topology           ]
+. (    0 sec) [     -3679.0294] [Topology           ]
+. (    0 sec) [     -3678.7034] [Topology           ]
+. (    0 sec) [     -3678.6141] [Topology           ]
+. (    0 sec) [     -3678.5882] [Topology           ]
+. (    0 sec) [     -3678.5804] [Topology           ]
+
+. Checking for NNIs, optimizing five branches...
+
+. (    0 sec) [     -3678.5178] [Alpha              ][  0.534702]
+. (    0 sec) [     -3678.5178] [Topology           ]
+. (    0 sec) [     -3678.5153] [Topology           ]
+. (    0 sec) [     -3678.5151] [Topology           ]
+
+. Checking for NNIs, optimizing five branches...
+
+. (    1 sec) [     -3678.5151] [Alpha              ][  0.535240]
+. (    1 sec) [     -3678.5151] [Topology           ]
+. (    1 sec) [     -3678.5150] [Topology           ]
+
+. Checking for NNIs, optimizing five branches...
+
+
+. Checking for NNIs, optimizing five branches...
+
+
+. Log likelihood of the current tree: -3678.515021.
+
+. Printing the most likely tree in file 'data.phy_phyml_tree.txt'...
+
+
+. Time used 0h0m1s
+
+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+Command line used for settings above =  -i data.phy -d nt -n 1 -b 0 -m 000000 -f 0.25 0.25 0.25 0.25 -c 4 -a e -s NNI -o tlr

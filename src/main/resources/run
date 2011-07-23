@@ -1,0 +1,1 @@
+java -jar jModelTest.jar -d aP6.fas -s 11 -f -i -g 4 -AIC -AICc -BIC -DT -p -v -a -t ML

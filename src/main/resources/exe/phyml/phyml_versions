@@ -1,0 +1,25 @@
+NOTES for PHYML3
+
+* Version february 2008
+	- Uses *.stats instead of *.stat
+	- has problems for some models (say JC) when estimating the likelihood from JC or user trees.
+	- aP6.fas in x seconds
+* Version 4 march 2008
+	- Fine
+	- aP6.fas in 40 seconds
+
+* Version 10 april 2008
+	- *.stats has some more blank lines
+	- aP6.fas in 60 seconds
+
+* Version 11 march 2009
+	- aP6.fas in 31 seconds
+
+* Version 21 may 2009 -- PhyML v3.0 (179M) - jmt 0.1.6
+	- aP6.fas in 29 seconds
+
+* Version 18 feb 2010 -- PhyML v3.0  (PhyML v3.0_176:178M ) (http://www.atgc-montpellier.fr/phyml/download.php) - jmt 0.1.6
+	- aP6.fas in 35 seconds
+
+* Version 19 feb 2010 -- PhyML v3.0  downlowaded from http://code.google.com/p/phyml/ - jmt 0.1.6
+	- aP6.fas in 34 seconds
