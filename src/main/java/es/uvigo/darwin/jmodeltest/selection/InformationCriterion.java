@@ -40,6 +40,10 @@ public abstract class InformationCriterion {
 	protected double atitv, akappa, apinvI, ashapeG, apinvIG, ashapeIG;
 	protected double aRa, aRb, aRc, aRd, aRe, aRf;
 
+	public List<Model> getConfidenceModels() {
+		return confidenceModels;
+	}
+	
 	public InformationCriterion(boolean mwritePAUPblock, boolean mdoImportances,
 			boolean mdoModelAveraging, double minterval) {
 		numModels = options.numModels;
@@ -381,6 +385,10 @@ public abstract class InformationCriterion {
 		return null;
 	}
 
+	public Model getModel(int i) {
+		return models[order[i]];
+	}
+	
 	public void print(TextOutputStream stream) {
 		int i, j;
 		String criterion = names[getType()];

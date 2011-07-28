@@ -24,7 +24,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 	protected ApplicationOptions options;
 	protected Model[] models;
 	
-	protected static final String PHYML_VERSION = "3.0";
+	public static final String PHYML_VERSION = "3.0";
 
 	public static String PHYML_TREE_SUFFIX = "_phyml_tree_";
 	public static String PHYML_STATS_SUFFIX;

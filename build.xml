@@ -4,15 +4,17 @@
     <property name="src.resources.dir" location="src/main/resources"/>
     <property name="bin" location="build/classes"/>
     <property name="lib" location="lib"/>
+    <property name="template" location="htmltemplate"/>
 <!--    <property name="dist" location="dist"/> -->
     <property name="dist" location="dist"/>
+    <property name="exe" location="${dist}/exe/phyml"/>
     <property name="jarfile" location="${dist}/${ant.project.name}.jar"/>
     <property name="compile.debug" value="true"/>
 
     <fileset id="lib.jars" dir="${lib}">
         <include name="**/*.jar"/>
     </fileset>
-
+    
     <path id="lib.path">
         <fileset refid="lib.jars"/>
     </path>
@@ -33,9 +35,9 @@
     <target name="jar" depends="compile" description="Build jar">
         <mkdir dir="${dist}"/>
         <jar jarfile="${jarfile}" basedir="${bin}" manifest="Manifest">
-            <!-- Merge library jars into final jar file 
+            <!-- Merge library jars into final jar file
             <zipgroupfileset refid="lib.jars"/>-->
-        </jar>
+      	</jar>
 	<mkdir dir="${dist}/lib"/>
 	<copy todir="${dist}/lib">
             <fileset id="lib.jars" dir="${lib}">
@@ -44,9 +46,10 @@
   	</copy>
 	<copy todir="${dist}">
             <fileset dir="${src.resources.dir}">
-  	  	<include name="**/*"/>
+  	  			<include name="**/*"/>
             </fileset>
   	</copy>
+  	<chmod perm="755" dir="${exe}" includes="*"/>
     </target>
 
     <target name="run" depends="jar" description="Run jar file">

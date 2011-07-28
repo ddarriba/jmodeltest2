@@ -151,7 +151,7 @@ public class AICc extends InformationCriterion {
 		cumWeight = 0;
 
 		// first construct the confidence interval for models
-		if (confidenceInterval == 1.0) {
+		if (confidenceInterval >= 1.0d) {
 			for (i = 0; i < numModels; i++) {
 				tmodel = models[order[i]];
 				tmodel.setInAICcinterval(true);
@@ -178,7 +178,7 @@ public class AICc extends InformationCriterion {
 			double randomNumber = generator.nextDouble();
 			if (randomNumber <= probIn) {
 				tmodel.setInAICcinterval(true);
-				confidenceModels.add(tmodel);
+				if (!confidenceModels.contains(tmodel)) confidenceModels.add(tmodel);
 				cumWeight += tmodel.getAICcw();
 			} else
 				tmodel.setInAICcinterval(false);

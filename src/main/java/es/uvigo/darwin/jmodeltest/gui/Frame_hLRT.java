@@ -64,8 +64,8 @@ public class Frame_hLRT extends JModelTestFrame {
 	}
 
 	public void initComponents() throws Exception {
-		java.awt.Image img0 = Toolkit.getDefaultToolkit().getImage(currentDirectory + "/icons/Up24.gif");
-		java.awt.Image img1 = Toolkit.getDefaultToolkit().getImage(currentDirectory + "/icons/Down24.gif");
+		java.awt.Image img0 = Toolkit.getDefaultToolkit().getImage(currentDirectory + "/resources/icons/Up24.gif");
+		java.awt.Image img1 = Toolkit.getDefaultToolkit().getImage(currentDirectory + "/resources/icons/Down24.gif");
 
 		PanelSettings.setSize(new java.awt.Dimension(460, 270));
 		PanelSettings.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "hLRT Settings", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
@@ -326,10 +326,14 @@ public class Frame_hLRT extends JModelTestFrame {
     //Swap two elements in the list.
     private void swap(int a, int b) 
     	{
-        Object aObject = listModel.getElementAt(a);
-        Object bObject = listModel.getElementAt(b);
-        listModel.set(a, bObject);
-        listModel.set(b, aObject);
+    	if (a >= 0 && b >= 0 
+    			&& a < listModel.getSize()
+    			&& b < listModel.getSize()) {
+	        Object aObject = listModel.getElementAt(a);
+	        Object bObject = listModel.getElementAt(b);
+	        listModel.set(a, bObject);
+	        listModel.set(b, aObject);
+	    	}
     	}				
 	
 	

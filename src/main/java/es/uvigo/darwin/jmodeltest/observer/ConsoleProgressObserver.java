@@ -5,6 +5,7 @@ import java.util.Observer;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
+import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;

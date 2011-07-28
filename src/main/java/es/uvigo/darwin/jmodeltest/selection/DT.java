@@ -192,7 +192,7 @@ public class DT extends InformationCriterion {
 		cumWeight = 0;
 
 		// first construct the confidence interval for models
-		if (confidenceInterval == 1.0) {
+		if (confidenceInterval >= 1.0d) {
 			for (i = 0; i < numModels; i++) {
 				tmodel = models[order[i]];
 				tmodel.setInDTinterval(true);

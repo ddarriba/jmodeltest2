@@ -49,6 +49,7 @@ import es.uvigo.darwin.jmodeltest.exe.RunPhyml;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlHibrid;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlMPJ;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlThread;
+import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ConsoleProgressObserver;
@@ -59,6 +60,7 @@ import es.uvigo.darwin.jmodeltest.selection.DT;
 import es.uvigo.darwin.jmodeltest.selection.HLRT;
 import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Simulation;
+import es.uvigo.darwin.prottest.consensus.Consensus;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 public class ModelTest {
@@ -102,6 +104,11 @@ public class ModelTest {
 	private static BIC myBIC;
 	private static DT myDT;
 	private static HLRT myHLRT;
+	
+	private static RunConsense consensusAIC;
+	private static RunConsense consensusAICc;
+	private static RunConsense consensusBIC;
+	private static RunConsense consensusDT;
 
 	public static Model[] model;
 	private static Model minAIC, minAICc, minBIC, minDT, minHLRT, minDLRT;
@@ -249,7 +256,7 @@ public class ModelTest {
 				AICwasCalculated = true;
 				myAIC.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
-					new RunConsense(myAIC, options.consensusType,
+					consensusAIC = new RunConsense(myAIC, options.consensusType,
 							options.confidenceInterval);
 				}
 			}
@@ -264,7 +271,7 @@ public class ModelTest {
 				AICcwasCalculated = true;
 				myAICc.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
-					new RunConsense(myAICc, options.consensusType,
+					consensusAICc = new RunConsense(myAICc, options.consensusType,
 							options.confidenceInterval);
 				}
 			}
@@ -278,7 +285,7 @@ public class ModelTest {
 				BICwasCalculated = true;
 				myBIC.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
-					new RunConsense(myBIC, options.consensusType,
+					consensusBIC = new RunConsense(myBIC, options.consensusType,
 							options.confidenceInterval);
 				}
 			}
@@ -292,7 +299,7 @@ public class ModelTest {
 				DTwasCalculated = true;
 				myDT.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
-					new RunConsense(myDT, options.consensusType,
+					consensusDT = new RunConsense(myDT, options.consensusType,
 							options.confidenceInterval);
 				}
 			}
@@ -310,6 +317,9 @@ public class ModelTest {
 				myHLRT.computeDynamical(!options.backwardHLRTSelection,
 						options.confidenceLevelHLRT, options.writePAUPblock);
 			}
+			
+			HtmlReporter.buildReport(options, ModelTest.model);
+			
 			MAIN_CONSOLE.println(" ");
 			MAIN_CONSOLE.println("Program is done.");
 			MAIN_CONSOLE.println(" ");
@@ -1025,6 +1035,21 @@ public class ModelTest {
 		return DTwasCalculated;
 	}
 
+	public static RunConsense getConsensusAIC() {
+		return consensusAIC;
+	}
+	
+	public static RunConsense getConsensusAICc() {
+		return consensusAICc;
+	}
+	
+	public static RunConsense getConsensusBIC() {
+		return consensusBIC;
+	}
+	
+	public static RunConsense getConsensusDT() {
+		return consensusDT;
+	}
 	/**
 	 * Finalizes the MPJ runtime environment. When an error occurs, it aborts
 	 * the execution of every other processes.

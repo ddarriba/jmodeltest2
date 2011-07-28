@@ -61,7 +61,7 @@ public class ModelTestService {
         String outO = "Linux";
         String os = System.getProperty("os.name");
         if (os.startsWith("Mac")) {
-            outO = "MacOS";
+            outO = "Linux";
         } else if (os.startsWith("Linux")) {
             outO = "Linux";
         } else if (os.startsWith("Win")) {

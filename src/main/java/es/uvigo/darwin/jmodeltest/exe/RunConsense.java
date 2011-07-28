@@ -221,6 +221,22 @@ public class RunConsense {
 		}
 	}
 
+	public double getConfidenceInterval() {
+		return confidenceInterval;
+	}
+	
+	public String getConsensusType() {
+		return consensusType;
+	}
+	
+	public List<Model> getConfidenceModels() {
+		return confidenceModels;
+	}
+	
+	public Tree getConsensus() {
+		return consensus.getConsensusTree();
+	}
+	
 	private void printConsensus() {
 		
 		double consensusThreshold = consensusType.equals("50% majority rule")?0.5:1.0;

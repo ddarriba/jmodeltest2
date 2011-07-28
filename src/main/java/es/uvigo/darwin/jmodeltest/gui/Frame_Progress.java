@@ -247,7 +247,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer {
 						ModelTest.getMainConsole().println(" ");
 					}
 				}
-
+				
 				String baseTree = "";
 
 				// update gui status
