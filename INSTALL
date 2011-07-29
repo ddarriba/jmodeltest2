@@ -1,0 +1,16 @@
+Basic Installation
+==================
+
+1. Requirements:
+
+* Apache ant 
+	http://ant.apache.org/manual/install.html
+* Java JDK 1.6 
+	http://www.java.com/en/download
+
+2. In a command-line window type:
+
+$ cd $JMODELTEST_HOME
+$ ant jar
+
+3. The distribution will be built in $JMODELTEST_HOME/dist/

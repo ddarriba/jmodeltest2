@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Vector;
 
 import mpi.MPI;
@@ -709,7 +708,7 @@ public class ModelTest {
 				+ "\n -h: confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)"
 				+ "\n -a: estimate model-averaged phylogeny for each active criterion (e.g., -a) (default is false)"
 				+ "\n -z: strict consensus type for model-averaged phylogeny (e.g., -z) (default is majority rule)"
-				+ "\n -tr: number of threads to execute (default is 1)"
+				+ "\n -tr: number of threads to execute (default is the "+ Runtime.getRuntime().availableProcessors() +")"
 				+ "\n\n Command line: java -jar jModeltest.jar [arguments]";
 		System.err.println(usage);
 		System.err.println(" ");
@@ -728,10 +727,10 @@ public class ModelTest {
 		stream.print("----------------------------- ");
 		stream.print("jModeltest " + CURRENT_VERSION);
 		stream.println(" -----------------------------");
-		stream.print("(c) 2008-onwards David Posada, ");
+		stream.println("(c) 2011-onwards Diego Darriba, David Posada,");
 		stream.println("Department of Biochemistry, Genetics and Immunology");
-		stream.println("University of Vigo, 36310 Vigo, Spain. e-mail: dposada@uvigo.es");
-		stream.println("--------------------------------------------------------------------------");
+		stream.println("University of Vigo, 36310 Vigo, Spain. e-mail: ddarriba@udc.es, dposada@uvigo.es");
+		stream.println("--------------------------------------------------------------------------------");
 
 		java.util.Date current_time = new java.util.Date();
 		stream.print(current_time.toString());
@@ -749,6 +748,11 @@ public class ModelTest {
 
 	static public void printNotice(TextOutputStream stream) {
 		// stream.println("\n******************************* NOTICE ************************************");
+		stream.println("jModelTest " + CURRENT_VERSION + "  Copyright (C) 2011 Diego Darriba, David Posada");
+		stream.println("This program comes with ABSOLUTELY NO WARRANTY");
+		stream.println("This is free software, and you are welcome to redistribute it");
+		stream.println("under certain conditions");
+		stream.println(" ");
 		stream.println("Notice: This program may contain errors. Please inspect results carefully.");
 		stream.println(" ");
 		// stream.println("***************************************************************************\n");
@@ -767,17 +771,6 @@ public class ModelTest {
 		stream.println(" ");
 		// stream.println("***************************************************************************\n");
 
-	}
-
-	public static void CheckExpiration(TextOutputStream stream) {
-		java.util.Calendar now = java.util.Calendar.getInstance();
-
-		if ((now.get(Calendar.MONTH) != Calendar.JUNE && now
-				.get(Calendar.MONTH) != Calendar.DECEMBER)
-				|| now.get(Calendar.YEAR) != 2007) {
-			stream.println("Program has expired! \n    Bye...");
-			System.exit(0);
-		}
 	}
 
 	/****************************
