@@ -1,3 +1,20 @@
+/*
+Copyright (C) 2011  Diego Darriba, David Posada
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 package es.uvigo.darwin.jmodeltest.io;
 
 import java.io.File;
@@ -26,9 +43,9 @@ import freemarker.template.Template;
 
 public abstract class HtmlReporter {
 
-	private static String[] TEMPLATE_DIRS = {"images"};
-	private static String[] TEMPLATE_FILES = {"style.css", "images" + File.separator + "homeicon.gif", 
-		"images" + File.separator + "topicon.gif", "images" + File.separator + "logo0.png"};
+	private static String[] TEMPLATE_DIRS = {"resources"};
+	private static String[] TEMPLATE_FILES = {"resources" + File.separator + "style.css", "resources" + File.separator + "homeicon.gif", 
+		"resources" + File.separator + "topicon.gif", "resources" + File.separator + "logo0.png"};
 	private static TreeFacade treeFacade = new TreeFacadeImpl();
 	private static Map<String,Object> datamodel;
 	
@@ -138,7 +155,6 @@ public abstract class HtmlReporter {
 			}
 		}
 		
-//		File outputFile = File.createTempFile(logDir.getPath() + File.separator + "jmodeltest-log-", "html");
 		File outputFile = new File(logDir.getPath() + File.separator + "jmodeltest-log-" + Calendar.getInstance().getTimeInMillis() + ".html");
 		Configuration cfg = new Configuration();
 		

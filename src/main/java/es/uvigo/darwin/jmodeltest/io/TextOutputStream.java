@@ -21,30 +21,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-
-/* 
-public class DocumentOutputStream extends OutputStream {
-     private Document doc;
-
-     public DocumentOutputStream(Document doc) {
-         this.doc = doc;
-     }
-
-     public void write(int b) throws IOException {
-         write(new Byte[]{b}, 0, 1);
-     }
-
-     public void write(byte b[], int off, int len) throws IOException {
-         try {
-             doc.insertString(doc.getLength(), new String(b, off, len), null);
-         } 
-         catch (BadLocationException ble) {
-             throw new IOException(ble.getMessage());
-         }
-     }
- }
-*/
-
 public class TextOutputStream extends OutputStream
 {  
 

@@ -1,36 +1,20 @@
-/** 
- * ModelTest.java
- *
- * Description:		Main class for selecting models of nucleotide substitition
- * @author			David Posada, University of Vigo, Spain  
- *					dposada@uvigo.es | darwin.uvigo.es
- * @version			0.0 (May 2006)
+/*
+Copyright (C) 2011  Diego Darriba, David Posada
 
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
 
- 0.1.1 previous version (0.1) was reading Rf as Re
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
- 0.1.2 (July 08) should not not print fT or Rf in the PAUP* block
-
- 0.1.3 (August 08) made GUI componentes resizable
-
- 0.1.4 (March 09) fixed some attempt to access frames when running on the command line. The models CI was not
- well constructed when building a model averaged tree.
-
- 0.1.5 (May 09): present all consensus trees from phylip in a consistent fashion (we remove now previous consense file for any 
-	execution of model averaging) and make explicit that they are unrooted. 
-	- report ML tree for best fit model if suited. 
-	- updated command lines for the latest phmyl version (PhyML v3.0 (179M)).
-
- 0.1.6 (Feb 10): uses PhyML v3.0  (PhyML v3.0_176:178M ) (http://www.atgc-montpellier.fr/phyml/download.php)
-	- fixed some attempt to access frames when running on the command line
-	 
-0.1.7 (Feb 10): uses PhyML v3.0 downloaded from http://code.google.com/p/phyml/
-	- checks for 32/64 bits
-
-TODO: check paths for user trees....
-
- */
-
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 package es.uvigo.darwin.jmodeltest;
 
 import java.io.File;
@@ -60,9 +44,18 @@ import es.uvigo.darwin.jmodeltest.selection.DT;
 import es.uvigo.darwin.jmodeltest.selection.HLRT;
 import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Simulation;
-import es.uvigo.darwin.prottest.consensus.Consensus;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
+/** 
+ * ModelTest.java
+ *
+ * Description:		Main class for selecting models of nucleotide substitition
+ * @author			Diego Darriba, University of Vigo / University of A Coru–a, Spain
+ * 					ddarriba@udc.es
+ * @author			David Posada, University of Vigo, Spain  
+ *					dposada@uvigo.es | darwin.uvigo.es
+ * @version			2.0 (Jul 2011)
+ */
 public class ModelTest {
 
 	private ApplicationOptions options = ApplicationOptions.getInstance();

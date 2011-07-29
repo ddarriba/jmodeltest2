@@ -1,3 +1,20 @@
+/*
+Copyright (C) 2011  Diego Darriba, David Posada
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 package es.uvigo.darwin.jmodeltest;
 
 import java.io.File;
@@ -13,10 +30,18 @@ import es.uvigo.darwin.jmodeltest.model.ModelConstants;
 import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
+/**
+ * This class gathers the parameters of a single execution of jModelTest 2.
+ * It is a singleton class.
+ * 
+ * @author Diego Darriba
+ *
+ */
 public class ApplicationOptions implements Serializable {
 
 	private static final long serialVersionUID = -3961572952922591321L;
 
+	/** Tree topology search algorithms */
 	public static enum TreeSearch {NNI, SPR, BEST};
 	
 	private static ApplicationOptions instance;
