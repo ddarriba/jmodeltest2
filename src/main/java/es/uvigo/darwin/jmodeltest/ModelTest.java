@@ -49,7 +49,7 @@ import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
  * ModelTest.java
  *
  * Description:		Main class for selecting models of nucleotide substitition
- * @author			Diego Darriba, University of Vigo / University of A Coru–a, Spain
+ * @author			Diego Darriba, University of Vigo / University of A Coruï¿½a, Spain
  * 					ddarriba@udc.es
  * @author			David Posada, University of Vigo, Spain  
  *					dposada@uvigo.es | darwin.uvigo.es
@@ -419,6 +419,24 @@ public class ModelTest {
 					}
 				}
 
+				else if (arg.equals("-n")) {
+					if (i < arguments.length) {
+						try {
+							String sampleSize = arguments[i++];
+							options.sampleSize = Integer.parseInt(sampleSize);
+						} catch (NumberFormatException e) {
+							System.err
+									.println(error
+											+ "-n option requires a sample size.");
+							PrintUsage();
+						}
+					} else {
+						System.err
+								.println(error
+										+ "-n option requires a sample size.");
+						PrintUsage();
+					}
+				}
 				else if (arg.equals("-t")) {
 					if (i < arguments.length) {
 						String type = arguments[i++];
@@ -615,13 +633,13 @@ public class ModelTest {
 						} catch (NumberFormatException e) {
 							System.err
 									.println(error
-											+ "-hoption requires a number (0-1) for the hLRT confidence interval.");
+											+ "-h option requires a number (0-1) for the hLRT confidence interval.");
 							PrintUsage();
 						}
 					} else {
 						System.err
 								.println(error
-										+ "-hoption requires a number (0-1) for the hLRT confidence interval.");
+										+ "-h option requires a number (0-1) for the hLRT confidence interval.");
 						PrintUsage();
 					}
 				}
@@ -698,11 +716,11 @@ public class ModelTest {
 				+ "\n -DT: calculate the decision theory criterion (e.g., -DT) (default is false)"
 				+ "\n -p: calculate parameter importances (e.g., -p) (default is false)"
 				+ "\n -v: do model averaging and parameter importances (e.g., -v) (default is false)"
-				+ "\n -c: confidence interval (e.g., -c90) (default is 100)"
+				+ "\n -c: confidence interval (e.g., -c 90) (default is 100)"
 				+ "\n -w: write PAUP block (e.g., -w) (default is false)"
 				+ "\n -dLRT: do dynamical likelihood ratio tests (e.g., -dLRT)(default is false)"
 				+ "\n -hLRT: do hierarchical likelihood ratio tests (default is false)"
-				+ "\n -o: hypothesis order for the hLRTs (e.g., -hLRT gpftv) (default is ftvgp/ftvwgp/ftvwxgp)"
+				+ "\n -o: hypothesis order for the hLRTs (e.g., -hLRT -o gpftv) (default is ftvgp/ftvwgp/ftvwxgp)"
 				+ "\n        f=freq, t=titvi, v=2ti4tv(subst=3)/2ti(subst>3), w=2tv, x=4tv, g=gamma, p=pinv"
 				+ "\n -r: backward selection for the hLRT (e.g., -r) (default is forward)"
 				+ "\n -h: confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)"

@@ -49,7 +49,7 @@
   	  			<include name="**/*"/>
             </fileset>
   	</copy>
-  	<chmod perm="755" dir="${exe}" includes="*"/>
+  	<!--<chmod perm="755" dir="${exe}" includes="*"/>-->
     </target>
 
     <target name="run" depends="jar" description="Run jar file">
