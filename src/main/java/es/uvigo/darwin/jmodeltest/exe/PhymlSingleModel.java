@@ -135,7 +135,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		if (currentModel.ispF())
 			commandLine += " -f m"; // changed from -f e DP200509
 		else
-			commandLine += " -f 0.25 0.25 0.25 0.25";
+			commandLine += " -f 0.25,0.25,0.25,0.25";
 
 		// optimize pinvar if needed
 		if (currentModel.ispI())
@@ -168,6 +168,9 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		if (numberOfThreads > 0) {
 			commandLine += " --num_threads " + numberOfThreads;
 		}
+		
+		// avoid memory warning
+		commandLine += " --no_memory_check";
 
 		// do optimize topology?
 		/*
@@ -212,9 +215,17 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		try {
 			File dir = new File(PHYML_PATH);
 
-			// to deal with spaces in path we need to fragment commandline (at
-			// least it works in MacOS X)
-			String[] executable = { PHYML_PATH + Utilities.getBinaryVersion() };
+			String[] executable = new String[1];
+			
+			File phymlBinary = new File (PHYML_PATH + "phyml");
+			if (phymlBinary.exists() && phymlBinary.canExecute())
+			{
+				executable[0] = phymlBinary.getAbsolutePath();
+			}
+			else
+			{
+				executable[0] = PHYML_PATH + Utilities.getBinaryVersion();
+			}
 			String[] tokenizedCommandLine = commandLine.split(" ");
 			String[] cmd = Utilities.specialConcatStringArrays(executable,
 					tokenizedCommandLine);
@@ -408,6 +419,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		} catch (NullPointerException e) {
 			System.err.println("Error while parsing result data from "
 					+ currentModel.getName());
+			e.printStackTrace();
 		}
 		phymlStatFile.close();
 

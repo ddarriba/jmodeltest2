@@ -31,7 +31,7 @@ import es.uvigo.darwin.jmodeltest.utilities.Utilities;
  * RunPhyml.java
  *
  * Description:		Makes phyml calculate likelihood scores for competing models
- * @author			Diego Darriba, University of Vigo / University of A Coru–a, Spain
+ * @author			Diego Darriba, University of Vigo / University of A Coruna, Spain
  * 					ddarriba@udc.es
  * @author			David Posada, University of Vigo, Spain  
  *					dposada@uvigo.es | darwin.uvigo.es
