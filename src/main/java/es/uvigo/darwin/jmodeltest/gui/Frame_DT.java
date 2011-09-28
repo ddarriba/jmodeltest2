@@ -301,6 +301,7 @@ public class Frame_DT extends JModelTestFrame {
 			myDT.compute();
 			myDT.print(ModelTest.getCurrentOutStream());
 			ModelTest.setMyDT(myDT);
+			options.doDT = myDT != null;
 			XManager.getInstance().resultsFrame.enablePane(FrameResults.TAB_DT);
 			XManager.getInstance().resultsFrame.populate(FrameResults.TAB_DT);
 			XManager.getInstance().enableMenuAveraging(!options.fixedTopology);

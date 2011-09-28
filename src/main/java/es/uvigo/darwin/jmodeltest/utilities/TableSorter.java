@@ -107,8 +107,8 @@ public class TableSorter extends TableMap {
                 return 0;
             }
         } else if (type == String.class) {
-            String s1 = (String)data.getValueAt(row1, column);
-            String s2    = (String)data.getValueAt(row2, column);
+            String s1 = (String)data.getValueAt(row1, column).toString();
+            String s2    = (String)data.getValueAt(row2, column).toString();
             int result = s1.compareTo(s2);
 
             if (result < 0) {
@@ -309,6 +309,6 @@ public class TableSorter extends TableMap {
             }
         };
         JTableHeader th = tableView.getTableHeader(); 
-        th.addMouseListener(listMouseListener); 
-    }
+		th.addMouseListener(listMouseListener);
+	}
 }

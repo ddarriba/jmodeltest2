@@ -24,12 +24,13 @@ public class ProgressInfo {
 	public static final int NA = 0;
 	public static final int BASE_TREE_INIT = 1;
 	public static final int BASE_TREE_COMPUTED = 2;
-	public static final int SINGLE_OPTIMIZATION_INIT = 3;
-	public static final int SINGLE_OPTIMIZATION_COMPLETED = 4;
-	public static final int OPTIMIZATION_COMPLETED_OK = 5;
-	public static final int OPTIMIZATION_COMPLETED_INTERRUPTED = 6;
-	public static final int INTERRUPTED = 7;
-	public static final int ERROR = 8;
+	public static final int OPTIMIZATION_INIT = 3;
+	public static final int SINGLE_OPTIMIZATION_INIT = 4;
+	public static final int SINGLE_OPTIMIZATION_COMPLETED = 5;
+	public static final int OPTIMIZATION_COMPLETED_OK = 6;
+	public static final int OPTIMIZATION_COMPLETED_INTERRUPTED = 7;
+	public static final int INTERRUPTED = 8;
+	public static final int ERROR = 9;
 	
 	private int type;
 	private Model model;

@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest.gui;
 
 import java.awt.BorderLayout;
@@ -52,6 +52,7 @@ import pal.alignment.Alignment;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.ModelTestService;
 import es.uvigo.darwin.jmodeltest.XManager;
+import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
 import es.uvigo.darwin.jmodeltest.utilities.BrowserLauncher;
 import es.uvigo.darwin.jmodeltest.utilities.InitialFocusSetter;
 import es.uvigo.darwin.jmodeltest.utilities.PrintUtilities;
@@ -63,6 +64,8 @@ import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 public class FrameMain extends JModelTestFrame {
 
 	private static final long serialVersionUID = 201103171450L;
+	public static final File LOG_DIR = new File(System.getProperty("user.dir")
+			+ File.separator + "log");
 
 	public static JPanel Panel = new JPanel();
 	private JScrollPane scrollPane = new JScrollPane();
@@ -81,6 +84,7 @@ public class FrameMain extends JModelTestFrame {
 	private JMenuItem menuEditPaste = new JMenuItem();
 	private JMenuItem menuEditSelectAll = new JMenuItem();
 	private JMenuItem menuEditClear = new JMenuItem();
+	private JMenuItem menuResultsHtmlOutput = new JMenuItem();
 	private JSeparator menuEditSeparator1 = new JSeparator();
 	private JMenuItem menuEditSaveConsole = new JMenuItem();
 	private JMenuItem menuEditPrintConsole = new JMenuItem();
@@ -128,13 +132,13 @@ public class FrameMain extends JModelTestFrame {
 	public void initComponents() throws Exception {
 
 		menuBar.setVisible(true);
-		menuBar.setBackground(new java.awt.Color(199, 199, 220));
+		menuBar.setBackground(XManager.MENU_COLOR);
 		menuBar.setFont(XManager.FONT_MENU);
 
 		// menu File
 		menuFile.setVisible(true);
 		menuFile.setText("File");
-		menuFile.setBackground(new java.awt.Color(199, 199, 220));
+		menuFile.setBackground(XManager.MENU_COLOR);
 		menuFileOpenDataFile
 				.setToolTipText("Load a DNA alignment in sequential or interleaved Phylip format");
 		menuFileOpenDataFile
@@ -160,7 +164,7 @@ public class FrameMain extends JModelTestFrame {
 		// menu Edit
 		menuEdit.setVisible(true);
 		menuEdit.setText("Edit");
-		menuEdit.setBackground(new java.awt.Color(199, 199, 220));
+		menuEdit.setBackground(XManager.MENU_COLOR);
 		menuEditCut.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(6, 3, 3, 3)));
 		menuEditCut.setVisible(true);
@@ -213,7 +217,7 @@ public class FrameMain extends JModelTestFrame {
 		// menu Analysis
 		menuAnalysis.setVisible(true);
 		menuAnalysis.setText("Analysis");
-		menuAnalysis.setBackground(new java.awt.Color(199, 199, 220));
+		menuAnalysis.setBackground(XManager.MENU_COLOR);
 
 		menuAnalysisCalculateLikelihoods
 				.setToolTipText("Compute model likelihoods and parameter estimates using Phyml");
@@ -272,7 +276,7 @@ public class FrameMain extends JModelTestFrame {
 		// menu Results
 		menuResults.setVisible(true);
 		menuResults.setText("Results");
-		menuResults.setBackground(new java.awt.Color(199, 199, 220));
+		menuResults.setBackground(XManager.MENU_COLOR);
 		menuResultsBLasParameters
 				.setToolTipText("Consider branch lengths as parameters");
 		menuResultsBLasParameters
@@ -292,11 +296,19 @@ public class FrameMain extends JModelTestFrame {
 		menuResultsShowModelTable.setEnabled(false);
 		menuResultsShowModelTable.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_M, ActionEvent.META_MASK));
+		menuResultsHtmlOutput
+				.setBorder(new BorderUIResource.EmptyBorderUIResource(
+						new java.awt.Insets(6, 3, 6, 3)));
+		menuResultsHtmlOutput.setVisible(true);
+		menuResultsHtmlOutput.setText("Build HTML log");
+		menuResultsHtmlOutput.setEnabled(false);
+		menuResultsHtmlOutput.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,
+				ActionEvent.META_MASK));
 
 		// menu Tools
 		menuTools.setVisible(true);
 		menuTools.setText("Tools");
-		menuTools.setBackground(new java.awt.Color(199, 199, 220));
+		menuTools.setBackground(XManager.MENU_COLOR);
 		menuToolsLRT.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(5, 5, 5, 5)));
 		menuToolsLRT.setVisible(true);
@@ -310,7 +322,7 @@ public class FrameMain extends JModelTestFrame {
 				new java.awt.Insets(5, 5, 5, 5)));
 		menuHelp.setVisible(true);
 		menuHelp.setText("Help");
-		menuHelp.setBackground(new java.awt.Color(199, 199, 220));
+		menuHelp.setBackground(XManager.MENU_COLOR);
 		menuHelpOpen.setVisible(true);
 		menuHelpOpen.setText("Open documentation");
 		menuHelpOpen.setBorder(new BorderUIResource.EmptyBorderUIResource(
@@ -321,7 +333,7 @@ public class FrameMain extends JModelTestFrame {
 		// menu About
 		menuAbout.setVisible(true);
 		menuAbout.setText("About");
-		menuAbout.setBackground(new java.awt.Color(199, 199, 220));
+		menuAbout.setBackground(XManager.MENU_COLOR);
 		menuAboutModelTest.setVisible(true);
 		menuAboutModelTest.setText("About jModelTest");
 		menuAboutWWW.setVisible(true);
@@ -424,6 +436,7 @@ public class FrameMain extends JModelTestFrame {
 
 		// menuResults.add(menuResultsBLasParameters);
 		menuResults.add(menuResultsShowModelTable);
+		menuResults.add(menuResultsHtmlOutput);
 
 		menuHelp.add(menuHelpOpen);
 
@@ -505,6 +518,13 @@ public class FrameMain extends JModelTestFrame {
 				.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent e) {
 						menuEditPrintConsoleActionPerformed(e);
+					}
+				});
+
+		menuResultsHtmlOutput
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent e) {
+						menuResultsHtmlOutputActionPerformed(e);
 					}
 				});
 
@@ -663,6 +683,8 @@ public class FrameMain extends JModelTestFrame {
 					LabelStatusData.setForeground(new java.awt.Color(102, 102,
 							153));
 					menuAnalysisCalculateLikelihoods.setEnabled(true);
+					enableMenuShowModelTable(false);
+					enableMenuHtmlOutput(false);
 					ModelTest.getMainConsole().println(" OK.");
 					ModelTest.getMainConsole().println(
 							"  number of sequences: " + options.numTaxa);
@@ -770,6 +792,48 @@ public class FrameMain extends JModelTestFrame {
 		try {
 			PrintUtilities.printComponent(mainEditorPane);
 			// mainEditorPane.print(mainEditorPane.getGraphics());
+		} catch (Exception f) {
+			f.printStackTrace();
+		}
+	}
+
+	private void menuResultsHtmlOutputActionPerformed(java.awt.event.ActionEvent e) {
+
+		FileDialog dialog;
+		try {
+			try {
+				dialog = new FileDialog(this, "Open file to save HTML log",
+						FileDialog.SAVE);
+				dialog.setFile("log.html");
+				dialog.setDirectory("log");
+				dialog.setVisible(true);
+			} catch (Throwable f) {
+				JOptionPane.showMessageDialog(this,
+						"It appears your VM does not allow file saving",
+						"jModelTest error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			if (!dialog.getDirectory().equals(LOG_DIR.getAbsolutePath())) {
+				try {
+					String warning = "If you want to save the log files out from the log directory\n "
+							+ "make sure to copy the \"log"
+							+ File.separator
+							+ "resources\" folder\n with the log file\n";
+
+					JOptionPane.showMessageDialog(new JFrame(), warning,
+							"jModelTest WARNING", JOptionPane.WARNING_MESSAGE);
+				} catch (Exception f) {
+					f.printStackTrace();
+				}
+			}
+
+			if (dialog.getFile() != null) /* a file was selected */
+			{
+				HtmlReporter.buildReport(options, ModelTest.model,
+						new File(dialog.getDirectory() + File.separator
+								+ dialog.getFile()));
+			}
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
@@ -887,13 +951,13 @@ public class FrameMain extends JModelTestFrame {
 	private void menuAboutCreditsActionPerformed(java.awt.event.ActionEvent e) {
 		try {
 			String credits = "-- Likelihood calculations with Phyml by Stephane Guindon\n";
-			credits += "-- FileIO with ReadSeq by Don Gilbert\n";
-			credits += "-- Consensus tree with the consense program from the \nPhylip package by Joe Felsenstein\n";
+			credits += "-- Alignment conversion with ALTER by Daniel Glez-Pe–a\n";
+			credits += "-- Phylogenetic trees management with Phyutility by Stephen A. Smith\n";
 			credits += "-- Table utilities by Philip Milne\n";
 			credits += "-- BrowserLauncher by Eric Albert\n";
 
 			JOptionPane.showMessageDialog(new JFrame(), credits,
-					"jModelTest message", JOptionPane.INFORMATION_MESSAGE);
+					"jModelTest - CREDITS", JOptionPane.INFORMATION_MESSAGE);
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
@@ -902,9 +966,9 @@ public class FrameMain extends JModelTestFrame {
 	private void menuAboutModelTestActionPerformed(java.awt.event.ActionEvent e) {
 		try {
 			String about = "jModelTest " + ModelTest.CURRENT_VERSION + "\n";
-			about += "Copyright David Posada 2005 onwards ";
+			about += "Copyright Diego Darriba and David Posada 2011 onwards ";
 			JOptionPane.showMessageDialog(new JFrame(), about,
-					"jModelTest message", JOptionPane.INFORMATION_MESSAGE);
+					"jModelTest - ABOUT", JOptionPane.INFORMATION_MESSAGE);
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
@@ -948,6 +1012,10 @@ public class FrameMain extends JModelTestFrame {
 
 	public void enableMenuShowModelTable(boolean enabled) {
 		menuShowModelTable.setEnabled(enabled);
+	}
+	
+	public void enableMenuHtmlOutput(boolean enabled) {
+		menuResultsHtmlOutput.setEnabled(enabled);
 	}
 
 	public void selectedMenuResultsBLasParameters(boolean selected) {

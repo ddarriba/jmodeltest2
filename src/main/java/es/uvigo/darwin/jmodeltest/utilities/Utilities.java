@@ -86,7 +86,8 @@ public final class Utilities {
 		String bit = System.getProperty("sun.arch.data.model");
 
 		if (os.startsWith("Mac") && arch.startsWith("ppc")) {
-			return "PhyML_3.0_macOS_ppc";
+			System.err.println("Sorry, PowerPC architecture is no longer supported");
+			System.exit(0);
 		} else if (os.startsWith("Mac")) {
 			return "PhyML_3.0_macOS_i386";
 		} else if (os.startsWith("Linux")) {
@@ -96,9 +97,8 @@ public final class Utilities {
 				return "PhyML_3.0_linux32";
 		} else if (os.startsWith("Windows")) {
 			return "PhyML_3.0_win32.exe";
-		} else {
-			return null;
 		}
+		return null;
 	}
 
 	public static String calculateRuntimeMinutes(long startTime, long endTime) {

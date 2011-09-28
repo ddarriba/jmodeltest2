@@ -261,13 +261,11 @@ public class RunConsense {
 			Utilities
 					.printRed("\nWarning: The DT weights used for this model averaged phylogeny are very gross"
 							+ " and should be used with caution. See the program documentation.\n");
-		
-		stream.println("----------------------------------------");
+        stream.println(" ");		
         stream.println("Selection criterion: . . . . " + criterion);
         stream.print("Confidence interval: . . . . "); 
         stream.printf("%4.2f\n", confidenceInterval);
         stream.println("Consensus type:. . . . . . . " + consensusType);
-        stream.println("----------------------------------------");
         stream.println(" ");
 
      // print confidence set
@@ -295,7 +293,6 @@ public class RunConsense {
             }
         }
 
-        stream.println("# # # # # # # # # # # # # # # #");
         stream.println(" ");
         stream.println("Species in order:");
         stream.println(" ");
@@ -305,35 +302,23 @@ public class RunConsense {
             Identifier id = consensus.getIdGroup().getIdentifier(i);
             stream.println("    " + (i + 1) + ". " + id.getName());
         }
+ 
         stream.println(" ");
-        stream.println("# # # # # # # # # # # # # # # #");
-        stream.println(" ");
-        stream.println("Sets included in the consensus tree");
+        stream.println("Bipartitions included in the consensus tree");
         stream.println(" ");
 
         stream.println(consensus.getSetsIncluded());
-
         stream.println(" ");
-        stream.println("Sets NOT included in consensus tree");
-        stream.println(" ");
-
-        stream.println(consensus.getSetsNotIncluded());
-
-        stream.println(" ");
-        stream.println("# # # # # # # # # # # # # # # #");
-        stream.println(" ");
+        
         Tree consensusTree = consensus.getConsensusTree();
+        stream.println(treeFacade.toASCII(consensusTree));
+        stream.println(" ");
         String newickTree = treeFacade.toNewick(consensusTree, true, true, true);
         stream.println(newickTree);
         stream.println(" ");
-        stream.println("# # # # # # # # # # # # # # # #");
-        stream.println(" ");
-        stream.println(treeFacade.toASCII(consensusTree));
-        stream.println(" ");
-        stream.println(treeFacade.branchInfo(consensusTree));
-        stream.println(" ");
-        stream.println(treeFacade.heightInfo(consensusTree));
-        
+        stream.println("Note: this tree is unrooted. Branch lengths are the expected number of "
+        		+ "substitutions per site. Labels next to parentheses represent phylogenetic "
+        		+ "uncertainty due to model selection (see documentation)");
 	}
 
 } // class RunConsense

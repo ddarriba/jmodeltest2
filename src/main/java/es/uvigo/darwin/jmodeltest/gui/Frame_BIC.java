@@ -313,6 +313,7 @@ public class Frame_BIC extends JModelTestFrame {
 			myBIC.compute();
 			myBIC.print(ModelTest.getCurrentOutStream());
 			ModelTest.setMyBIC(myBIC);
+			options.doBIC = myBIC != null;
 			XManager.getInstance().resultsFrame.enablePane(FrameResults.TAB_BIC);
 			XManager.getInstance().resultsFrame.populate(FrameResults.TAB_BIC);
 			XManager.getInstance().enableMenuAveraging(!options.fixedTopology);

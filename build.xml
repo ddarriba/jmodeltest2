@@ -4,10 +4,10 @@
     <property name="src.resources.dir" location="src/main/resources"/>
     <property name="bin" location="build/classes"/>
     <property name="lib" location="lib"/>
-    <property name="template" location="htmltemplate"/>
-<!--    <property name="dist" location="dist"/> -->
+    <property name="html.template.dir" location="${src.resources.dir}/resources"/>
     <property name="dist" location="dist"/>
     <property name="exe" location="${dist}/exe/phyml"/>
+	<property name="log" location="${dist}/log"/>
     <property name="jarfile" location="${dist}/${ant.project.name}.jar"/>
     <property name="compile.debug" value="true"/>
 
@@ -38,18 +38,19 @@
             <!-- Merge library jars into final jar file
             <zipgroupfileset refid="lib.jars"/>-->
       	</jar>
-	<mkdir dir="${dist}/lib"/>
-	<copy todir="${dist}/lib">
+		<mkdir dir="${dist}/lib"/>
+		<copy todir="${dist}/lib">
             <fileset id="lib.jars" dir="${lib}">
         	<include name="**/*.jar"/>
 	    </fileset>
-  	</copy>
-	<copy todir="${dist}">
+  		</copy>
+		<copy todir="${dist}">
             <fileset dir="${src.resources.dir}">
   	  			<include name="**/*"/>
             </fileset>
-  	</copy>
-  	<!--<chmod perm="755" dir="${exe}" includes="*"/>-->
+  		</copy>
+    	<mkdir dir="${log}"/>
+  		<chmod perm="755" dir="${dist}" includes="*.sh *.bat"/>
     </target>
 
     <target name="run" depends="jar" description="Run jar file">

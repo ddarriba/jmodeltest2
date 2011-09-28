@@ -345,6 +345,7 @@ public class Frame_AIC extends JModelTestFrame {
 				myAICc.compute();
 				myAICc.print(ModelTest.getCurrentOutStream());
 				ModelTest.setMyAICc(myAICc);
+				options.doAICc = myAICc != null;
 				XManager.getInstance().resultsFrame.enablePane(FrameResults.TAB_AICc);
 				XManager.getInstance().resultsFrame.populate(FrameResults.TAB_AICc);
 			} else {
@@ -353,6 +354,7 @@ public class Frame_AIC extends JModelTestFrame {
 				myAIC.compute();
 				myAIC.print(ModelTest.getCurrentOutStream());
 				ModelTest.setMyAIC(myAIC);
+				options.doAIC = myAIC != null;
 				XManager.getInstance().resultsFrame.enablePane(FrameResults.TAB_AIC);
 				XManager.getInstance().resultsFrame.populate(FrameResults.TAB_AIC);
 			}

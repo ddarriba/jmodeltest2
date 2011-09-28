@@ -44,6 +44,7 @@ public class XManager {
 		FONT_TABULAR;
 	public static final Color LABEL_BLUE_COLOR = new java.awt.Color(102,102,153);
 	public static final Color LABEL_FAIL_COLOR = Color.red;
+	public static final Color MENU_COLOR = new Color(199, 199, 220);
 	
 	public static SimpleAttributeSet redText;
 	public static SimpleAttributeSet blackText;
@@ -56,13 +57,13 @@ public class XManager {
 	static {
 
 		if (Utilities.isWindows() == false) {
-			FONT_CONSOLE = new Font(Font.MONOSPACED, 0, 10);
+			FONT_CONSOLE = new Font(Font.MONOSPACED, 0, 12);
 		} else {
-			FONT_CONSOLE = new Font("Lucida Console", 0, 11);
+			FONT_CONSOLE = new Font("Lucida Console", 0, 12);
 		}
-		FONT_LABEL = new Font("Application", 1, 9);
-		FONT_LABEL_BIG = new Font("Application", 0, 10);
-		FONT_SLIDER = new Font("Application", 1, 8);
+		FONT_LABEL = new Font("Application", 1, 10);
+		FONT_LABEL_BIG = new Font("Application", 0, 12);
+		FONT_SLIDER = new Font("Application", 1, 9);
 		FONT_MENU = new Font("Dialog", 0, 9);
 		FONT_STATUS = new Font("Dialog", 0, 9);
 		FONT_TABULAR = new java.awt.Font("Verdana", 0, 12);
@@ -190,6 +191,10 @@ public class XManager {
 	
 	public void enableMenuShowModelTable(boolean enabled) {
 		frame.enableMenuShowModelTable(enabled);
+	}
+	
+	public void enableMenuHtmlOutput(boolean enabled) {
+		frame.enableMenuHtmlOutput(enabled);
 	}
 	
 	public void selectedMenuResultsBLasParameters(boolean selected) {

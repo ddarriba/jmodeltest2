@@ -100,7 +100,7 @@ public class Frame_Consense extends JModelTestFrame {
 		ButtonDT.setText("DT");
 		ButtonDT.setLocation(new java.awt.Point(230, 20));
 
-		PanelConsensus.setSize(new java.awt.Dimension(220, 50));
+		PanelConsensus.setSize(new java.awt.Dimension(240, 50));
 		PanelConsensus.setBorder(new javax.swing.plaf.BorderUIResource.TitledBorderUIResource(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 1, false), "Consensus type", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
 		PanelConsensus.setLocation(new java.awt.Point(20, 80));
 		PanelConsensus.setVisible(true);
@@ -111,7 +111,7 @@ public class Frame_Consense extends JModelTestFrame {
 		ButtonMajority.setLocation(new java.awt.Point(20, 20));
 		ButtonMajority.setSelected(true);
 		ButtonStrict.setVisible(true);
-		ButtonStrict.setSize(new java.awt.Dimension(60, 20));
+		ButtonStrict.setSize(new java.awt.Dimension(80, 20));
 		ButtonStrict.setText("Strict");
 		ButtonStrict.setLocation(new java.awt.Point(140, 20));
 
@@ -147,7 +147,7 @@ public class Frame_Consense extends JModelTestFrame {
 		JSliderInterval.setToolTipText("Set the confidence interval for model averaging and/or parameter importance");
 		JSliderInterval.setBorder(new javax.swing.plaf.BorderUIResource.TitledBorderUIResource(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 1, false), "Confidence interval = 100%", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
 		JSliderInterval.setSize(new java.awt.Dimension(170, 70));
-		JSliderInterval.setLocation(new java.awt.Point(260, 80));
+		JSliderInterval.setLocation(new java.awt.Point(280, 80));
 		JSliderInterval.setMinimum(0);
 		JSliderInterval.setMaximum(100);
 		JSliderInterval.setValue(100);

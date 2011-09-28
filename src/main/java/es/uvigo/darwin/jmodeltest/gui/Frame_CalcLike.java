@@ -273,6 +273,8 @@ public class Frame_CalcLike extends JModelTestFrame {
 		ButtonMLCalcLike.setSize(new java.awt.Dimension(130, 20));
 		ButtonMLCalcLike.setVisible(true);
 		ButtonMLCalcLike.setSelected(true);
+		
+		enableTreeSearching(ButtonMLCalcLike.isSelected());
 
 		jLabelUserTopology.setLocation(new java.awt.Point(194, 22));
 		jLabelUserTopology.setSize(new java.awt.Dimension(300, 50));
@@ -303,7 +305,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(new java.awt.Color(
 								153, 153, 153), 1, false),
-						"Tree topology search operations", 4, 2,
+						"Base tree search", 4, 2,
 						new java.awt.Font("Application", 1, 10),
 						new java.awt.Color(102, 102, 153)));
 		PanelTreeOptimizationMethod.setVisible(true);
@@ -440,6 +442,35 @@ public class Frame_CalcLike extends JModelTestFrame {
 						ReadUserTopologyCalcLike(e);
 					}
 				});
+		
+		ButtonBIONJCalcLike
+		.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				enableTreeSearching(false);
+			}
+		});
+		
+		ButtonFixedCalcLike
+		.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				enableTreeSearching(false);
+			}
+		});
+		
+		ButtonFixedUserTopologyCalcLike
+		.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				enableTreeSearching(false);
+			}
+		});
+		
+		ButtonMLCalcLike
+		.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				enableTreeSearching(true);
+			}
+		});
+		
 		/*
 		 * ButtonFixedUserTreeCalcLike.addActionListener(new
 		 * java.awt.event.ActionListener() { public void
@@ -466,7 +497,13 @@ public class Frame_CalcLike extends JModelTestFrame {
 
 		// END GENERATED CODE
 	}
-
+	
+	private void enableTreeSearching(boolean enabled) {
+		ButtonNNICalcLike.setEnabled(enabled);
+		ButtonSPRCalcLike.setEnabled(enabled);
+		ButtonBestCalcLike.setEnabled(enabled);
+	}
+	
 	private boolean mShown = false;
 
 	public void addNotify() {
@@ -709,6 +746,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		} else // file does not exists
 		{
 			ButtonMLCalcLike.setSelected(true);
+			enableTreeSearching(true);
 			// ModelTest.mainConsole.println ("\nOpen file canceled\n");
 		}
 	}

@@ -52,7 +52,7 @@ public abstract class HtmlReporter {
 	private static TreeFacade treeFacade = new TreeFacadeImpl();
 	private static Map<String, Object> datamodel;
 
-	public static void buildReport(ApplicationOptions options, Model models[]) {
+	public static void buildReport(ApplicationOptions options, Model models[], File outputFile) {
 
 		// Add the values in the datamodel
 		datamodel = new HashMap<String, Object>();
@@ -147,7 +147,7 @@ public abstract class HtmlReporter {
 
 		// Process the template using FreeMarker
 		try {
-			freemarkerDo(datamodel, "index.html");
+			freemarkerDo(datamodel, "index.html", outputFile);
 		} catch (Exception e) {
 			System.out
 					.println("There was a problem building the html log files: "
@@ -156,7 +156,7 @@ public abstract class HtmlReporter {
 	}
 
 	// Process a template using FreeMarker and print the results
-	static void freemarkerDo(Map<String, Object> datamodel, String template)
+	static void freemarkerDo(Map<String, Object> datamodel, String template, File mOutputFile)
 			throws Exception {
 		File resourcesDir = new File("resources" + File.separator + "template");
 		File logDir = new File("log");
@@ -183,9 +183,16 @@ public abstract class HtmlReporter {
 			}
 		}
 
-		File outputFile = new File(logDir.getPath() + File.separator
+		File outputFile = mOutputFile;
+		if (outputFile != null) {
+			if (!(outputFile.getName().endsWith(".htm") || outputFile.getName().endsWith(".html"))) {
+				outputFile = new File(outputFile.getAbsolutePath() + ".html");
+			}
+		} else {
+			outputFile = new File(logDir.getPath() + File.separator
 				+ "jmodeltest-log-" + Calendar.getInstance().getTimeInMillis()
 				+ ".html");
+		}
 		Configuration cfg = new Configuration();
 
 		cfg.setDirectoryForTemplateLoading(resourcesDir);

@@ -197,7 +197,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer {
 						+ "  total time = "
 						+ Utilities.calculateRuntime(startTime,
 								System.currentTimeMillis()));
-
+/*
 				stream.println("\nMaximum likelihod estimation for the "
 						+ info.getModel().getName() + " model.");
 
@@ -208,14 +208,21 @@ public class Frame_Progress extends JModelTestFrame implements Observer {
 				else if (options.optimizeMLTopology)
 					stream.println("  ML optimized tree topology");
 				else
-					stream.println("  BIONJ tree topology");
+					stream.println("  BIONJ tree topology");*/
 				break;
 
+			case ProgressInfo.OPTIMIZATION_INIT:
+				stream.println(" ");
+				stream.println("::Progress::");
+				stream.println("Model \t\t Exec. Time \t Total Time \t -lnL");
+				stream.println("-------------------------------------------------------------------------");
+				break;
+			
 			case ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED:
-				stream.print("  Computation time = " + info.getMessage());
-				stream.println("  ("
-						+ Utilities.calculateRuntime(startTime,
-								System.currentTimeMillis()) + ")");
+				stream.println(info.getModel().getName() + "\t\t" 
+						+ info.getMessage() + "\t" 
+						+ Utilities.calculateRuntime(startTime, System.currentTimeMillis()) + "\t" 
+						+ info.getModel().getLnL());
 
 				// scroll to the bottom
 				XManager.getInstance()
@@ -228,6 +235,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer {
 			case ProgressInfo.INTERRUPTED:
 				if (!interrupted) {
 					interrupted = true;
+					stream.println(" ");
 					stream.println("\nComputation of likelihood scores discontinued ...");
 					stream.println(" ");
 					XManager.getInstance()
@@ -247,6 +255,9 @@ public class Frame_Progress extends JModelTestFrame implements Observer {
 
 			case ProgressInfo.OPTIMIZATION_COMPLETED_OK:
 
+				stream.println(" ");
+				stream.println("::Results::");
+				stream.println(" ");
 				int numComputedModels = 0;
 				for (Model model : ModelTest.model) {
 					if (model.getLnL() > 0.0) {
@@ -301,6 +312,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer {
 				// build results table
 				XManager.getInstance().buildFrameResults();
 				XManager.getInstance().enableMenuShowModelTable(true);
+				XManager.getInstance().enableMenuHtmlOutput(true);
 
 				XManager.getInstance()
 						.getPane()

@@ -59,33 +59,21 @@ public class ConsoleProgressObserver implements Observer {
 						+ info.getModel().getTreeString());
 				break;
 
+			case ProgressInfo.OPTIMIZATION_INIT:
+				stream.println("\n\n::Progress::");
+				stream.println("Model \t\t Exec. Time \t Total Time \t -lnL");
+				stream.println("-------------------------------------------------------------------------");
+				break;
+				
 			case ProgressInfo.SINGLE_OPTIMIZATION_INIT:
-				stream.println(" ");
-				stream.println("Computing " + info.getModel().getName() + "...");
 				break;
 
 			case ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED:
-				stream.println(" ");
-				stream.println("Maximum likelihod estimation for the "
-						+ info.getModel().getName() + " model: "
+				stream.println(info.getModel().getName() + "\t\t" 
+						+ info.getMessage() + "\t" 
+						+ Utilities.calculateRuntime(startTime, System.currentTimeMillis()) + "\t" 
 						+ info.getModel().getLnL());
-				if (options.userTopologyExists)
-					stream.println("  User tree topology");
-
-				if (options.userTopologyExists)
-					stream.println("  User tree topology");
-				else if (options.fixedTopology)
-					stream.println("  BIONJ-JC tree topology");
-				else if (options.optimizeMLTopology)
-					stream.println("  ML optimized tree topology");
-				else
-					stream.println("  BIONJ tree topology");
-				stream.print("  Computation time = " + info.getMessage());
-				stream.println("  ("
-						+ Utilities.calculateRuntime(startTime,
-								System.currentTimeMillis()) + ")");
 				break;
-
 			case ProgressInfo.INTERRUPTED:
 				stream.println(" ");
 				stream.println("Computation of likelihood scores discontinued ...");
@@ -97,6 +85,7 @@ public class ConsoleProgressObserver implements Observer {
 
 			case ProgressInfo.OPTIMIZATION_COMPLETED_OK:
 
+				stream.println(" ");
 				for (Model model : ModelTest.model) {
 					model.print(ModelTest.getMainConsole());
 					ModelTest.getMainConsole().println(" ");

@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 package es.uvigo.darwin.jmodeltest.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.Point;
@@ -108,24 +109,24 @@ public class FrameResults extends JModelTestFrame {
 			DTtableColumn.setCellRenderer((javax.swing.table.TableCellRenderer) DTRenderer); 
 			}
 
- 		panelInfo.setSize(new java.awt.Dimension(600, 30));
+ 		panelInfo.setSize(new java.awt.Dimension(700, 30));
  		panelInfo.setLocation(new java.awt.Point(0, 400));
  		panelInfo.setVisible(true);
  		panelInfo.setLayout(null);
- 		labelInfo.setSize(new java.awt.Dimension(580, 20));
+ 		labelInfo.setSize(new java.awt.Dimension(680, 20));
  		labelInfo.setLocation(new java.awt.Point(40, 0));
  		labelInfo.setVisible(true);
  		labelInfo.setText("Decimal numbers are rounded. Click on column headers to sort data in ascending or descending order (+Shift)");
  		labelInfo.setForeground(java.awt.Color.gray);
  		labelInfo.setHorizontalTextPosition(javax.swing.JLabel.CENTER);
  		labelInfo.setFont(XManager.FONT_LABEL_BIG);
- 		labelDate.setSize(new java.awt.Dimension(80, 20));
+ 		labelDate.setSize(new java.awt.Dimension(200, 20));
  		labelDate.setLocation(new java.awt.Point(40, 10));
  		labelDate.setVisible(true);
  		labelDate.setText("Date");
  		labelDate.setForeground(java.awt.Color.gray);
  		labelDate.setFont(XManager.FONT_LABEL_BIG);
- 		tabbedPane.setSize(new java.awt.Dimension(600, 400));
+ 		tabbedPane.setSize(new java.awt.Dimension(700, 400));
  		tabbedPane.setLocation(new java.awt.Point(0, 0));
  		tabbedPane.setVisible(true);
  		tabbedPane.setAutoscrolls(true);
@@ -133,7 +134,7 @@ public class FrameResults extends JModelTestFrame {
  		panelModels.setLayout(null);
 		panelModels.setFont(XManager.FONT_CONSOLE);
 
- 		scrollPaneModels.setSize(new java.awt.Dimension(570, 320));
+ 		scrollPaneModels.setSize(new java.awt.Dimension(670, 320));
  		scrollPaneModels.setLocation(new java.awt.Point(12, 14));
  		scrollPaneModels.setVisible(true);
  		scrollPaneModels.setAutoscrolls(true);
@@ -145,12 +146,12 @@ public class FrameResults extends JModelTestFrame {
  		tableModels.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
  		tableModels.setCellSelectionEnabled(true);
  		tableModels.setVisible(true);
- 		tableModels.setPreferredScrollableViewportSize(new java.awt.Dimension(500, 300));
+ 		tableModels.setPreferredScrollableViewportSize(new java.awt.Dimension(600, 300));
  		tableModels.setGridColor(java.awt.Color.gray);
  		tableModels.setFont(XManager.FONT_TABULAR);
  		panelAIC.setVisible(true);
 		panelAIC.setLayout(null);
- 		scrollPaneAIC.setSize(new java.awt.Dimension(570, 320));
+ 		scrollPaneAIC.setSize(new java.awt.Dimension(670, 320));
  		scrollPaneAIC.setLocation(new java.awt.Point(12, 14));
  		scrollPaneAIC.setVisible(true);
  		scrollPaneAIC.setAutoscrolls(true);
@@ -162,12 +163,12 @@ public class FrameResults extends JModelTestFrame {
  		tableAIC.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
  		tableAIC.setCellSelectionEnabled(true);
  		tableAIC.setVisible(true);
- 		tableAIC.setPreferredScrollableViewportSize(new java.awt.Dimension(575, 350));
+ 		tableAIC.setPreferredScrollableViewportSize(new java.awt.Dimension(675, 350));
  		tableAIC.setGridColor(java.awt.Color.gray);
  		tableAIC.setFont(XManager.FONT_TABULAR);
  		panelAICc.setVisible(true);
  		panelAICc.setLayout(null);
- 		scrollPaneAICc.setSize(new java.awt.Dimension(570, 320));
+ 		scrollPaneAICc.setSize(new java.awt.Dimension(670, 320));
  		scrollPaneAICc.setLocation(new java.awt.Point(12, 14));
  		scrollPaneAICc.setVisible(true);
  		scrollPaneAICc.setAutoscrolls(true);
@@ -179,12 +180,12 @@ public class FrameResults extends JModelTestFrame {
  		tableAICc.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
  		tableAICc.setCellSelectionEnabled(true);
  		tableAICc.setVisible(true);
- 		tableAICc.setPreferredScrollableViewportSize(new java.awt.Dimension(575, 350));
+ 		tableAICc.setPreferredScrollableViewportSize(new java.awt.Dimension(675, 350));
  		tableAICc.setGridColor(java.awt.Color.gray);
  		tableAICc.setFont(XManager.FONT_TABULAR);
  		panelBIC.setVisible(true);
  		panelBIC.setLayout(null);
- 		scrollPaneBIC.setSize(new java.awt.Dimension(570, 320));
+ 		scrollPaneBIC.setSize(new java.awt.Dimension(670, 320));
  		scrollPaneBIC.setLocation(new java.awt.Point(12, 14));
  		scrollPaneBIC.setVisible(true);
  		scrollPaneBIC.setAutoscrolls(true);
@@ -196,12 +197,12 @@ public class FrameResults extends JModelTestFrame {
  		tableBIC.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
  		tableBIC.setCellSelectionEnabled(true);
  		tableBIC.setVisible(true);
- 		tableBIC.setPreferredScrollableViewportSize(new java.awt.Dimension(575, 350));
+ 		tableBIC.setPreferredScrollableViewportSize(new java.awt.Dimension(675, 350));
  		tableBIC.setGridColor(java.awt.Color.gray);
  		tableBIC.setFont(XManager.FONT_TABULAR);
   		panelDT.setVisible(true);
  		panelDT.setLayout(null);
- 		scrollPaneDT.setSize(new java.awt.Dimension(570, 320));
+ 		scrollPaneDT.setSize(new java.awt.Dimension(670, 320));
  		scrollPaneDT.setLocation(new java.awt.Point(12, 14));
  		scrollPaneDT.setVisible(true);
  		scrollPaneDT.setAutoscrolls(true);
@@ -213,7 +214,7 @@ public class FrameResults extends JModelTestFrame {
  		tableDT.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
  		tableDT.setCellSelectionEnabled(true);
  		tableDT.setVisible(true);
- 		tableDT.setPreferredScrollableViewportSize(new java.awt.Dimension(575, 350));
+ 		tableDT.setPreferredScrollableViewportSize(new java.awt.Dimension(675, 350));
  		tableDT.setGridColor(java.awt.Color.gray);
  		tableDT.setFont(XManager.FONT_TABULAR);
  		setLocation(new java.awt.Point(281, 80));
@@ -230,15 +231,19 @@ public class FrameResults extends JModelTestFrame {
  		tabbedPane.add(panelAIC);
 		tabbedPane.setTitleAt(tabbedPane.getTabCount() - 1, "AIC");
 		tabbedPane.setEnabledAt(tabbedPane.getTabCount() - 1, false);
+ 		tabbedPane.setForegroundAt(tabbedPane.getTabCount() - 1, Color.gray);
 		tabbedPane.add(panelAICc);
  		tabbedPane.setTitleAt(tabbedPane.getTabCount() - 1, "AICc");
  		tabbedPane.setEnabledAt(tabbedPane.getTabCount() - 1, false);
+ 		tabbedPane.setForegroundAt(tabbedPane.getTabCount() - 1, Color.gray);
 		tabbedPane.add(panelBIC);
  		tabbedPane.setTitleAt(tabbedPane.getTabCount() - 1, "BIC");
 		tabbedPane.setEnabledAt(tabbedPane.getTabCount() - 1, false);
+		tabbedPane.setForegroundAt(tabbedPane.getTabCount() - 1, Color.gray);
 		tabbedPane.add(panelDT);
  		tabbedPane.setTitleAt(tabbedPane.getTabCount() - 1, "DT");
 		tabbedPane.setEnabledAt(tabbedPane.getTabCount() - 1, false);
+		tabbedPane.setForegroundAt(tabbedPane.getTabCount() - 1, Color.gray);
 
 		panelModels.add(scrollPaneModels);
  		scrollPaneModels.getViewport().add(tableModels);
@@ -255,7 +260,7 @@ public class FrameResults extends JModelTestFrame {
  		add(tabbedPane);
  
  		tabbedPane.setSelectedIndex(0);
- 		setSize(new java.awt.Dimension(600, 460));
+ 		setSize(new java.awt.Dimension(700, 460));
  
  		// event handling
  		addWindowListener(new java.awt.event.WindowAdapter() {
@@ -306,10 +311,12 @@ public class FrameResults extends JModelTestFrame {
 	
 	public void enablePane(int pane) {
 		tabbedPane.setEnabledAt(pane, true);
+		tabbedPane.setForegroundAt(pane, Color.black);
 	}
 	
 	public void disablePane(int pane) {
 		tabbedPane.setEnabledAt(pane, false);
+		tabbedPane.setForegroundAt(pane, Color.gray);
 	}
 
 	public void populate(int pane) {

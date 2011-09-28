@@ -93,6 +93,9 @@ public abstract class RunPhyml extends Observable implements Observer {
 		System.out.print("computing likelihood scores for "
 				+ models.length + " models with Phyml " + PHYML_VERSION);
 		
+		notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0,
+				models[0], null);
+		
 		doPhyml();
 	}
 
@@ -110,7 +113,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 		stream.println("*                                                             *");
 		stream.println("---------------------------------------------------------------");
 		stream.println(" ");
-		stream.println("Settings:");
+		stream.println("::Settings::");
 		stream.println(" Phyml version = " + PHYML_VERSION);
 		stream.println(" Phyml binary = " + Utilities.getBinaryVersion());
 		stream.println(" Candidate models = " + models.length);

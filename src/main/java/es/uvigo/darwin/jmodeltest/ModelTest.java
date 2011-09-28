@@ -310,7 +310,7 @@ public class ModelTest {
 						options.confidenceLevelHLRT, options.writePAUPblock);
 			}
 			
-			HtmlReporter.buildReport(options, ModelTest.model);
+			HtmlReporter.buildReport(options, ModelTest.model, null);
 			
 			MAIN_CONSOLE.println(" ");
 			MAIN_CONSOLE.println("Program is done.");
@@ -751,11 +751,12 @@ public class ModelTest {
 		stream.println("--------------------------------------------------------------------------------");
 
 		java.util.Date current_time = new java.util.Date();
-		stream.print(current_time.toString());
-		stream.println("  (" + System.getProperty("os.name") + " "
+		stream.println(current_time.toString());
+		stream.println(System.getProperty("os.name") + " "
 				+ System.getProperty("os.version") + ", arch: "
 				+ System.getProperty("os.arch") + ", bits: "
-				+ System.getProperty("sun.arch.data.model") + ")");
+				+ System.getProperty("sun.arch.data.model") + ", numcores: " 
+				+ Runtime.getRuntime().availableProcessors());
 		stream.println(" ");
 	}
 

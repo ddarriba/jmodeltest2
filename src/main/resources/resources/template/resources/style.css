@@ -5,11 +5,14 @@ body {
 	margin: 0;
 	font-size: 0.8em;
 	font-family: Tahoma, Verdana, Arial, sans-serif;
-        background-color: #BF7730; 
-        background: #BF7730 -webkit-gradient(linear, 0 top, 0 bottom, from(#FFB873), to(#BF7730));
+	background-color: #FFF;
+    /*
+    background-color: #BF7730; 
+    background: #BF7730 -webkit-gradient(linear, 0 top, 0 bottom, from(#FFB873), to(#BF7730));
 	background: -moz-linear-gradient(-90deg, #FFB873, #BF7730) repeat scroll 0 0 #BF7730;
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#FFB873, endColorstr=#BF7730);
         -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#FFB873, endColorstr=#BF7730)";
+    */
 	color: #000;
 }
 
