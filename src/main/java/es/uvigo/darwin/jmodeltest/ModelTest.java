@@ -73,9 +73,8 @@ public class ModelTest {
 	public static final int MAX_NAME = 60;
 	public static final String CURRENT_VERSION = "2.0";
 	public static final String programName = ("jModeltest");
-	public static final String URL = "http://darwin.uvigo.es/software/jmodeltest.html";
-	public static final String PDF = "/doc/jModelTest." + CURRENT_VERSION
-			+ ".pdf";
+	public static final String URL = "http://code.google.com/p/jmodeltest2";
+	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
 
 	private static TextOutputStream MAIN_CONSOLE;
 	private static TextOutputStream CURRENT_OUT_STREAM;

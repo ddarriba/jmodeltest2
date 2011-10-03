@@ -214,6 +214,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer {
 			case ProgressInfo.OPTIMIZATION_INIT:
 				stream.println(" ");
 				stream.println("::Progress::");
+				stream.println(" ");
 				stream.println("Model \t\t Exec. Time \t Total Time \t -lnL");
 				stream.println("-------------------------------------------------------------------------");
 				break;
@@ -222,7 +223,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer {
 				stream.println(info.getModel().getName() + "\t\t" 
 						+ info.getMessage() + "\t" 
 						+ Utilities.calculateRuntime(startTime, System.currentTimeMillis()) + "\t" 
-						+ info.getModel().getLnL());
+						+ String.format("%5.4f", info.getModel().getLnL()));
 
 				// scroll to the bottom
 				XManager.getInstance()

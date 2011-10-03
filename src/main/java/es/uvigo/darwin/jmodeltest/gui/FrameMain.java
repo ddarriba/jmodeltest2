@@ -31,6 +31,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Calendar;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -65,7 +66,7 @@ public class FrameMain extends JModelTestFrame {
 
 	private static final long serialVersionUID = 201103171450L;
 	public static final File LOG_DIR = new File(System.getProperty("user.dir")
-			+ File.separator + "log");
+			+ File.separator + "log" + File.separator);
 
 	public static JPanel Panel = new JPanel();
 	private JScrollPane scrollPane = new JScrollPane();
@@ -804,7 +805,7 @@ public class FrameMain extends JModelTestFrame {
 			try {
 				dialog = new FileDialog(this, "Open file to save HTML log",
 						FileDialog.SAVE);
-				dialog.setFile("log.html");
+				dialog.setFile(options.getAlignmentFile().getName() + "-jmodeltest-log.html");
 				dialog.setDirectory("log");
 				dialog.setVisible(true);
 			} catch (Throwable f) {
@@ -814,25 +815,17 @@ public class FrameMain extends JModelTestFrame {
 				return;
 			}
 
-			if (!dialog.getDirectory().equals(LOG_DIR.getAbsolutePath())) {
-				try {
-					String warning = "If you want to save the log files out from the log directory\n "
-							+ "make sure to copy the \"log"
+			if (!dialog.getDirectory().equals(LOG_DIR.getAbsolutePath() + File.separator)) {
+				Utilities
+				.printRed("\nWarning: If you save the log files out from the log directory, make sure to copy the \"log"
 							+ File.separator
-							+ "resources\" folder\n with the log file\n";
-
-					JOptionPane.showMessageDialog(new JFrame(), warning,
-							"jModelTest WARNING", JOptionPane.WARNING_MESSAGE);
-				} catch (Exception f) {
-					f.printStackTrace();
-				}
+							+ "resources\" folder with the log file\n");
 			}
 
 			if (dialog.getFile() != null) /* a file was selected */
 			{
 				HtmlReporter.buildReport(options, ModelTest.model,
-						new File(dialog.getDirectory() + File.separator
-								+ dialog.getFile()));
+						new File(dialog.getDirectory() + dialog.getFile()));
 			}
 		} catch (Exception f) {
 			f.printStackTrace();
@@ -923,20 +916,11 @@ public class FrameMain extends JModelTestFrame {
 	}
 
 	private void menuHelpOpenActionPerformed(java.awt.event.ActionEvent e) {
-		String docfile = null;
 		try {
-			if (!Utilities.isWindows())
-				docfile = "file://"
-						+ Utilities.substituteSpaces(System
-								.getProperty("user.dir")) + ModelTest.PDF;
-			else
-				docfile = "file://" + System.getProperty("user.dir")
-						+ ModelTest.PDF;
-
-			BrowserLauncher.openURL(docfile);
+			BrowserLauncher.openURL(ModelTest.WIKI);
 		} catch (Exception f) {
-			System.err.println("\ntrying to open " + docfile);
-			f.printStackTrace();
+			JOptionPane.showMessageDialog(new JFrame(), f.getMessage(),
+					"Error loading webpage", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -944,7 +928,8 @@ public class FrameMain extends JModelTestFrame {
 		try {
 			BrowserLauncher.openURL(ModelTest.URL);
 		} catch (Exception f) {
-			f.printStackTrace();
+			JOptionPane.showMessageDialog(new JFrame(), f.getMessage(),
+					"Error loading webpage", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -952,7 +937,7 @@ public class FrameMain extends JModelTestFrame {
 		try {
 			String credits = "-- Likelihood calculations with Phyml by Stephane Guindon\n";
 			credits += "-- Alignment conversion with ALTER by Daniel Glez-Pe–a\n";
-			credits += "-- Phylogenetic trees management with Phyutility by Stephen A. Smith\n";
+			credits += "-- Phylogenetic trees management with PAL: Phylogenetic Analysis Library by A. Drummond and K. Strimmer\n";
 			credits += "-- Table utilities by Philip Milne\n";
 			credits += "-- BrowserLauncher by Eric Albert\n";
 

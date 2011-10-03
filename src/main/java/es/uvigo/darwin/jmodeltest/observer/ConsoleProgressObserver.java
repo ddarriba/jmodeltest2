@@ -72,7 +72,7 @@ public class ConsoleProgressObserver implements Observer {
 				stream.println(info.getModel().getName() + "\t\t" 
 						+ info.getMessage() + "\t" 
 						+ Utilities.calculateRuntime(startTime, System.currentTimeMillis()) + "\t" 
-						+ info.getModel().getLnL());
+						+ String.format("%5.4f", info.getModel().getLnL()));
 				break;
 			case ProgressInfo.INTERRUPTED:
 				stream.println(" ");
