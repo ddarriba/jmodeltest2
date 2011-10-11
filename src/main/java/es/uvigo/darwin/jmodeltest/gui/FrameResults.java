@@ -19,6 +19,7 @@ package es.uvigo.darwin.jmodeltest.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Point;
 import java.text.SimpleDateFormat;
@@ -38,6 +39,13 @@ public class FrameResults extends JModelTestFrame {
 	public static final int TAB_AICc = 2;
 	public static final int TAB_BIC = 3;
 	public static final int TAB_DT = 4;
+	
+	private static final Dimension TABBED_PANE_DIM = new Dimension(700+100, 400-20);
+	private static final Dimension SCROLL_PANE_DIM = new Dimension(670+100, 320);
+	private static final Dimension PANEL_INFO_DIM = new Dimension(700+100, 30);
+	private static final Dimension LABEL_INFO_DIM = new Dimension(680+100, 20);
+	private static final Dimension LABEL_DATE_DIM = new Dimension(200+100, 20);
+	private static final Dimension FRAME_DIM = new Dimension(700+100, 460);
 	
 	private static final long serialVersionUID = 7368405541555631433L;
 
@@ -109,24 +117,24 @@ public class FrameResults extends JModelTestFrame {
 			DTtableColumn.setCellRenderer((javax.swing.table.TableCellRenderer) DTRenderer); 
 			}
 
- 		panelInfo.setSize(new java.awt.Dimension(700, 30));
- 		panelInfo.setLocation(new java.awt.Point(0, 400));
+ 		panelInfo.setSize(PANEL_INFO_DIM);
+ 		panelInfo.setLocation(new java.awt.Point(0, 390));
  		panelInfo.setVisible(true);
  		panelInfo.setLayout(null);
- 		labelInfo.setSize(new java.awt.Dimension(680, 20));
+ 		labelInfo.setSize(LABEL_INFO_DIM);
  		labelInfo.setLocation(new java.awt.Point(40, 0));
  		labelInfo.setVisible(true);
  		labelInfo.setText("Decimal numbers are rounded. Click on column headers to sort data in ascending or descending order (+Shift)");
  		labelInfo.setForeground(java.awt.Color.gray);
  		labelInfo.setHorizontalTextPosition(javax.swing.JLabel.CENTER);
  		labelInfo.setFont(XManager.FONT_LABEL_BIG);
- 		labelDate.setSize(new java.awt.Dimension(200, 20));
+ 		labelDate.setSize(LABEL_DATE_DIM);
  		labelDate.setLocation(new java.awt.Point(40, 10));
  		labelDate.setVisible(true);
  		labelDate.setText("Date");
  		labelDate.setForeground(java.awt.Color.gray);
  		labelDate.setFont(XManager.FONT_LABEL_BIG);
- 		tabbedPane.setSize(new java.awt.Dimension(700, 400));
+ 		tabbedPane.setSize(TABBED_PANE_DIM);
  		tabbedPane.setLocation(new java.awt.Point(0, 0));
  		tabbedPane.setVisible(true);
  		tabbedPane.setAutoscrolls(true);
@@ -134,7 +142,7 @@ public class FrameResults extends JModelTestFrame {
  		panelModels.setLayout(null);
 		panelModels.setFont(XManager.FONT_CONSOLE);
 
- 		scrollPaneModels.setSize(new java.awt.Dimension(670, 320));
+ 		scrollPaneModels.setSize(SCROLL_PANE_DIM);
  		scrollPaneModels.setLocation(new java.awt.Point(12, 14));
  		scrollPaneModels.setVisible(true);
  		scrollPaneModels.setAutoscrolls(true);
@@ -151,7 +159,7 @@ public class FrameResults extends JModelTestFrame {
  		tableModels.setFont(XManager.FONT_TABULAR);
  		panelAIC.setVisible(true);
 		panelAIC.setLayout(null);
- 		scrollPaneAIC.setSize(new java.awt.Dimension(670, 320));
+ 		scrollPaneAIC.setSize(SCROLL_PANE_DIM);
  		scrollPaneAIC.setLocation(new java.awt.Point(12, 14));
  		scrollPaneAIC.setVisible(true);
  		scrollPaneAIC.setAutoscrolls(true);
@@ -160,7 +168,7 @@ public class FrameResults extends JModelTestFrame {
  		scrollPaneAIC.setFont(XManager.FONT_TABULAR);
  		tableAIC.setColumnSelectionAllowed(true);
  		tableAIC.setToolTipText("Click and Shift+Click on headers to order up and down");
- 		tableAIC.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+ 		tableAIC.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
  		tableAIC.setCellSelectionEnabled(true);
  		tableAIC.setVisible(true);
  		tableAIC.setPreferredScrollableViewportSize(new java.awt.Dimension(675, 350));
@@ -168,7 +176,7 @@ public class FrameResults extends JModelTestFrame {
  		tableAIC.setFont(XManager.FONT_TABULAR);
  		panelAICc.setVisible(true);
  		panelAICc.setLayout(null);
- 		scrollPaneAICc.setSize(new java.awt.Dimension(670, 320));
+ 		scrollPaneAICc.setSize(SCROLL_PANE_DIM);
  		scrollPaneAICc.setLocation(new java.awt.Point(12, 14));
  		scrollPaneAICc.setVisible(true);
  		scrollPaneAICc.setAutoscrolls(true);
@@ -185,7 +193,7 @@ public class FrameResults extends JModelTestFrame {
  		tableAICc.setFont(XManager.FONT_TABULAR);
  		panelBIC.setVisible(true);
  		panelBIC.setLayout(null);
- 		scrollPaneBIC.setSize(new java.awt.Dimension(670, 320));
+ 		scrollPaneBIC.setSize(SCROLL_PANE_DIM);
  		scrollPaneBIC.setLocation(new java.awt.Point(12, 14));
  		scrollPaneBIC.setVisible(true);
  		scrollPaneBIC.setAutoscrolls(true);
@@ -202,7 +210,7 @@ public class FrameResults extends JModelTestFrame {
  		tableBIC.setFont(XManager.FONT_TABULAR);
   		panelDT.setVisible(true);
  		panelDT.setLayout(null);
- 		scrollPaneDT.setSize(new java.awt.Dimension(670, 320));
+ 		scrollPaneDT.setSize(SCROLL_PANE_DIM);
  		scrollPaneDT.setLocation(new java.awt.Point(12, 14));
  		scrollPaneDT.setVisible(true);
  		scrollPaneDT.setAutoscrolls(true);
@@ -260,7 +268,7 @@ public class FrameResults extends JModelTestFrame {
  		add(tabbedPane);
  
  		tabbedPane.setSelectedIndex(0);
- 		setSize(new java.awt.Dimension(700, 460));
+ 		setSize(FRAME_DIM);
  
  		// event handling
  		addWindowListener(new java.awt.event.WindowAdapter() {

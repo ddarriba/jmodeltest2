@@ -19,10 +19,12 @@ package es.uvigo.darwin.jmodeltest;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Properties;
 
 import parser.ParseException;
 import converter.Converter;
@@ -152,4 +154,5 @@ public class ModelTestService {
 		
 		return criterion;
 	}
+	
 }

@@ -75,7 +75,8 @@ public class ModelTest {
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
-
+	public static final String CONFIG_FILE = "conf/jmodeltest.conf";
+	
 	private static TextOutputStream MAIN_CONSOLE;
 	private static TextOutputStream CURRENT_OUT_STREAM;
 
@@ -309,7 +310,9 @@ public class ModelTest {
 						options.confidenceLevelHLRT, options.writePAUPblock);
 			}
 			
-			HtmlReporter.buildReport(options, ModelTest.model, null);
+			if (ModelTestConfiguration.isAutoLogEnabled()) {
+				HtmlReporter.buildReport(options, ModelTest.model, null);
+			}
 			
 			MAIN_CONSOLE.println(" ");
 			MAIN_CONSOLE.println("Program is done.");

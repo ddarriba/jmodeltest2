@@ -19,7 +19,6 @@ package es.uvigo.darwin.jmodeltest.exe;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Observable;
 
@@ -29,6 +28,7 @@ import mpi.MPI;
 import mpi.Request;
 import mpi.Status;
 import es.uvigo.darwin.jmodeltest.model.Model;
+import es.uvigo.darwin.jmodeltest.model.ModelComparator;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 
 public class MultipleDistributor extends Observable implements Runnable {
@@ -188,32 +188,7 @@ public class MultipleDistributor extends Observable implements Runnable {
 		}
 	}
 
-	private class ModelComparator implements Comparator<Model> {
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		public int compare(Model model1, Model model2) {
-			int value = 0;
-			if (model1 != null && model2 != null)
-				value = getWeight(model2) - getWeight(model1);
-			return value;
-		}
-
-		private int getWeight(Model model) {
-			int weight = 0;
-			if (model.ispG())
-				weight += 4;
-			if (model.ispI())
-				weight += 2;
-			if (model.ispF())
-				weight += 1;
-			return weight;
-		}
-	}
-
+	
 	private Model getNextModel(int numPEs, int maxAvailableThreads) {
         Model nextModel = null;
         for (Model model : modelsToSend) {

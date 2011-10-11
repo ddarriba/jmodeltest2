@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 package es.uvigo.darwin.jmodeltest.exe;
 
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -24,6 +25,7 @@ import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
+import es.uvigo.darwin.jmodeltest.model.ModelComparator;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
@@ -58,10 +60,13 @@ public abstract class RunPhyml extends Observable implements Observer {
 	}
 
 	public RunPhyml(Observer progress, ApplicationOptions options, Model[] models) {
-		this.models = models;
+		this.models = new Model[models.length];
+		for (int i=0; i<models.length; i++)
+			this.models[i] = models[i];
 		this.options = options;
 		this.progress = progress;
 		this.addObserver(progress);
+		Arrays.sort(this.models, new ModelComparator());
 	}
 	
 	public void execute() {

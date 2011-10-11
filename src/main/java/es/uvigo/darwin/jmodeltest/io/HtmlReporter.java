@@ -32,6 +32,7 @@ import java.util.Map;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
+import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.exe.RunPhyml;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
@@ -46,8 +47,8 @@ public abstract class HtmlReporter {
 	private static String[] TEMPLATE_DIRS = { "resources" };
 	private static String[] TEMPLATE_FILES = {
 			"resources" + File.separator + "style.css",
-			"resources" + File.separator + "homeicon.gif",
-			"resources" + File.separator + "topicon.gif",
+			"resources" + File.separator + "homeIcon.gif",
+			"resources" + File.separator + "topIcon.gif",
 			"resources" + File.separator + "logo0.png" };
 	private static TreeFacade treeFacade = new TreeFacadeImpl();
 	private static Map<String, Object> datamodel;
@@ -159,7 +160,9 @@ public abstract class HtmlReporter {
 	static void freemarkerDo(Map<String, Object> datamodel, String template, File mOutputFile)
 			throws Exception {
 		File resourcesDir = new File("resources" + File.separator + "template");
-		File logDir = new File("log");
+		File logDir = new File(ModelTestConfiguration.getProperty(
+				ModelTestConfiguration.LOG_DIR)
+				);
 		if (!logDir.exists() || !logDir.isDirectory()) {
 			logDir.delete();
 			logDir.mkdir();
@@ -209,9 +212,9 @@ public abstract class HtmlReporter {
 		for (String argument : ModelTest.arguments)
 			arguments.append(argument + " ");
 		datamodel.put("arguments", arguments);
-		datamodel.put("alignName", "Test Alignment.phy");
-		datamodel.put("numTaxa", new Integer(50));
-		datamodel.put("seqLength", new Integer(1500));
+		datamodel.put("alignName", options.getInputFile());
+		datamodel.put("numTaxa", options.numTaxa);
+		datamodel.put("seqLength", options.numSites);
 		datamodel.put("phymlVersion", RunPhyml.PHYML_VERSION);
 		datamodel.put("phymlBinary", Utilities.getBinaryVersion());
 		datamodel.put("candidateModels", ModelTest.model.length);

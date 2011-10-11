@@ -27,11 +27,8 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Calendar;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -49,8 +46,8 @@ import javax.swing.KeyStroke;
 import javax.swing.plaf.BorderUIResource;
 
 import pal.alignment.Alignment;
-
 import es.uvigo.darwin.jmodeltest.ModelTest;
+import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.ModelTestService;
 import es.uvigo.darwin.jmodeltest.XManager;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
@@ -58,7 +55,6 @@ import es.uvigo.darwin.jmodeltest.utilities.BrowserLauncher;
 import es.uvigo.darwin.jmodeltest.utilities.InitialFocusSetter;
 import es.uvigo.darwin.jmodeltest.utilities.PrintUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
-import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 /* This class sets the main GUI */
@@ -822,7 +818,7 @@ public class FrameMain extends JModelTestFrame {
 							+ "resources\" folder with the log file\n");
 			}
 
-			if (dialog.getFile() != null) /* a file was selected */
+			if (dialog.getFile() != null && ModelTestConfiguration.isAutoLogEnabled()) /* a file was selected */
 			{
 				HtmlReporter.buildReport(options, ModelTest.model,
 						new File(dialog.getDirectory() + dialog.getFile()));
@@ -936,7 +932,7 @@ public class FrameMain extends JModelTestFrame {
 	private void menuAboutCreditsActionPerformed(java.awt.event.ActionEvent e) {
 		try {
 			String credits = "-- Likelihood calculations with Phyml by Stephane Guindon\n";
-			credits += "-- Alignment conversion with ALTER by Daniel Glez-Pe–a\n";
+			credits += "-- Alignment conversion with ALTER by Daniel Glez-Peï¿½a\n";
 			credits += "-- Phylogenetic trees management with PAL: Phylogenetic Analysis Library by A. Drummond and K. Strimmer\n";
 			credits += "-- Table utilities by Philip Milne\n";
 			credits += "-- BrowserLauncher by Eric Albert\n";
