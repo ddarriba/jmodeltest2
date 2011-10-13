@@ -801,7 +801,7 @@ public class FrameMain extends JModelTestFrame {
 			try {
 				dialog = new FileDialog(this, "Open file to save HTML log",
 						FileDialog.SAVE);
-				dialog.setFile(options.getAlignmentFile().getName() + "-jmodeltest-log.html");
+				dialog.setFile(options.getInputFile().getName() + ".jmodeltest.html");
 				dialog.setDirectory("log");
 				dialog.setVisible(true);
 			} catch (Throwable f) {

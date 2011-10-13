@@ -119,6 +119,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 		stream.println("---------------------------------------------------------------");
 		stream.println(" ");
 		stream.println("::Settings::");
+		stream.println(" ");
 		stream.println(" Phyml version = " + PHYML_VERSION);
 		stream.println(" Phyml binary = " + Utilities.getBinaryVersion());
 		stream.println(" Candidate models = " + models.length);

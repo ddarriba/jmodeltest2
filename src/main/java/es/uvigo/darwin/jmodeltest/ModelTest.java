@@ -787,8 +787,11 @@ public class ModelTest {
 
 	static public void printCitation(TextOutputStream stream) {
 		// stream.println("\n******************************* CITATION *********************************");
-		stream.println("Citation: Posada D. 2008. jModelTest: Phylogenetic Model Averaging.");
-		stream.println("          Molecular Biology and Evolution 25: 1253-1256.");
+		stream.println("Citation: Diego Darriba, Guillermo L. Taboada, Ramón Doallo, and David Posada.");
+		stream.println("          2011. HPC selection of models of DNA substitution. In Proceedings of");
+		stream.println("          the 9th International Conference on Computational Methods in Systems");
+		stream.println("          Biology (CMSB '11), Paris, September 2011, pages 65-72. ");
+		stream.println("          (paper in ACM DL)");
 		stream.println(" ");
 		// stream.println("***************************************************************************\n");
 
@@ -1057,6 +1060,23 @@ public class ModelTest {
 	public static RunConsense getConsensusDT() {
 		return consensusDT;
 	}
+	
+	public static void setConsensusAIC(RunConsense pConsensusAIC) {
+		consensusAIC = pConsensusAIC;
+	}
+	
+	public static void setConsensusAICc(RunConsense pConsensusAICc) {
+		consensusAICc = pConsensusAICc;
+	}
+	
+	public static void setConsensusBIC(RunConsense pConsensusBIC) {
+		consensusBIC = pConsensusBIC;
+	}
+	
+	public static void setConsensusDT(RunConsense pConsensusDT) {
+		consensusDT = pConsensusDT;
+	}
+	
 	/**
 	 * Finalizes the MPJ runtime environment. When an error occurs, it aborts
 	 * the execution of every other processes.

@@ -32,4 +32,5 @@ public abstract class ModelTestConfiguration {
     public static boolean isAutoLogEnabled() {
     	return getProperty(AUTO_LOG).equalsIgnoreCase("enabled");
     }
+    
 }

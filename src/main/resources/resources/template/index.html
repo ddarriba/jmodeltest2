@@ -78,9 +78,13 @@
 	University of Vigo, 36310 Vigo, Spain. e-mail: dposada@uvigo.es<br/>
 	<hr/>
 	Wed Jul 20 12:33:19 CEST 2011  (Mac OS X 10.6.7, arch: x86_64, bits: 64)<br/>
-	 
-	<p>Citation: Posada D. 2008. jModelTest: Phylogenetic Model Averaging.<br/>
-	      Molecular Biology and Evolution 25: 1253-1256.</p>
+	
+	<p></p> 
+	<table align="center">
+	<tr valign="top"><td>Citation:</td><td align="left">Diego Darriba, Guillermo L. Taboada, Ram&oacute;n Doallo, and David Posada. 2011. HPC selection of models of DNA substitution. In Proceedings of the 9th International Conference on Computational Methods in Systems Biology (CMSB'11), Paris, September 2011, pages 65-72. (paper in ACM DL)</td></tr>
+    </table>
+	<p></p>
+
 	 
 	Notice: This program may contain errors. Please inspect results carefully.<br/>
 	 <br/>
@@ -130,7 +134,7 @@
 <table class="model-info">
 <tr><th> ID </th><th> Name </th><th> Partition </th><th> -lnL </th><th> p </th><th> fA </th><th> fC </th><th> fG </th><th> fT </th><th> ti/tv </th><th> R(a) </th><th> R(b) </th><th> R(c) </th><th> R(d) </th><th> R(e) </th><th> R(f) </th><th> p-inv </th><th> shape </th></tr>
 <#list sortedModels as model>
-<tr><td> ${model.index}</td><td> ${model.name} </td><td> ${model.partition} </td><td> ${model.lnl} </td><td> ${model.k} </td><td> ${model.fA} </td><td> ${model.fC} </td><td> ${model.fG} </td><td> ${model.fT} </td><td> ${model.titv} </td><td> ${model.rA} </td><td> ${model.rB} </td><td> ${model.rC} </td><td> ${model.rD} </td><td> ${model.rE} </td><td> ${model.rF} </td><td> ${model.pInv} </td><td> ${model.shape} </td></tr>
+<tr><td> ${model.index}</td><td><a href="http://www.phylowidget.org/full/?tree=${model.tree}&useBranchLengths=true">${model.name}</a></td><td> ${model.partition} </td><td> ${model.lnl} </td><td> ${model.k} </td><td> ${model.fA} </td><td> ${model.fC} </td><td> ${model.fG} </td><td> ${model.fT} </td><td> ${model.titv} </td><td> ${model.rA} </td><td> ${model.rB} </td><td> ${model.rC} </td><td> ${model.rD} </td><td> ${model.rE} </td><td> ${model.rF} </td><td> ${model.pInv} </td><td> ${model.shape} </td></tr>
 </#list>
 </table>
 </div><!--sorted-models-->
@@ -164,12 +168,12 @@
 	</div> <!--selection_best_model-->
 <div id="selection_best_tree">
 
-	<h2 style="text-align: center;"> Best model tree (NNI) </h2>
+	<h2 style="text-align: center;"> Best model tree </h2>
 	
 		<div id="newick-tree">
 		${bestAicModel.tree}
 		</div><!--best-tree-newick-->
-	<a href="http://www.phylowidget.org/full/?tree=${bestAicModel.tree}&useBranchLengths=true">Display in PhyloWidget</a>
+	<a href="http://www.phylowidget.org/full/?tree=${bestAicModel.tree}&useBranchLengths=true">Display best model tree in PhyloWidget</a>
 	</div><!--selection_best_tree-->
 </div><!--selection-upper-->
 
@@ -181,7 +185,7 @@
 		</tr>
 		<#list aicModels as model>
 		<tr><td>
-		<a href="http://www.phylowidget.org/full/?tree=${model.tree}">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
+		<a href="http://www.phylowidget.org/full/?tree=${model.tree}&useBranchLengths=true">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
 		</#list>
 		 </table>
 </div><!--selection_results-->
@@ -210,20 +214,20 @@ ${aicConfidenceList}
   
 <p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
 
-<#if doAveragedPhylogeny == 1>
+<#if doAICAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
 
 <table style="text-align:left;">
-<tr><th>Selection criterion</th><td>AIC</td>
-<tr><th>Confidence interval</th><td>${confidenceInterval}%</td>
-<tr><th>Consensus type</th><td>${consensusType}</td>
+<tr><th>Selection criterion</th><td>AIC</td></tr>
+<tr><th>Confidence interval</th><td>${confidenceInterval}%</td></tr>
+<tr><th>Consensus type</th><td>${consensusType}</td></tr>
 </table>
  
 <div id="consensus-tree">
  <div id="newick-tree">
 ${aicConsensusTree}
 		</div><!--newick-tree-->
- <a href="http://www.phylowidget.org/full/?tree=${aicConsensusTree}&useBranchLengths=true">Display in PhyloWidget</a>
+ <a href="http://www.phylowidget.org/full/?tree=${aicConsensusTree}&useBranchLengths=true">Display consensus tree in PhyloWidget</a>
 </div><!--consensus-tree-->
 </#if>
 
@@ -256,12 +260,12 @@ ${aicConsensusTree}
 	</div> <!--selection_best_model-->
 <div id="selection_best_tree">
 
-	<h2 style="text-align: center;"> Best model tree (NNI) </h2>
+	<h2 style="text-align: center;"> Best model tree </h2>
 	
 		<div id="newick-tree">
 		${bestAiccModel.tree}
 		</div><!--best-tree-newick-->
-	<a href="http://www.phylowidget.org/full/?tree=${bestAiccModel.tree}&useBranchLengths=true">Display in PhyloWidget</a>
+	<a href="http://www.phylowidget.org/full/?tree=${bestAiccModel.tree}&useBranchLengths=true">Display best model tree in PhyloWidget</a>
 	</div><!--selection_best_tree-->
 </div><!--selection-upper-->
 
@@ -273,7 +277,7 @@ ${aicConsensusTree}
 		</tr>
 		<#list aiccModels as model>
 		<tr><td>
-		<a href="http://www.phylowidget.org/full/?tree=${model.tree}">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
+		<a href="http://www.phylowidget.org/full/?tree=${model.tree}&useBranchLengths=true">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
 		</#list>
 		 </table>
 </div><!--selection_results-->
@@ -302,20 +306,20 @@ ${aiccConfidenceList}
   
 <p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
 
-<#if doAveragedPhylogeny == 1>
+<#if doAICcAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
 
 <table style="text-align:left;">
-<tr><th>Selection criterion</th><td>AICc</td>
-<tr><th>Confidence interval</th><td>${confidenceInterval}%</td>
-<tr><th>Consensus type</th><td>${consensusType}</td>
+<tr><th>Selection criterion</th><td>AICc</td></tr>
+<tr><th>Confidence interval</th><td>${confidenceInterval}%</td></tr>
+<tr><th>Consensus type</th><td>${consensusType}</td></tr>
 </table>
  
 <div id="consensus-tree">
  <div id="newick-tree">
 ${aiccConsensusTree}
 		</div><!--newick-tree-->
- <a href="http://www.phylowidget.org/full/?tree=${aiccConsensusTree}&useBranchLengths=true">Display in PhyloWidget</a>
+ <a href="http://www.phylowidget.org/full/?tree=${aiccConsensusTree}&useBranchLengths=true">Display consensus tree in PhyloWidget</a>
 </div><!--consensus-tree-->
 </#if>
 
@@ -349,12 +353,12 @@ ${aiccConsensusTree}
 	</div> <!--selection_best_model-->
 <div id="selection_best_tree">
 
-	<h2 style="text-align: center;"> Best model tree (NNI) </h2>
+	<h2 style="text-align: center;"> Best model tree </h2>
 	
 		<div id="newick-tree">
 		${bestBicModel.tree}
 		</div><!--best-tree-newick-->
-	<a href="http://www.phylowidget.org/full/?tree=${bestBicModel.tree}&useBranchLengths=true">Display in PhyloWidget</a>
+	<a href="http://www.phylowidget.org/full/?tree=${bestBicModel.tree}&useBranchLengths=true">Display best model tree in PhyloWidget</a>
 	</div><!--selection_best_tree-->
 </div><!--selection-upper-->
 
@@ -366,7 +370,7 @@ ${aiccConsensusTree}
 		</tr>
 		<#list bicModels as model>
 		<tr><td>
-		<a href="http://www.phylowidget.org/full/?tree=${model.tree}">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
+		<a href="http://www.phylowidget.org/full/?tree=${model.tree}&useBranchLengths=true">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
 		</#list>
 		 </table>
 </div><!--selection_results-->
@@ -395,20 +399,20 @@ ${bicConfidenceList}
   
 <p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
 
-<#if doAveragedPhylogeny == 1>
+<#if doBICAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
 
 <table style="text-align:left;">
-<tr><th>Selection criterion</th><td>BIC</td>
-<tr><th>Confidence interval</th><td>${confidenceInterval}%</td>
-<tr><th>Consensus type</th><td>${consensusType}</td>
+<tr><th>Selection criterion</th><td>BIC</td></tr>
+<tr><th>Confidence interval</th><td>${confidenceInterval}%</td></tr>
+<tr><th>Consensus type</th><td>${consensusType}</td></tr>
 </table>
  
 <div id="consensus-tree">
  <div id="newick-tree">
 ${bicConsensusTree}
 		</div><!--newick-tree-->
- <a href="http://www.phylowidget.org/full/?tree=${bicConsensusTree}&useBranchLengths=true">Display in PhyloWidget</a>
+ <a href="http://www.phylowidget.org/full/?tree=${bicConsensusTree}&useBranchLengths=true">Display consensus tree in PhyloWidget</a>
 </div><!--consensus-tree-->
 </#if>
 
@@ -441,12 +445,12 @@ ${bicConsensusTree}
 	</div> <!--selection_best_model-->
 <div id="selection_best_tree">
 
-	<h2 style="text-align: center;"> Best model tree (NNI) </h2>
+	<h2 style="text-align: center;"> Best model tree </h2>
 	
 		<div id="newick-tree">
 		${bestDtModel.tree}
 		</div><!--best-tree-newick-->
-	<a href="http://www.phylowidget.org/full/?tree=${bestDtModel.tree}&useBranchLengths=true">Display in PhyloWidget</a>
+	<a href="http://www.phylowidget.org/full/?tree=${bestDtModel.tree}&useBranchLengths=true">Display best model tree in PhyloWidget</a>
 	</div><!--selection_best_tree-->
 </div><!--selection-upper-->
 
@@ -458,7 +462,7 @@ ${bicConsensusTree}
 		</tr>
 		<#list dtModels as model>
 		<tr><td>
-		<a href="http://www.phylowidget.org/full/?tree=${model.tree}">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
+		<a href="http://www.phylowidget.org/full/?tree=${model.tree}&useBranchLengths=true">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
 		</#list>
 		 </table>
 </div><!--selection_results-->
@@ -486,20 +490,20 @@ ${dtConfidenceList}
   </div><!--selection-lower-->
 <p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
 
-<#if doAveragedPhylogeny == 1>
+<#if doDTAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
 
 <table style="text-align:left;">
-<tr><th>Selection criterion</th><td>DT</td>
-<tr><th>Confidence interval</th><td>${confidenceInterval}%</td>
-<tr><th>Consensus type</th><td>${consensusType}</td>
+<tr><th>Selection criterion</th><td>DT</td></tr>
+<tr><th>Confidence interval</th><td>${confidenceInterval}%</td></tr>
+<tr><th>Consensus type</th><td>${consensusType}</td></tr>
 </table>
  
 <div id="consensus-tree">
  <div id="newick-tree">
 ${dtConsensusTree}
 		</div><!--newick-tree-->
- <a href="http://www.phylowidget.org/full/?tree=${dtConsensusTree}&useBranchLengths=true">Display in PhyloWidget</a>
+ <a href="http://www.phylowidget.org/full/?tree=${dtConsensusTree}&useBranchLengths=true">Display consensus tree in PhyloWidget</a>
 </div><!--consensus-tree-->
 </#if>
 

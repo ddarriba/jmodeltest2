@@ -260,14 +260,18 @@ public class Frame_Consense extends JModelTestFrame {
 		try
 			{
 			// get criterion
-			if (ButtonAIC.isSelected())
+			if (ButtonAIC.isSelected()) {
 				criterion = ModelTest.getMyAIC();
-			else if (ButtonAICc.isSelected())
+			}
+			else if (ButtonAICc.isSelected()) {
 				criterion = ModelTest.getMyAICc();
-			else if (ButtonBIC.isSelected())
+			}
+			else if (ButtonBIC.isSelected()) {
 				criterion = ModelTest.getMyBIC();
-			else
-				criterion = ModelTest.getMyDT();		
+			}
+			else {
+				criterion = ModelTest.getMyDT();
+			}
 
 			// get consensus type
 			if (ButtonMajority.isSelected())
@@ -283,6 +287,18 @@ public class Frame_Consense extends JModelTestFrame {
 			// run consense
 			runConsense = new RunConsense(criterion, consensusType, credibleInterval);
 
+			if (ButtonAIC.isSelected()) {
+				ModelTest.setConsensusAIC(runConsense);
+			}
+			else if (ButtonAICc.isSelected()) {
+				ModelTest.setConsensusAICc(runConsense);
+			}
+			else if (ButtonBIC.isSelected()) {
+				ModelTest.setConsensusBIC(runConsense);
+			}
+			else {
+				ModelTest.setConsensusDT(runConsense);
+			}
 			}
 		catch (Exception f) 
 			{

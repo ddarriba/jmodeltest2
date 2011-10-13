@@ -53,13 +53,11 @@ public abstract class HtmlReporter {
 	private static TreeFacade treeFacade = new TreeFacadeImpl();
 	private static Map<String, Object> datamodel;
 
-	public static void buildReport(ApplicationOptions options, Model models[], File outputFile) {
+	public static void buildReport(ApplicationOptions options, Model models[],
+			File outputFile) {
 
 		// Add the values in the datamodel
 		datamodel = new HashMap<String, Object>();
-
-		datamodel.put("doAveragedPhylogeny",
-				options.doAveragedPhylogeny ? new Integer(1) : new Integer(0));
 
 		fillInWithOptions(options);
 		fillInWithSortedModels(models);
@@ -124,26 +122,41 @@ public abstract class HtmlReporter {
 			datamodel.put("dtConfidenceList", dtConfModels.toString());
 		}
 
-		if (options.doAveragedPhylogeny) {
+		datamodel.put("doAICAveragedPhylogeny",
+				ModelTest.getConsensusAIC() != null ? new Integer(1)
+						: new Integer(0));
+		if (ModelTest.getConsensusAIC() != null) {
+			datamodel.put("aicConsensusTree", treeFacade.toNewick(ModelTest
+					.getConsensusAIC().getConsensus(), true, true, true));
 			datamodel.put("consensusType", ModelTest.getConsensusAIC()
 					.getConsensusType());
-			if (ModelTest.getConsensusAIC() != null) {
-				datamodel.put("aicConsensusTree", treeFacade.toNewick(ModelTest
-						.getConsensusAIC().getConsensus(), true, true, true));
-			}
-			if (ModelTest.getConsensusAICc() != null) {
-				datamodel.put("aiccConsensusTree", treeFacade.toNewick(
-						ModelTest.getConsensusAICc().getConsensus(), true,
-						true, true));
-			}
-			if (ModelTest.getConsensusBIC() != null) {
-				datamodel.put("bicConsensusTree", treeFacade.toNewick(ModelTest
-						.getConsensusBIC().getConsensus(), true, true, true));
-			}
-			if (ModelTest.getConsensusDT() != null) {
-				datamodel.put("dtConsensusTree", treeFacade.toNewick(ModelTest
-						.getConsensusDT().getConsensus(), true, true, true));
-			}
+		}
+		datamodel.put("doAICcAveragedPhylogeny",
+				ModelTest.getConsensusAICc() != null ? new Integer(1)
+						: new Integer(0));
+		if (ModelTest.getConsensusAICc() != null) {
+			datamodel.put("aiccConsensusTree", treeFacade.toNewick(ModelTest
+					.getConsensusAICc().getConsensus(), true, true, true));
+			datamodel.put("consensusType", ModelTest.getConsensusAICc()
+					.getConsensusType());
+		}
+		datamodel.put("doBICAveragedPhylogeny",
+				ModelTest.getConsensusBIC() != null ? new Integer(1)
+						: new Integer(0));
+		if (ModelTest.getConsensusBIC() != null) {
+			datamodel.put("bicConsensusTree", treeFacade.toNewick(ModelTest
+					.getConsensusBIC().getConsensus(), true, true, true));
+			datamodel.put("consensusType", ModelTest.getConsensusBIC()
+					.getConsensusType());
+		}
+		datamodel.put("doDTAveragedPhylogeny",
+				ModelTest.getConsensusDT() != null ? new Integer(1)
+						: new Integer(0));
+		if (ModelTest.getConsensusDT() != null) {
+			datamodel.put("dtConsensusTree", treeFacade.toNewick(ModelTest
+					.getConsensusDT().getConsensus(), true, true, true));
+			datamodel.put("consensusType", ModelTest.getConsensusDT()
+					.getConsensusType());
 		}
 
 		// Process the template using FreeMarker
@@ -157,12 +170,12 @@ public abstract class HtmlReporter {
 	}
 
 	// Process a template using FreeMarker and print the results
-	static void freemarkerDo(Map<String, Object> datamodel, String template, File mOutputFile)
-			throws Exception {
+	static void freemarkerDo(Map<String, Object> datamodel, String template,
+			File mOutputFile) throws Exception {
 		File resourcesDir = new File("resources" + File.separator + "template");
-		File logDir = new File(ModelTestConfiguration.getProperty(
-				ModelTestConfiguration.LOG_DIR)
-				);
+		File logDir = new File(
+				ModelTestConfiguration
+						.getProperty(ModelTestConfiguration.LOG_DIR));
 		if (!logDir.exists() || !logDir.isDirectory()) {
 			logDir.delete();
 			logDir.mkdir();
@@ -188,13 +201,15 @@ public abstract class HtmlReporter {
 
 		File outputFile = mOutputFile;
 		if (outputFile != null) {
-			if (!(outputFile.getName().endsWith(".htm") || outputFile.getName().endsWith(".html"))) {
+			if (!(outputFile.getName().endsWith(".htm") || outputFile.getName()
+					.endsWith(".html"))) {
 				outputFile = new File(outputFile.getAbsolutePath() + ".html");
 			}
 		} else {
 			outputFile = new File(logDir.getPath() + File.separator
-				+ "jmodeltest-log-" + Calendar.getInstance().getTimeInMillis()
-				+ ".html");
+					+ ApplicationOptions.getInstance().getInputFile().getName() 
+					+ ".jmodeltest."
+					+ Calendar.getInstance().getTimeInMillis() + ".html");
 		}
 		Configuration cfg = new Configuration();
 
@@ -319,6 +334,7 @@ public abstract class HtmlReporter {
 			modelMap.put("shape",
 					model.ispG() ? String.format("%6.4f", model.getShape())
 							: "-");
+			modelMap.put("tree", model.getTreeString());
 			sortedModels.add(modelMap);
 		}
 

@@ -24,6 +24,7 @@ import java.util.Observable;
 
 import pal.tree.TreeParseException;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
+import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.io.TextInputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
@@ -36,11 +37,13 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	private static final String CURRENT_DIRECTORY = System
 			.getProperty("user.dir");
 
-	public static final String PHYML_PATH = CURRENT_DIRECTORY + "/exe/phyml/";
+	public static String PHYML_PATH = CURRENT_DIRECTORY + "/exe/phyml/";
 
 	private String phymlStatFileName;
 	private String phymlTreeFileName;
 
+	private static boolean PHYML_GLOBAL = false;
+	
 	private Model model;
 	private long startTime;
 	private long endTime;
@@ -51,6 +54,25 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	private ApplicationOptions options;
 	private int numberOfThreads = -1;
 
+	static {
+		PHYML_GLOBAL = ModelTestConfiguration.getProperty(
+				ModelTestConfiguration.GLOBAL_PHYML_EXE).equalsIgnoreCase("true");
+		if (PHYML_GLOBAL) {
+			PHYML_PATH = "";
+		} else {
+			String path = ModelTestConfiguration.getProperty(
+					ModelTestConfiguration.EXE_DIR);
+			if (!path.startsWith(File.separator)) {
+				PHYML_PATH = CURRENT_DIRECTORY + File.separator + path;
+			} else {
+				PHYML_PATH = path;
+			}
+			if (!PHYML_PATH.endsWith(File.separator)) {
+				PHYML_PATH += File.separator;
+			}
+		}
+	}
+	
 	public Model getModel() {
 		return model;
 	}

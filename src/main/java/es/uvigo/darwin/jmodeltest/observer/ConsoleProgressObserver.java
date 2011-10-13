@@ -60,7 +60,7 @@ public class ConsoleProgressObserver implements Observer {
 				break;
 
 			case ProgressInfo.OPTIMIZATION_INIT:
-				stream.println("\n\n::Progress::");
+				stream.println("\n\n::Progress::\n");
 				stream.println("Model \t\t Exec. Time \t Total Time \t -lnL");
 				stream.println("-------------------------------------------------------------------------");
 				break;
@@ -69,8 +69,10 @@ public class ConsoleProgressObserver implements Observer {
 				break;
 
 			case ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED:
-				stream.println(info.getModel().getName() + "\t\t" 
-						+ info.getMessage() + "\t" 
+				stream.print(info.getModel().getName() + "\t");
+				if (info.getModel().getName().length()<8)
+					stream.print("\t");
+				stream.println(info.getMessage() + "\t" 
 						+ Utilities.calculateRuntime(startTime, System.currentTimeMillis()) + "\t" 
 						+ String.format("%5.4f", info.getModel().getLnL()));
 				break;
