@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 package es.uvigo.darwin.jmodeltest.exe;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Observable;
@@ -316,8 +317,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		// phymlLkFile.close();
 
 		// Get model likelihood and parameter estimates
-		TextInputStream phymlStatFile = new TextInputStream(phymlStatFileName);
 		try {
+		TextInputStream phymlStatFile = new TextInputStream(phymlStatFileName);
 			while ((line = phymlStatFile.readLine()) != null) {
 				if (line.length() > 0 && line.startsWith(". Log-likelihood")) {
 					currentModel.setLnL((-1.0)
@@ -438,12 +439,15 @@ public class PhymlSingleModel extends Observable implements Runnable {
 					}
 				}
 			}
-		} catch (NullPointerException e) {
-			System.err.println("Error while parsing result data from "
-					+ currentModel.getName());
-			e.printStackTrace();
-		}
 		phymlStatFile.close();
+		} catch (FileNotFoundException e) {
+			notifyObservers(ProgressInfo.ERROR, index, model, "Optimization results file does not exist: "
+					+ phymlStatFileName);
+			
+		} catch (NullPointerException e) {
+			notifyObservers(ProgressInfo.ERROR, index, model, "Error while parsing result data from "
+					+ currentModel.getName());
+		}
 
 		try {
 			// Get ML tree
@@ -452,7 +456,12 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			String treestr = phymlTreeFile.readLine();
 			currentModel.setTreeString(treestr);
 			phymlTreeFile.close();
-		} catch (TreeParseException e) {
+		} catch (FileNotFoundException e) {
+			notifyObservers(ProgressInfo.ERROR, index, model, null);
+			System.err.println("Optimized tree file does not exist: "
+					+ phymlTreeFileName);
+			
+		}catch (TreeParseException e) {
 			System.out.println(" ");
 			System.out.println("ERROR: ML tree for " + model.getName()
 					+ " is invalid.");

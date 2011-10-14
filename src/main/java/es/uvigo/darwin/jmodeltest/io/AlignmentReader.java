@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest.io;
 
 import iubio.readseq.BioseqFormats;
@@ -22,6 +22,7 @@ import iubio.readseq.BioseqWriterIface;
 import iubio.readseq.Readseq;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.StringTokenizer;
 
@@ -29,9 +30,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
+import es.uvigo.darwin.jmodeltest.exception.InputFileException;
+import es.uvigo.darwin.jmodeltest.gui.JModelTestFrame;
 
 public abstract class AlignmentReader {
-	private static ApplicationOptions options = ApplicationOptions.getInstance();;
+	private static ApplicationOptions options = ApplicationOptions
+			.getInstance();;
 
 	/****************************
 	 * readDataFile **************************** * Reads the input file and gets
@@ -40,12 +44,19 @@ public abstract class AlignmentReader {
 
 	static public void getHeader(String infilenameComplete) {
 		// needs the complete path to the file
-		TextInputStream in = new TextInputStream(infilenameComplete);
-		String line = in.readLine();
-		in.close();
-		StringTokenizer reader = new StringTokenizer(line);
-		options.numTaxa = Integer.parseInt(reader.nextToken());
-		options.numSites = Integer.parseInt(reader.nextToken());
+		try {
+			TextInputStream in = new TextInputStream(infilenameComplete);
+			String line = in.readLine();
+			in.close();
+			StringTokenizer reader = new StringTokenizer(line);
+			options.numTaxa = Integer.parseInt(reader.nextToken());
+			options.numSites = Integer.parseInt(reader.nextToken());
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(new JFrame(),
+					"Could not read the input alignment",
+					"jModelTest error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 
 		if (options.numTaxa <= 4)
 			JOptionPane.showMessageDialog(new JFrame(),
@@ -98,7 +109,8 @@ public abstract class AlignmentReader {
 				 */
 
 				// get alignment info and check it is valid for jModeltest
-				TextInputStream in = new TextInputStream(outputFile.getAbsolutePath());
+				TextInputStream in = new TextInputStream(
+						outputFile.getAbsolutePath());
 				String line = in.readLine();
 				in.close();
 				StringTokenizer reader = new StringTokenizer(line);
@@ -124,9 +136,11 @@ public abstract class AlignmentReader {
 				}
 
 			} else {
-				JOptionPane.showMessageDialog(new JFrame(),
-						"Cannot read or import the file: " + inputFile.getName(),
-						"jModeltest error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(
+						new JFrame(),
+						"Cannot read or import the file: "
+								+ inputFile.getName(), "jModeltest error",
+						JOptionPane.ERROR_MESSAGE);
 			}
 
 		}

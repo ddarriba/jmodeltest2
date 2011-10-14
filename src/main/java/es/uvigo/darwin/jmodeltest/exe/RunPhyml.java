@@ -47,18 +47,10 @@ public abstract class RunPhyml extends Observable implements Observer {
 	public static final String PHYML_VERSION = "3.0";
 
 	public static String PHYML_TREE_SUFFIX = "_phyml_tree_";
-	public static String PHYML_STATS_SUFFIX;
+	public static String PHYML_STATS_SUFFIX = "_phyml_stats_";
 
 	protected Observer progress;
 	
-	static {
-
-		if (Utilities.isWindows())
-			PHYML_STATS_SUFFIX = "_phyml_stat_";
-		else
-			PHYML_STATS_SUFFIX = "_phyml_stats_";
-	}
-
 	public RunPhyml(Observer progress, ApplicationOptions options, Model[] models) {
 		this.models = new Model[models.length];
 		for (int i=0; i<models.length; i++)
