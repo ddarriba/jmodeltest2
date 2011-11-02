@@ -756,7 +756,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		private RunPhyml runPhyml;
 		
 		public ComputeLikelihoodTask() {
-			this.runPhyml = new RunPhymlThread(progressFrame, options, ModelTest.model);
+			this.runPhyml = new RunPhymlThread(progressFrame, options, ModelTest.getCandidateModels());
 		}
 		
 		public Object construct() {

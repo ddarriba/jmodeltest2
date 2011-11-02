@@ -222,7 +222,7 @@ public class Simulation {
 		options.setCandidateModels();
 
 		// calculate likelihoods with phyml in the command line
-		RunPhyml phymlrun = new RunPhymlThread(new ConsoleProgressObserver(options), options, ModelTest.model);
+		RunPhyml phymlrun = new RunPhymlThread(new ConsoleProgressObserver(options), options, ModelTest.getCandidateModels());
 		phymlrun.execute();
 
 		// print all model trees to tree file and parameters to parms file
@@ -231,13 +231,13 @@ public class Simulation {
 					.println("data\tname\tln\tK\tfA\tfC\tfG\tfT\tkappa\ttitv\trAC\tAG\trAT\trCG\trCT\trGT\tpinvI\tshapeG\tpinvIG\tshapeIG");
 		for (i = 0; i < options.numModels; i++) {
 			treeConsole.println(options.getInputFile().getName() + "\t"
-					+ ModelTest.model[i].getName() + "\t"
-					+ ModelTest.model[i].getTreeString());
+					+ ModelTest.getCandidateModels()[i].getName() + "\t"
+					+ ModelTest.getCandidateModels()[i].getTreeString());
 			printModelLine(
-					ModelTest.model[i],
+					ModelTest.getCandidateModels()[i],
 					parameterConsole,
 					options.getInputFile().getName() + "\t"
-							+ ModelTest.model[i].getName(), nil, nil);
+							+ ModelTest.getCandidateModels()[i].getName(), nil, nil);
 		}
 
 		// do AIC if selected

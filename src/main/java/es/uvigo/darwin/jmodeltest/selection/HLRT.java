@@ -70,9 +70,9 @@ public class HLRT
 			System.out.print("computing hLRT ... ");
 
 		if (forward)
-			currentModel = ModelTest.model[0];	
+			currentModel = ModelTest.getCandidateModels()[0];	
 		else
-			currentModel = ModelTest.model[options.numModels-1];
+			currentModel = ModelTest.getCandidateModels()[options.numModels-1];
 			
 		stream.println("\n\n\n---------------------------------------------------------------");
 		stream.println("*                                                             *");
@@ -218,9 +218,9 @@ public class HLRT
 			System.out.print("computing dynamical LRTs ... ");
 
 		if (forward)
-			currentModel = ModelTest.model[0];	
+			currentModel = ModelTest.getCandidateModels()[0];	
 		else
-			currentModel = ModelTest.model[options.numModels-1];
+			currentModel = ModelTest.getCandidateModels()[options.numModels-1];
 			
 		stream.println("\n\n\n---------------------------------------------------------------");
 		stream.println("*                                                             *");
@@ -404,7 +404,7 @@ public class HLRT
 		Model competing, found;
 		
 		found = null;
-		for (Model model : ModelTest.model)
+		for (Model model : ModelTest.getCandidateModels())
 			{
 			competing = model;
 			isTest = false;
@@ -537,7 +537,7 @@ public class HLRT
 		
 		m1 = m2 = m3 = null;
 		
-		for (Model model : ModelTest.model)
+		for (Model model : ModelTest.getCandidateModels())
 			{
 			if (modelName1.equals(model.getName()))
 				m1 = model;

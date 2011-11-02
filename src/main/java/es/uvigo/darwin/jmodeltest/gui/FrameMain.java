@@ -820,7 +820,7 @@ public class FrameMain extends JModelTestFrame {
 
 			if (dialog.getFile() != null && ModelTestConfiguration.isAutoLogEnabled()) /* a file was selected */
 			{
-				HtmlReporter.buildReport(options, ModelTest.model,
+				HtmlReporter.buildReport(options, ModelTest.getCandidateModels(),
 						new File(dialog.getDirectory() + dialog.getFile()));
 			}
 		} catch (Exception f) {

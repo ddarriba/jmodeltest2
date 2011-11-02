@@ -88,7 +88,7 @@ public class ConsoleProgressObserver implements Observer {
 			case ProgressInfo.OPTIMIZATION_COMPLETED_OK:
 
 				stream.println(" ");
-				for (Model model : ModelTest.model) {
+				for (Model model : ModelTest.getCandidateModels()) {
 					model.print(ModelTest.getMainConsole());
 					ModelTest.getMainConsole().println(" ");
 				}

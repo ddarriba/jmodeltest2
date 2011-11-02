@@ -64,7 +64,7 @@ public abstract class InformationCriterion {
 	public InformationCriterion(boolean mwritePAUPblock, boolean mdoImportances,
 			boolean mdoModelAveraging, double minterval) {
 		numModels = options.numModels;
-		models = ModelTest.model;
+		models = ModelTest.getCandidateModels();
 		order = new int[numModels];
 		writePAUPblock = mwritePAUPblock;
 		doImportances = mdoImportances;

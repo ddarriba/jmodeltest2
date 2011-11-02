@@ -260,7 +260,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer {
 				stream.println("::Results::");
 				stream.println(" ");
 				int numComputedModels = 0;
-				for (Model model : ModelTest.model) {
+				for (Model model : ModelTest.getCandidateModels()) {
 					if (model.getLnL() > 0.0) {
 						numComputedModels++;
 						model.print(ModelTest.getMainConsole());

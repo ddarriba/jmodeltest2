@@ -14,16 +14,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Vector;
 
 import pal.alignment.Alignment;
+import es.uvigo.darwin.jmodeltest.io.TextInputStream;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.model.ModelConstants;
@@ -31,19 +33,21 @@ import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 /**
- * This class gathers the parameters of a single execution of jModelTest 2.
- * It is a singleton class.
+ * This class gathers the parameters of a single execution of jModelTest 2. It
+ * is a singleton class.
  * 
  * @author Diego Darriba
- *
+ * 
  */
 public class ApplicationOptions implements Serializable {
 
 	private static final long serialVersionUID = -3961572952922591321L;
 
 	/** Tree topology search algorithms */
-	public static enum TreeSearch {NNI, SPR, BEST};
-	
+	public static enum TreeSearch {
+		NNI, SPR, BEST
+	};
+
 	private static ApplicationOptions instance;
 	private static Vector<String> testOrder;
 
@@ -52,10 +56,18 @@ public class ApplicationOptions implements Serializable {
 	private File logFile;
 	// Newick user tree
 	private String userTree;
-	
+
+	/*
+	 * Number of threads for shared memory execution or static thread scheduling
+	 */
 	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
+	/*
+	 * Number of threads for dynamic thread scheduling
+	 */
+	private File machinesFile;
+
 	public boolean threadScheduling = false;
-	
+
 	public boolean doAIC = false;
 	public boolean doAICc = false;
 	public boolean doBIC = false;
@@ -89,13 +101,13 @@ public class ApplicationOptions implements Serializable {
 	public boolean optimizeMLTopology = true;
 
 	public TreeSearch treeSearchOperations = TreeSearch.NNI;
-	
+
 	public int numSites;
 	public int numTaxa;
 	public int numBranches;
 	public int numModels;
 	public int sampleSize;
-	
+
 	public String consensusType = "50% majority rule"; // consensus type
 														// for model
 														// averaged
@@ -146,7 +158,7 @@ public class ApplicationOptions implements Serializable {
 					.getAbsolutePath());
 			out.print(getUserTree());
 			out.close();
-		} 
+		}
 	}
 
 	public static ApplicationOptions getInstance() {
@@ -166,7 +178,7 @@ public class ApplicationOptions implements Serializable {
 		boolean includeModel;
 
 		// fill in list of models
-		ModelTest.model = new Model[numModels];
+		ModelTest.setCandidateModels(new Model[numModels]);
 
 		for (i = j = 0; i < ModelTest.MAX_NUM_MODELS; i++) {
 			includeModel = true;
@@ -184,7 +196,7 @@ public class ApplicationOptions implements Serializable {
 			if (includeModel) {
 				// System.out.println("Including model" + Model.modelName[i] +
 				// " out of " + ModelTest.numModels + " models");
-				loadModelConstraints(ModelTest.model[j], j, i);
+				loadModelConstraints(ModelTest.getCandidateModel(j), j, i);
 				j++;
 			}
 		}
@@ -286,7 +298,7 @@ public class ApplicationOptions implements Serializable {
 		else
 			modelParameters = ModelConstants.freeParameters[modelNo] + BL;
 
-		ModelTest.model[order] = new Model(order + 1,
+		ModelTest.getCandidateModels()[order] = new Model(order + 1,
 				ModelConstants.modelName[modelNo],
 				ModelConstants.modelCode[modelNo], lk, modelParameters, pF, pT,
 				pV, pR, pI, pG, ModelConstants.numTransitions[modelNo],
@@ -378,5 +390,22 @@ public class ApplicationOptions implements Serializable {
 	public void setNumberOfThreads(int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
 	}
-	
+
+	public void setMachinesFile(File machinesFile) throws FileNotFoundException {
+		if (ModelTest.HOSTS_TABLE.containsKey(ModelTest.getHostname())) {
+			
+			setNumberOfThreads((Integer) ModelTest.HOSTS_TABLE.get(ModelTest
+					.getHostname()));
+			
+		} else {
+			System.err.println("");
+			System.err.println("WARNING: Machines File format is wrong.");
+			System.err.println("         This host: " + ModelTest.getHostname()
+					+ " does not exist");
+			System.err.println("         Using a single thread");
+			System.err.println("");
+			this.numberOfThreads = 1;
+		}
+	}
+
 }

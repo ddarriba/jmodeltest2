@@ -112,8 +112,8 @@ public class RunPhymlHibrid extends RunPhyml {
 			Model[] modelToReceive = null;
 			Model model = null;
 			if (ModelTest.MPJ_ME > 0) {
-				int[] sendMessage = { availablePEs };
-				Request modelRequest = MPI.COMM_WORLD.Isend(sendMessage, 0, 1,
+				int[] sendMessage = { availablePEs, maxPEs };
+				Request modelRequest = MPI.COMM_WORLD.Isend(sendMessage, 0, 2,
 						MPI.INT, 0, MultipleDistributor.TAG_SEND_REQUEST);
 				// prepare reception
 				modelToReceive = new Model[1];

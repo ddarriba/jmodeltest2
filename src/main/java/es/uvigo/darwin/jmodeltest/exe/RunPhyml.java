@@ -52,8 +52,11 @@ public abstract class RunPhyml extends Observable implements Observer {
 	protected Observer progress;
 	
 	public RunPhyml(Observer progress, ApplicationOptions options, Model[] models) {
+		if (models != null)
 		this.models = new Model[models.length];
-		for (int i=0; i<models.length; i++)
+		else
+	    this.models = new Model[0];
+		for (int i=0; i < this.models.length; i++)
 			this.models[i] = models[i];
 		this.options = options;
 		this.progress = progress;

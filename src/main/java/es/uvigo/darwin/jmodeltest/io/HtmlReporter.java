@@ -232,7 +232,7 @@ public abstract class HtmlReporter {
 		datamodel.put("seqLength", options.numSites);
 		datamodel.put("phymlVersion", RunPhyml.PHYML_VERSION);
 		datamodel.put("phymlBinary", Utilities.getBinaryVersion());
-		datamodel.put("candidateModels", ModelTest.model.length);
+		datamodel.put("candidateModels", ModelTest.getCandidateModels().length);
 		if (options.getSubstTypeCode() == 0)
 			datamodel.put("substSchemes", "3");
 		else if (options.getSubstTypeCode() == 1)

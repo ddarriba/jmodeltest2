@@ -71,7 +71,7 @@ public class RunPhymlMPJ extends RunPhyml {
 		distributorThread.start();
 		request();
 
-		for (Model model : models) {
+		for (Model model : ModelTest.getCandidateModels()) {
 			model.update(modelList.get(modelList.indexOf(model)));
 		}
 

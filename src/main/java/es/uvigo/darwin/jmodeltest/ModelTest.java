@@ -14,14 +14,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Vector;
+
+import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 
 import mpi.MPI;
 import pal.alignment.Alignment;
@@ -33,6 +38,7 @@ import es.uvigo.darwin.jmodeltest.exe.RunPhymlHibrid;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlMPJ;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlThread;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
+import es.uvigo.darwin.jmodeltest.io.TextInputStream;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ConsoleProgressObserver;
@@ -45,15 +51,16 @@ import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Simulation;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
-/** 
+/**
  * ModelTest.java
- *
- * Description:		Main class for selecting models of nucleotide substitition
- * @author			Diego Darriba, University of Vigo / University of A Coru�a, Spain
- * 					ddarriba@udc.es
- * @author			David Posada, University of Vigo, Spain  
- *					dposada@uvigo.es | darwin.uvigo.es
- * @version			2.0 (Jul 2011)
+ * 
+ * Description: Main class for selecting models of nucleotide substitition
+ * 
+ * @author Diego Darriba, University of Vigo / University of A Coru�a, Spain
+ *         ddarriba@udc.es
+ * @author David Posada, University of Vigo, Spain dposada@uvigo.es |
+ *         darwin.uvigo.es
+ * @version 2.0.1 (Jul 2011)
  */
 public class ModelTest {
 
@@ -71,12 +78,13 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.0";
+	public static final String CURRENT_VERSION = "2.0.1";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
 	public static final String CONFIG_FILE = "conf/jmodeltest.conf";
-	
+	public static final String UNKNOWN_HOSTNAME = "UNKNOWN";
+
 	private static TextOutputStream MAIN_CONSOLE;
 	private static TextOutputStream CURRENT_OUT_STREAM;
 
@@ -96,17 +104,33 @@ public class ModelTest {
 	private static BIC myBIC;
 	private static DT myDT;
 	private static HLRT myHLRT;
-	
+
 	private static RunConsense consensusAIC;
 	private static RunConsense consensusAICc;
 	private static RunConsense consensusBIC;
 	private static RunConsense consensusDT;
 
-	public static Model[] model;
+	private static Model[] candidateModels;
 	private static Model minAIC, minAICc, minBIC, minDT, minHLRT, minDLRT;
+
+	private static String hostname;
+	public static Hashtable HOSTS_TABLE;
 
 	// We can work under a GUI or in the command line
 	public static boolean buildGUI = true;
+
+	static {
+		InetAddress addr;
+		try {
+			addr = InetAddress.getLocalHost();
+			// Get hostname
+			hostname = addr.getHostName();
+		} catch (UnknownHostException e) {
+			hostname = UNKNOWN_HOSTNAME;
+			System.err.println("WARNING: This host is unknown");
+			// WARN AND DO NOTHING
+		}
+	}
 
 	// constructor with GUI
 	public ModelTest() {
@@ -134,12 +158,15 @@ public class ModelTest {
 
 	public static void main(String[] args) {
 		// initializing MPJ environment (if available)
+		System.err.println("[MPJ] "+ hostname +" Attempting to initialize MPJ environment...");
 		try {
 			arguments = MPI.Init(args);
+			System.err.println("[MPJ] MPJ succesfully initialized... ["+hostname+" ("+MPJ_ME+")]");
 			MPJ_ME = MPI.COMM_WORLD.Rank();
 			MPJ_SIZE = MPI.COMM_WORLD.Size();
 			MPJ_RUN = true;
 		} catch (Exception e) {
+			//System.err.println("[MPJ] Unknown exception");
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
@@ -147,6 +174,12 @@ public class ModelTest {
 		} catch (ExceptionInInitializerError e) {
 			e.printStackTrace();
 			System.exit(-1);
+			MPJ_ME = 0;
+			MPJ_SIZE = 1;
+			MPJ_RUN = false;
+			arguments = args;
+		} catch (NoClassDefFoundError e) {
+			//System.err.println("[MPJ] NoClassDefFoundError");
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
@@ -225,15 +258,17 @@ public class ModelTest {
 		RunPhyml runPhyml;
 		if (MPJ_RUN) {
 			if (options.threadScheduling && options.getNumberOfThreads() > 0) {
-				runPhyml = new RunPhymlHibrid(MPJ_ME, MPJ_SIZE, new ConsoleProgressObserver(options),
-						options, model, options.getNumberOfThreads());
+				runPhyml = new RunPhymlHibrid(MPJ_ME, MPJ_SIZE,
+						new ConsoleProgressObserver(options), options,
+						getCandidateModels(), options.getNumberOfThreads());
 			} else {
-				runPhyml = new RunPhymlMPJ(new ConsoleProgressObserver(options),
-						options, model);
+				runPhyml = new RunPhymlMPJ(
+						new ConsoleProgressObserver(options), options,
+						getCandidateModels());
 			}
 		} else {
 			runPhyml = new RunPhymlThread(new ConsoleProgressObserver(options),
-					options, model);
+					options, getCandidateModels());
 		}
 		runPhyml.execute();
 
@@ -248,8 +283,8 @@ public class ModelTest {
 				AICwasCalculated = true;
 				myAIC.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
-					consensusAIC = new RunConsense(myAIC, options.consensusType,
-							options.confidenceInterval);
+					consensusAIC = new RunConsense(myAIC,
+							options.consensusType, options.confidenceInterval);
 				}
 			}
 
@@ -263,8 +298,8 @@ public class ModelTest {
 				AICcwasCalculated = true;
 				myAICc.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
-					consensusAICc = new RunConsense(myAICc, options.consensusType,
-							options.confidenceInterval);
+					consensusAICc = new RunConsense(myAICc,
+							options.consensusType, options.confidenceInterval);
 				}
 			}
 
@@ -277,8 +312,8 @@ public class ModelTest {
 				BICwasCalculated = true;
 				myBIC.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
-					consensusBIC = new RunConsense(myBIC, options.consensusType,
-							options.confidenceInterval);
+					consensusBIC = new RunConsense(myBIC,
+							options.consensusType, options.confidenceInterval);
 				}
 			}
 
@@ -309,11 +344,12 @@ public class ModelTest {
 				myHLRT.computeDynamical(!options.backwardHLRTSelection,
 						options.confidenceLevelHLRT, options.writePAUPblock);
 			}
-			
+
 			if (ModelTestConfiguration.isAutoLogEnabled()) {
-				HtmlReporter.buildReport(options, ModelTest.model, null);
+				HtmlReporter.buildReport(options,
+						ModelTest.getCandidateModels(), null);
 			}
-			
+
 			MAIN_CONSOLE.println(" ");
 			MAIN_CONSOLE.println("Program is done.");
 			MAIN_CONSOLE.println(" ");
@@ -339,6 +375,12 @@ public class ModelTest {
 							.println(error
 									+ "Arguments must start with \"-\". The ofending argument was: "
 									+ arguments[i] + ".");
+					System.err.print("      Arguments: ");
+					for (String argument : arguments) {
+						System.err.print(argument + " ");
+					}
+					System.err.println("");
+
 					PrintUsage();
 					System.exit(1);
 				}
@@ -427,19 +469,16 @@ public class ModelTest {
 							String sampleSize = arguments[i++];
 							options.sampleSize = Integer.parseInt(sampleSize);
 						} catch (NumberFormatException e) {
-							System.err
-									.println(error
-											+ "-n option requires a sample size.");
+							System.err.println(error
+									+ "-n option requires a sample size.");
 							PrintUsage();
 						}
 					} else {
-						System.err
-								.println(error
-										+ "-n option requires a sample size.");
+						System.err.println(error
+								+ "-n option requires a sample size.");
 						PrintUsage();
 					}
-				}
-				else if (arg.equals("-t")) {
+				} else if (arg.equals("-t")) {
 					if (i < arguments.length) {
 						String type = arguments[i++];
 
@@ -504,13 +543,13 @@ public class ModelTest {
 						}
 					} else {
 						System.err
-						.println(error
-								+ "-S option requires a type of tree topology search operation: "
-								+ "\"NNI\", \"SPR\", \"BEST\"");
+								.println(error
+										+ "-S option requires a type of tree topology search operation: "
+										+ "\"NNI\", \"SPR\", \"BEST\"");
 						PrintUsage();
 					}
 				}
-				
+
 				else if (arg.equals("-AIC")) {
 					options.doAIC = true;
 				}
@@ -665,27 +704,102 @@ public class ModelTest {
 						PrintUsage();
 					}
 
-				} else if (arg.equals("-tr")) {
+				} else if (arg.equals("-machinesfile")) {
 					if (i < arguments.length) {
+
+						File machinesFile = new File(arguments[i++]);
+						if (!(machinesFile.exists() && machinesFile.canRead())) {
+							if (MPJ_ME == 0) {
+								System.err
+										.println(error
+												+ "Machines file does not exists or it is not readable");
+							}
+							PrintUsage();
+						}
+
+						boolean hostsError = false;
 						try {
-							String type = arguments[i++];
-							options.setNumberOfThreads(Integer.parseInt(type));
-							options.threadScheduling = true;
-						} catch (NumberFormatException e) {
+							TextInputStream machinesInputStream = new TextInputStream(
+									machinesFile.getAbsolutePath());
+							String line;
+
+							HOSTS_TABLE = new Hashtable();
+							while ((line = machinesInputStream.readLine()) != null) {
+								String hostProcs[] = line.split(":");
+								if (hostProcs.length == 2) {
+									try {
+
+										int numberOfThreads = Integer
+												.parseInt(hostProcs[1]);
+
+										HOSTS_TABLE.put(hostProcs[0],
+												new Integer(numberOfThreads));
+
+									} catch (NumberFormatException e) {
+										hostsError = true;
+										break;
+										// Warn and continue with 1 processor
+									}
+								} else {
+									hostsError = true;
+								}
+
+								if (hostsError) {
+									if (MPJ_ME == 0) {
+										System.err.println("");
+										System.err
+												.println("WARNING: Machines File format is wrong.");
+										System.err
+												.println("         Each line should have the following format:");
+										System.err
+												.println("         HOSTNAME:NUMBER_OF_PROCESORS");
+										System.err
+												.println("Using a single thread");
+										System.err.println("");
+									}
+									HOSTS_TABLE = null;
+									options.setNumberOfThreads(1);
+								}
+							}
+							options.setMachinesFile(machinesFile);
+
+						} catch (FileNotFoundException e) {
+							System.err
+									.println(error
+											+ "Machines file does not exists or it is not readable");
+							PrintUsage();
+						}
+					} else {
+						System.err.println(error
+								+ "-machinesfile option requires a filename");
+						PrintUsage();
+					}
+				} else if (arg.equals("-tr")) {
+					if (HOSTS_TABLE != null) {
+						String type = arguments[i++];
+						System.err
+								.println("WARNING: Machines File has been specified. -tr "
+										+ type + " argument will be ignored.");
+					} else {
+						if (i < arguments.length) {
+							try {
+								String type = arguments[i++];
+								options.setNumberOfThreads(Integer
+										.parseInt(type));
+								options.threadScheduling = true;
+							} catch (NumberFormatException e) {
+								System.err
+										.println(error
+												+ "-tr option requires the number of processors to compute.");
+								PrintUsage();
+							}
+						} else {
 							System.err
 									.println(error
 											+ "-tr option requires the number of processors to compute.");
 							PrintUsage();
 						}
 					}
-					
-					else {
-						System.err
-								.println(error
-										+ "-tr option requires the number of processors to compute.");
-						PrintUsage();
-					}
-
 				} else {
 					System.err.println(error + "the argument \" " + arg
 							+ "\" is unknown. Check its syntax.");
@@ -702,38 +816,42 @@ public class ModelTest {
 	 * PrintUsage **************************** * Prints command line usage * *
 	 ************************************************************************/
 	static public void PrintUsage() {
-		String usage = "\njModelTest command usage"
-				+ "\n -d: input data file (e.g., -d data.phy)"
-				+ "\n -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11; default is 3)"
-				+ "\n -f: include models with unequals base frecuencies (e.g., -f) (default is false)"
-				+ "\n -i: include models with a proportion invariable sites (e.g., -i) (default is false)"
-				+ "\n -g: include models with rate variation among sites and number of categories (e.g., -g 8) (default is false & 4 categories)"
-				+ "\n -t: base tree for likelihood calculations (fixed (BIONJ-JC), BIONJ, ML) (e.g., -t BIONJ) (default is ML)"
-				+ "\n -u: user tree for likelihood calculations  (e.g., -u data.tre)"
-				+ "\n -S: tree topology search operation option (NNI (fast), SPR (a bit slower), BEST (best of NNI and SPR)) (default is NNI)"
-				+ "\n -n: sample size (-n235) (default is  the number of sites)"
-				+ "\n -AIC: calculate the Akaike Information Criterion (e.g., -AIC) (default is false)"
-				+ "\n -AICc: calculate the corrected Akaike Information Criterion (e.g., -AICc) (default is false)"
-				+ "\n -BIC: calculate the Bayesian Information Criterion (e.g., -BIC) (default is false)"
-				+ "\n -DT: calculate the decision theory criterion (e.g., -DT) (default is false)"
-				+ "\n -p: calculate parameter importances (e.g., -p) (default is false)"
-				+ "\n -v: do model averaging and parameter importances (e.g., -v) (default is false)"
-				+ "\n -c: confidence interval (e.g., -c 90) (default is 100)"
-				+ "\n -w: write PAUP block (e.g., -w) (default is false)"
-				+ "\n -dLRT: do dynamical likelihood ratio tests (e.g., -dLRT)(default is false)"
-				+ "\n -hLRT: do hierarchical likelihood ratio tests (default is false)"
-				+ "\n -o: hypothesis order for the hLRTs (e.g., -hLRT -o gpftv) (default is ftvgp/ftvwgp/ftvwxgp)"
-				+ "\n        f=freq, t=titvi, v=2ti4tv(subst=3)/2ti(subst>3), w=2tv, x=4tv, g=gamma, p=pinv"
-				+ "\n -r: backward selection for the hLRT (e.g., -r) (default is forward)"
-				+ "\n -h: confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)"
-				+ "\n -a: estimate model-averaged phylogeny for each active criterion (e.g., -a) (default is false)"
-				+ "\n -z: strict consensus type for model-averaged phylogeny (e.g., -z) (default is majority rule)"
-				+ "\n -tr: number of threads to execute (default is the "+ Runtime.getRuntime().availableProcessors() +")"
-				+ "\n\n Command line: java -jar jModeltest.jar [arguments]";
-		System.err.println(usage);
-		System.err.println(" ");
+		if (MPJ_ME == 0) {
+			String usage = "\njModelTest command usage"
+					+ "\n -d: input data file (e.g., -d data.phy)"
+					+ "\n -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11; default is 3)"
+					+ "\n -f: include models with unequals base frecuencies (e.g., -f) (default is false)"
+					+ "\n -i: include models with a proportion invariable sites (e.g., -i) (default is false)"
+					+ "\n -g: include models with rate variation among sites and number of categories (e.g., -g 8) (default is false & 4 categories)"
+					+ "\n -t: base tree for likelihood calculations (fixed (BIONJ-JC), BIONJ, ML) (e.g., -t BIONJ) (default is ML)"
+					+ "\n -u: user tree for likelihood calculations  (e.g., -u data.tre)"
+					+ "\n -S: tree topology search operation option (NNI (fast), SPR (a bit slower), BEST (best of NNI and SPR)) (default is NNI)"
+					+ "\n -n: sample size (-n235) (default is  the number of sites)"
+					+ "\n -AIC: calculate the Akaike Information Criterion (e.g., -AIC) (default is false)"
+					+ "\n -AICc: calculate the corrected Akaike Information Criterion (e.g., -AICc) (default is false)"
+					+ "\n -BIC: calculate the Bayesian Information Criterion (e.g., -BIC) (default is false)"
+					+ "\n -DT: calculate the decision theory criterion (e.g., -DT) (default is false)"
+					+ "\n -p: calculate parameter importances (e.g., -p) (default is false)"
+					+ "\n -v: do model averaging and parameter importances (e.g., -v) (default is false)"
+					+ "\n -c: confidence interval (e.g., -c 90) (default is 100)"
+					+ "\n -w: write PAUP block (e.g., -w) (default is false)"
+					+ "\n -dLRT: do dynamical likelihood ratio tests (e.g., -dLRT)(default is false)"
+					+ "\n -hLRT: do hierarchical likelihood ratio tests (default is false)"
+					+ "\n -o: hypothesis order for the hLRTs (e.g., -hLRT -o gpftv) (default is ftvgp/ftvwgp/ftvwxgp)"
+					+ "\n        f=freq, t=titvi, v=2ti4tv(subst=3)/2ti(subst>3), w=2tv, x=4tv, g=gamma, p=pinv"
+					+ "\n -r: backward selection for the hLRT (e.g., -r) (default is forward)"
+					+ "\n -h: confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)"
+					+ "\n -a: estimate model-averaged phylogeny for each active criterion (e.g., -a) (default is false)"
+					+ "\n -z: strict consensus type for model-averaged phylogeny (e.g., -z) (default is majority rule)"
+					+ "\n -tr: number of threads to execute (default is the "
+					+ Runtime.getRuntime().availableProcessors()
+					+ ")"
+					+ "\n -machinesfile: gets the processors per host from a machines file"
+					+ "\n\n Command line: java -jar jModeltest.jar [arguments]";
+			System.err.println(usage);
+			System.err.println(" ");
+		}
 		System.exit(1);
-
 	}
 
 	/****************************
@@ -757,7 +875,7 @@ public class ModelTest {
 		stream.println(System.getProperty("os.name") + " "
 				+ System.getProperty("os.version") + ", arch: "
 				+ System.getProperty("os.arch") + ", bits: "
-				+ System.getProperty("sun.arch.data.model") + ", numcores: " 
+				+ System.getProperty("sun.arch.data.model") + ", numcores: "
 				+ Runtime.getRuntime().availableProcessors());
 		stream.println(" ");
 	}
@@ -769,7 +887,8 @@ public class ModelTest {
 
 	static public void printNotice(TextOutputStream stream) {
 		// stream.println("\n******************************* NOTICE ************************************");
-		stream.println("jModelTest " + CURRENT_VERSION + "  Copyright (C) 2011 Diego Darriba, David Posada");
+		stream.println("jModelTest " + CURRENT_VERSION
+				+ "  Copyright (C) 2011 Diego Darriba, David Posada");
 		stream.println("This program comes with ABSOLUTELY NO WARRANTY");
 		stream.println("This is free software, and you are welcome to redistribute it");
 		stream.println("under certain conditions");
@@ -887,13 +1006,14 @@ public class ModelTest {
 
 			try {
 
-//				File outputFile = File
-//						.createTempFile("jmodeltest", "input.aln");
-				ModelTestService.readAlignment(inputFile, options.getAlignmentFile());
+				// File outputFile = File
+				// .createTempFile("jmodeltest", "input.aln");
+				ModelTestService.readAlignment(inputFile,
+						options.getAlignmentFile());
 
 				Alignment alignment = AlignmentReader.readAlignment(
-						new PrintWriter(System.err),
-						options.getAlignmentFile().getAbsolutePath(), true); // file
+						new PrintWriter(System.err), options.getAlignmentFile()
+								.getAbsolutePath(), true); // file
 				options.numTaxa = alignment.getSequenceCount();
 				options.numSites = alignment.getSiteCount();
 				options.numBranches = 2 * options.numTaxa - 3;
@@ -1048,35 +1168,35 @@ public class ModelTest {
 	public static RunConsense getConsensusAIC() {
 		return consensusAIC;
 	}
-	
+
 	public static RunConsense getConsensusAICc() {
 		return consensusAICc;
 	}
-	
+
 	public static RunConsense getConsensusBIC() {
 		return consensusBIC;
 	}
-	
+
 	public static RunConsense getConsensusDT() {
 		return consensusDT;
 	}
-	
+
 	public static void setConsensusAIC(RunConsense pConsensusAIC) {
 		consensusAIC = pConsensusAIC;
 	}
-	
+
 	public static void setConsensusAICc(RunConsense pConsensusAICc) {
 		consensusAICc = pConsensusAICc;
 	}
-	
+
 	public static void setConsensusBIC(RunConsense pConsensusBIC) {
 		consensusBIC = pConsensusBIC;
 	}
-	
+
 	public static void setConsensusDT(RunConsense pConsensusDT) {
 		consensusDT = pConsensusDT;
 	}
-	
+
 	/**
 	 * Finalizes the MPJ runtime environment. When an error occurs, it aborts
 	 * the execution of every other processes.
@@ -1157,5 +1277,32 @@ public class ModelTest {
 	public static Model getMinAIC() {
 		return minAIC;
 	}
+
+	/**
+	 * @param candidateModels
+	 *            the candidateModels to set
+	 */
+	public static void setCandidateModels(Model[] candidateModels) {
+		ModelTest.candidateModels = candidateModels;
+	}
+
+	/**
+	 * @return the candidateModels
+	 */
+	public static Model[] getCandidateModels() {
+		return candidateModels;
+	}
+
+	/**
+	 * @return a single candidate model
+	 */
+	public static Model getCandidateModel(int index) {
+		return candidateModels[index];
+	}
+
+	public static String getHostname() {
+		return hostname;
+	}
+
 } // class ModelTest
 

@@ -69,7 +69,7 @@ public class RunConsense {
 		criterion = tcriterion;
 		consensusType = tconsensusType;
 		numModels = tcriterion.getNumModels();
-		model = ModelTest.model;
+		model = ModelTest.getCandidateModels();
 		order = new int[numModels];
 		confidenceInterval = minterval;
 		confidenceModels = new Vector<Model>();
