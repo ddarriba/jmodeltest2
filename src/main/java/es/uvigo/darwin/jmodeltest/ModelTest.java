@@ -367,6 +367,7 @@ public class ModelTest {
 		int i, j;
 		String arg = "";
 		String error = "\nCOMMAND LINE ERROR: ";
+		boolean isInputFile = false;
 		try {
 			i = 0;
 			while (i < arguments.length) {
@@ -390,6 +391,7 @@ public class ModelTest {
 				if (arg.equals("-d")) {
 					if (i < arguments.length) {
 						options.setInputFile(new File(arguments[i++]));
+						isInputFile = true;
 					} else {
 						System.err.println(error
 								+ "-d option requires an input filename.");
@@ -807,6 +809,10 @@ public class ModelTest {
 				}
 
 			} // while
+			if (!isInputFile) {
+				System.err.println(error + "Input File is required (-d argument)");
+				PrintUsage();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -843,7 +849,7 @@ public class ModelTest {
 					+ "\n -h: confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)"
 					+ "\n -a: estimate model-averaged phylogeny for each active criterion (e.g., -a) (default is false)"
 					+ "\n -z: strict consensus type for model-averaged phylogeny (e.g., -z) (default is majority rule)"
-					+ "\n -tr: number of threads to execute (default is the "
+					+ "\n -tr: number of threads to execute (default is "
 					+ Runtime.getRuntime().availableProcessors()
 					+ ")"
 					+ "\n -machinesfile: gets the processors per host from a machines file"
@@ -906,11 +912,8 @@ public class ModelTest {
 
 	static public void printCitation(TextOutputStream stream) {
 		// stream.println("\n******************************* CITATION *********************************");
-		stream.println("Citation: Diego Darriba, Guillermo L. Taboada, Ramón Doallo, and David Posada.");
-		stream.println("          2011. HPC selection of models of DNA substitution. In Proceedings of");
-		stream.println("          the 9th International Conference on Computational Methods in Systems");
-		stream.println("          Biology (CMSB '11), Paris, September 2011, pages 65-72. ");
-		stream.println("          (paper in ACM DL)");
+		stream.println("Citation: Posada D. 2008. jModelTest: Phylogenetic Model Averaging.");
+		stream.println("          Molecular Biology and Evolution 25: 1253-1256.");
 		stream.println(" ");
 		// stream.println("***************************************************************************\n");
 

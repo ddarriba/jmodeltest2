@@ -369,7 +369,7 @@ public class FrameMain extends JModelTestFrame {
 		mainEditorPane.setMargin(new Insets(5, 5, 5, 5));
 		mainEditorPane.setFont(XManager.FONT_CONSOLE);
 
-		mainEditorPane.setBackground(Color.white);
+		mainEditorPane.setBackground(XManager.PANE_BACK_COLOR);
 		mainEditorPane.setEditable(false);
 		mainEditorPane.setSize(new java.awt.Dimension(15, 10));
 		mainEditorPane.setAutoscrolls(true);
@@ -377,13 +377,12 @@ public class FrameMain extends JModelTestFrame {
 
 		StatusPanel.setPreferredSize(new java.awt.Dimension(592, 30));
 		StatusPanel.setBorder(new BorderUIResource.EtchedBorderUIResource(1,
-				new java.awt.Color(182, 182, 182), new java.awt.Color(89, 89,
-						89)));
+				XManager.INNER_BORDER_COLOR, XManager.OUTER_BORDER_COLOR));
 		StatusPanel.setLocation(new java.awt.Point(20, 630));
 		StatusPanel.setVisible(true);
 		StatusPanel.setLayout(new BorderLayout());
 		StatusPanel.setForeground(java.awt.Color.blue);
-		StatusPanel.setBackground(new java.awt.Color(220, 220, 220));
+		StatusPanel.setBackground(XManager.STATUS_BACK_COLOR);
 		StatusPanel.setFont(XManager.FONT_STATUS);
 
 		LabelStatusLikelihoods.setSize(new java.awt.Dimension(270, 40));
@@ -391,13 +390,13 @@ public class FrameMain extends JModelTestFrame {
 		LabelStatusLikelihoods.setText("  Likelihood scores not available");
 		LabelStatusLikelihoods
 				.setToolTipText("Status of likelihood scores calculations");
-		LabelStatusLikelihoods.setForeground(new java.awt.Color(153, 0, 0));
+		LabelStatusLikelihoods.setForeground(XManager.LABEL_FAIL_COLOR);
 		LabelStatusLikelihoods.setFont(XManager.FONT_LABEL);
 		LabelStatusData.setSize(new java.awt.Dimension(150, 40));
 		LabelStatusData.setVisible(true);
 		LabelStatusData.setText("No data file loaded  ");
 		LabelStatusData.setToolTipText("Active current data file");
-		LabelStatusData.setForeground(new java.awt.Color(153, 0, 0));
+		LabelStatusData.setForeground(XManager.LABEL_FAIL_COLOR);
 		LabelStatusData.setHorizontalAlignment(JLabel.RIGHT);
 		LabelStatusData.setFont(XManager.FONT_LABEL);
 

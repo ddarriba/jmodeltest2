@@ -42,9 +42,14 @@ public class XManager {
 	public static final Font FONT_CONSOLE, FONT_LABEL, 
 		FONT_MENU, FONT_STATUS, FONT_SLIDER, FONT_LABEL_BIG,
 		FONT_TABULAR;
-	public static final Color LABEL_BLUE_COLOR = new java.awt.Color(102,102,153);
-	public static final Color LABEL_FAIL_COLOR = Color.red;
-	public static final Color MENU_COLOR = new Color(199, 199, 220);
+	public static final Color LABEL_BLUE_COLOR = new Color(102,102,153);
+	public static final Color LABEL_FAIL_COLOR = new Color(153, 0, 0);
+	public static final Color MENU_COLOR = new Color(130,130,150);//(199, 199, 220);
+	public static final Color MENU_FG_COLOR = new Color(0,0,0);
+	public static final Color PANE_BACK_COLOR = Color.WHITE;
+	public static final Color INNER_BORDER_COLOR = new Color(182,182,182); //182
+	public static final Color OUTER_BORDER_COLOR = new Color(89,89,89); //89
+	public static final Color STATUS_BACK_COLOR = new Color(220,220,220); //220
 	
 	public static SimpleAttributeSet redText;
 	public static SimpleAttributeSet blackText;
