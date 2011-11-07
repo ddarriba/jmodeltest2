@@ -25,7 +25,6 @@ import java.io.Serializable;
 import java.util.Vector;
 
 import pal.alignment.Alignment;
-import es.uvigo.darwin.jmodeltest.io.TextInputStream;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.model.ModelConstants;

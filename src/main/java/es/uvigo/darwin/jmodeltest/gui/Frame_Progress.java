@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package es.uvigo.darwin.jmodeltest.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -31,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
 
@@ -42,26 +44,38 @@ import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
-public class Frame_Progress extends JModelTestFrame implements Observer, ActionListener {
+public class Frame_Progress extends JModelTestFrame implements Observer,
+		ActionListener {
 
 	private static final long serialVersionUID = 201102181036L;
-	private static final int HEIGHT_PER_THREAD = 25;
+	private static final int LABEL_HEIGHT = 20;
+	private static final int THREAD_BAR_HEIGHT = 20;
+	private static final int PROGRESS_BAR_HEIGHT = 30;
+	private static final int HEIGHT_PER_THREAD = 45;
+	private static final int COMPONENTS_WIDTH = 300;
+	private static final int SECTIONS_PADDING = 5;
+	private static final int COMPONENTS_MARGIN = 70;
+
+	private static final int THREADS_SECTIONS_VLOC = 30 + SECTIONS_PADDING;
+
 	private static final String NO_MODEL = "iddle";
 
 	private TextOutputStream stream;
 
 	private int numberOfThreads;
 	private JProgressBar threadProgressBar[];
+	private JLabel threadProgressLabel[];
 	private JLabel threadProgressModelLabel[];
 	private JButton progressBarCancelButton = new JButton();
 	private JProgressBar progressBarLike = new JProgressBar();
 	private JLabel progressBarLikeLabel = new JLabel();
 	private JLabel timerLabel = new JLabel();
+
 	/** Timer for calculate the elapsed time **/
 	private long startTime;
 	private Frame_CalcLike frameCalcLike;
 	private Timer timer;
-	
+
 	private int completedModels = 0;
 	private int totalModels;
 
@@ -78,6 +92,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer, ActionL
 		this.startTime = System.currentTimeMillis();
 		this.stream = ModelTest.getMainConsole();
 		this.threadProgressBar = new JProgressBar[numberOfThreads];
+		this.threadProgressLabel = new JLabel[numberOfThreads];
 		this.threadProgressModelLabel = new JLabel[numberOfThreads];
 		this.maximum = numModels;
 		this.frameCalcLike = frameCalcLike;
@@ -89,51 +104,77 @@ public class Frame_Progress extends JModelTestFrame implements Observer, ActionL
 		this.progressBarLike.setValue(0);
 		this.progressBarLike.setStringPainted(true);
 		this.progressBarLike.setString(null);
-		
+
 		timer = new Timer(1000, this);
 		timer.setRepeats(true);
 		timer.start();
 	}
 
 	public void initComponents() {
-		// the following code sets the frame's initial state
-		progressBarLike.setSize(new java.awt.Dimension(300, 30));
-		progressBarLike.setString("");
-		progressBarLike.setLocation(new java.awt.Point(40, 40
-				+ HEIGHT_PER_THREAD * numberOfThreads));
-		progressBarLike.setVisible(true);
-		progressBarLikeLabel.setSize(new java.awt.Dimension(120, 20));
-		progressBarLikeLabel.setLocation(new java.awt.Point(40, 20));
+		// TOP LABEL
+		progressBarLikeLabel.setSize(new java.awt.Dimension(120, LABEL_HEIGHT));
+		progressBarLikeLabel.setLocation(new java.awt.Point(40, 10));
 		progressBarLikeLabel.setVisible(true);
 		progressBarLikeLabel.setFont(XManager.FONT_CONSOLE);
-		timerLabel.setSize(new java.awt.Dimension(180, 20));
-		timerLabel.setLocation(new java.awt.Point(160, 20));
+		progressBarLikeLabel.setText("Completed 0/" + totalModels);
+
+		timerLabel.setSize(new java.awt.Dimension(180, LABEL_HEIGHT));
+		timerLabel.setLocation(new java.awt.Point(160, 10));
 		timerLabel.setVisible(true);
 		timerLabel.setFont(XManager.FONT_CONSOLE);
 		timerLabel.setAlignmentX(RIGHT_ALIGNMENT);
-		progressBarCancelButton.setVisible(true);
-		progressBarCancelButton.setSize(new java.awt.Dimension(100, 35));
-		progressBarCancelButton.setText("Cancel");
-		progressBarCancelButton.setLocation(new java.awt.Point(140, 80
-				+ HEIGHT_PER_THREAD * numberOfThreads));
-		progressBarLikeLabel.setText("Completed 0/" + totalModels);
+
+		// THREAD SECTION
+
 		for (int i = 0; i < numberOfThreads; i++) {
+			threadProgressLabel[i] = new JLabel();
+			threadProgressLabel[i].setSize(new java.awt.Dimension(80,
+					LABEL_HEIGHT));
+			threadProgressLabel[i].setLocation(new java.awt.Point(40,
+					THREADS_SECTIONS_VLOC + (i) * HEIGHT_PER_THREAD));
+			threadProgressLabel[i].setVisible(true);
+			threadProgressLabel[i].setFont(XManager.FONT_CONSOLE);
+			threadProgressLabel[i].setText("Thread " + i + ":");
 			threadProgressModelLabel[i] = new JLabel();
-			threadProgressModelLabel[i].setSize(new java.awt.Dimension(80, 20));
-			threadProgressModelLabel[i].setLocation(new java.awt.Point(40, 40
-					+ (i) * HEIGHT_PER_THREAD));
+			threadProgressModelLabel[i].setSize(new java.awt.Dimension(220,
+					LABEL_HEIGHT));
+			threadProgressModelLabel[i].setLocation(new java.awt.Point(120,
+					THREADS_SECTIONS_VLOC + (i) * HEIGHT_PER_THREAD));
 			threadProgressModelLabel[i].setVisible(true);
 			threadProgressModelLabel[i].setFont(XManager.FONT_CONSOLE);
-			threadProgressModelLabel[i].setText("Thread " + i + ":");
+			threadProgressModelLabel[i].setText(NO_MODEL);
+			threadProgressModelLabel[i].setOpaque(true);
+			threadProgressModelLabel[i]
+					.setForeground(XManager.LABEL_FAIL_COLOR);
 			threadProgressBar[i] = new JProgressBar();
-			threadProgressBar[i].setSize(new java.awt.Dimension(220, 20));
-			threadProgressBar[i].setString(NO_MODEL);
-			threadProgressBar[i].setStringPainted(true);
+			threadProgressBar[i].setSize(new java.awt.Dimension(220,
+					THREAD_BAR_HEIGHT));
+			threadProgressBar[i].setStringPainted(false);
 			threadProgressBar[i].setIndeterminate(false);
-			threadProgressBar[i].setLocation(new java.awt.Point(120, 40 + (i)
-					* HEIGHT_PER_THREAD));
+			threadProgressBar[i].setLocation(new java.awt.Point(120,
+					THREADS_SECTIONS_VLOC + LABEL_HEIGHT + (i)
+							* HEIGHT_PER_THREAD));
 			threadProgressBar[i].setVisible(true);
 		}
+
+		// BOTTOM SECTION
+
+		progressBarLike.setSize(new java.awt.Dimension(COMPONENTS_WIDTH,
+				PROGRESS_BAR_HEIGHT));
+		progressBarLike.setString("");
+		progressBarLike.setLocation(new java.awt.Point(40,
+				THREADS_SECTIONS_VLOC + HEIGHT_PER_THREAD * numberOfThreads
+						+ SECTIONS_PADDING));
+		progressBarLike.setVisible(true);
+
+		progressBarCancelButton.setVisible(true);
+		progressBarCancelButton.setSize(new java.awt.Dimension(100, 30));
+		progressBarCancelButton.setText("Cancel");
+		progressBarCancelButton.setLocation(new java.awt.Point(140,
+				THREADS_SECTIONS_VLOC + HEIGHT_PER_THREAD * numberOfThreads
+						+ SECTIONS_PADDING + PROGRESS_BAR_HEIGHT + 5));
+
+		// MAIN WINDOW
 
 		setLocation(new java.awt.Point(281, 80));
 		getContentPane().setLayout(null);
@@ -142,19 +183,22 @@ public class Frame_Progress extends JModelTestFrame implements Observer, ActionL
 		for (JProgressBar progressBar : threadProgressBar) {
 			getContentPane().add(progressBar);
 		}
-		// for (JLabel progressLabel : threadProgressLabel) {
-		// getContentPane().add(progressLabel);
-		// }
-		for (JLabel progressLabel : threadProgressModelLabel) {
+
+		for (JLabel progressLabel : threadProgressLabel) {
 			getContentPane().add(progressLabel);
 		}
+
+		for (JLabel progressModelLabel : threadProgressModelLabel) {
+			getContentPane().add(progressModelLabel);
+		}
+
 		getContentPane().add(progressBarLike);
 		getContentPane().add(progressBarLikeLabel);
 		getContentPane().add(progressBarCancelButton);
 		getContentPane().add(timerLabel);
 
-		setSize(new java.awt.Dimension(370, 152 + HEIGHT_PER_THREAD
-				* numberOfThreads));
+		setSize(new java.awt.Dimension(COMPONENTS_WIDTH + COMPONENTS_MARGIN,
+				152 + HEIGHT_PER_THREAD * numberOfThreads));
 		setResizable(false);
 
 		// event handling
@@ -240,11 +284,13 @@ public class Frame_Progress extends JModelTestFrame implements Observer, ActionL
 				break;
 
 			case ProgressInfo.SINGLE_OPTIMIZATION_INIT:
-				for (JProgressBar progress : threadProgressBar) {
-					if (progress.getString().equals(NO_MODEL)) {
-						progress.setString("Computing "
+				for (int i = 0; i < numberOfThreads; i++) {
+					JLabel progressLabel = threadProgressModelLabel[i];
+					if (progressLabel.getText().equals(NO_MODEL)) {
+						progressLabel.setText("Computing "
 								+ info.getModel().getName() + "...");
-						progress.setIndeterminate(true);
+						progressLabel.setForeground(XManager.LABEL_GREEN_COLOR);
+						threadProgressBar[i].setIndeterminate(true);
 						break;
 					}
 				}
@@ -279,17 +325,19 @@ public class Frame_Progress extends JModelTestFrame implements Observer, ActionL
 			case ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED:
 				this.completedModels++;
 				int value = (completedModels * 100) / totalModels;
-				for (JProgressBar progress : threadProgressBar) {
-					if (progress.getString().equals(
+				for (int i = 0; i < numberOfThreads; i++) {
+					JLabel progressLabel = threadProgressModelLabel[i];
+					if (progressLabel.getText().equals(
 							"Computing " + info.getModel().getName() + "...")) {
-						progress.setString(NO_MODEL);
-						progress.setIndeterminate(false);
+						progressLabel.setText(NO_MODEL);
+						progressLabel.setForeground(XManager.LABEL_FAIL_COLOR);
+						threadProgressBar[i].setIndeterminate(false);
 						break;
 					}
 				}
-				
-				progressBarLikeLabel.setText("Completed "
-						+ completedModels + "/" + totalModels);
+
+				progressBarLikeLabel.setText("Completed " + completedModels
+						+ "/" + totalModels);
 				progressBarLike.setValue(value);
 
 				stream.println(info.getModel().getName()
@@ -425,7 +473,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer, ActionL
 		}
 
 	}
-	
+
 	public void actionPerformed(ActionEvent e) {
 		// If the timer caused this event.
 		timerLabel.setText("Elapsed time: "
