@@ -30,7 +30,6 @@ import es.uvigo.darwin.jmodeltest.io.TextInputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
-import es.uvigo.darwin.prottest.exe.ExternalExecutionManager;
 
 public class PhymlSingleModel extends Observable implements Runnable {
 
@@ -256,6 +255,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			// get process and execute command line
 			Runtime rt = Runtime.getRuntime();
 			Process proc = rt.exec(cmd, null, dir);
+			ProcessManager.getInstance().registerProcess(proc);
+			
 			// any error message?
 			StreamGobbler errorGobbler = new StreamGobbler(
 					proc.getErrorStream(), "ERROR", System.err);
@@ -264,7 +265,6 @@ public class PhymlSingleModel extends Observable implements Runnable {
 					options.getLogFile(), true);
 			StreamGobbler outputGobbler = new StreamGobbler(
 					proc.getInputStream(), "OUTPUT", logFile);
-			ExternalExecutionManager.getInstance().addProcess(proc);
 
 			// kick them off
 			errorGobbler.start();
@@ -272,7 +272,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 			// any error???
 			int exitVal = proc.waitFor();
-			ExternalExecutionManager.getInstance().removeProcess(proc);
+			ProcessManager.getInstance().removeProcess(proc);
 
 			if (verbose > 1)
 				System.out.println("ExitValue: " + exitVal);
@@ -288,15 +288,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			notifyObservers(ProgressInfo.INTERRUPTED, index, model, null);
 			interrupted = true;
 		} catch (Throwable t) {
-			System.err.println(" ");
-			System.err
-					.println("ERROR: cannot run the Phyml command line for some reason. Check the phmyl log file.");
-			System.err.print("Arguments: " + commandLine);
-			System.err.println("Current phyml path: " + PHYML_PATH);
-			System.err.println("Current phyml binary: "
-					+ Utilities.getBinaryVersion());
-			System.err.println(" ");
-			System.exit(0);
+			notifyObservers(ProgressInfo.ERROR, index, model, "Cannot run the Phyml command line for some reason: "+ PHYML_PATH + Utilities.getBinaryVersion());  
+			interrupted = true;			
 		}
 
 	}
@@ -462,11 +455,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 					+ phymlTreeFileName);
 			
 		}catch (TreeParseException e) {
-			System.out.println(" ");
-			System.out.println("ERROR: ML tree for " + model.getName()
-					+ " is invalid.");
-			System.out.println(" ");
-			System.exit(-1);
+			notifyObservers(ProgressInfo.ERROR, index, model, "ML tree for "
+					+ currentModel.getName() + " is invalid.");
 		}
 
 		Utilities.deleteFile(phymlStatFileName);

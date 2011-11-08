@@ -17,7 +17,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package es.uvigo.darwin.jmodeltest.gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -32,17 +31,18 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.XManager;
+import es.uvigo.darwin.jmodeltest.exe.ProcessManager;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
+import es.uvigo.darwin.prottest.exe.ExternalExecutionManager;
 
 public class Frame_Progress extends JModelTestFrame implements Observer,
 		ActionListener {
@@ -55,7 +55,6 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	private static final int COMPONENTS_WIDTH = 300;
 	private static final int SECTIONS_PADDING = 5;
 	private static final int COMPONENTS_MARGIN = 70;
-
 	private static final int THREADS_SECTIONS_VLOC = 30 + SECTIONS_PADDING;
 
 	private static final String NO_MODEL = "iddle";
@@ -377,12 +376,13 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 							.setCaretPosition(
 									XManager.getInstance().getPane()
 											.getDocument().getLength());
+					ProcessManager.getInstance().killAll();
 				}
 				break;
 
 			case ProgressInfo.ERROR:
-				stream.println(info.getMessage());
-
+				progressBarCancel(null);
+				Utilities.printRed(info.getMessage());
 				JOptionPane.showMessageDialog(new JFrame(), info.getMessage(),
 						"jModeltest error", JOptionPane.ERROR_MESSAGE);
 				break;
@@ -462,6 +462,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 
 			case ProgressInfo.OPTIMIZATION_COMPLETED_INTERRUPTED:
 				// dispose
+				ExternalExecutionManager.getInstance().killProcesses();
 				setVisible(false);
 				dispose();
 				break;

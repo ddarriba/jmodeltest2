@@ -22,7 +22,6 @@ import java.util.Observer;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
-import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
@@ -83,6 +82,9 @@ public class ConsoleProgressObserver implements Observer {
 
 			case ProgressInfo.ERROR:
 				stream.println(info.getMessage());
+				stream.println(" ");
+				stream.println("Computation of likelihood scores discontinued ...");
+				System.exit(-1);
 				break;
 
 			case ProgressInfo.OPTIMIZATION_COMPLETED_OK:
@@ -92,14 +94,6 @@ public class ConsoleProgressObserver implements Observer {
 					model.print(ModelTest.getMainConsole());
 					ModelTest.getMainConsole().println(" ");
 				}
-				
-//				String baseTree = "";
-//
-//				// update gui status
-//				if (!(options.fixedTopology || options.userTopologyExists))
-//					baseTree = "(optimized trees)";
-//				else
-//					baseTree = "(fixed tree)";
 
 				stream.println(" ");
 				stream.println("Computation of likelihood scores completed. It took "

@@ -14,12 +14,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest.exe;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -33,16 +33,14 @@ import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 
 public class RunPhymlThread extends RunPhyml {
 
-	private List<Model> runningModels = new ArrayList<Model>();
 	private ExecutorService threadPool;
-	
+
 	public RunPhymlThread(Observer progress, ApplicationOptions options,
 			Model[] models) {
 		super(progress, options, models);
-		
-		this.threadPool = Executors.newFixedThreadPool(
-				options.getNumberOfThreads()
-				);
+
+		this.threadPool = Executors.newFixedThreadPool(options
+				.getNumberOfThreads());
 	}
 
 	/*******************************
@@ -94,14 +92,31 @@ public class RunPhymlThread extends RunPhyml {
 			}
 		}
 
-		notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_OK,
-				models.length, null, null);
+		if (!errorsFound) {
+			notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_OK, models.length,
+				null, null);
+		} else {
+			notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_INTERRUPTED, models.length,
+				null, null);
+		}
 
 		return "All Done";
 	} // doPhyml
-	
+
 	public void interruptThread() {
 		super.interruptThread();
-		threadPool.shutdown();
+		ProcessManager.getInstance().killAll();
+		threadPool.shutdownNow();// shutdown();
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if (arg != null) {
+			ProgressInfo info = (ProgressInfo) arg;
+			if (info.getType() == ProgressInfo.ERROR) {
+				interruptThread();
+			}
+		}
+		super.update(o, arg);
 	}
 }

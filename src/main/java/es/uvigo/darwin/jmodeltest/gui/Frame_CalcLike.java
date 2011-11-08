@@ -97,6 +97,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 
 	public void cancelTask() {
 		task.interrupt();
+		this.dispose();
 	}
 	
 	public RunPhyml getRunPhyml() {
@@ -764,10 +765,11 @@ public class Frame_CalcLike extends JModelTestFrame {
 			return runPhyml;
 		}
 
-		public void finished() {
-
+		public void interrupt() {
+			runPhyml.interruptThread();
+			super.interrupt();
 		}
-		
+				
 		public RunPhyml getValue() {
 			return runPhyml;
 		}
