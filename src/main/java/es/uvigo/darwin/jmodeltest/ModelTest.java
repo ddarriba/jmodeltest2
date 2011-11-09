@@ -24,9 +24,8 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Vector;
-
-import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 
 import mpi.MPI;
 import pal.alignment.Alignment;
@@ -114,7 +113,7 @@ public class ModelTest {
 	private static Model minAIC, minAICc, minBIC, minDT, minHLRT, minDLRT;
 
 	private static String hostname;
-	public static Hashtable HOSTS_TABLE;
+	public static Hashtable<String,Integer> HOSTS_TABLE;
 
 	// We can work under a GUI or in the command line
 	public static boolean buildGUI = true;
@@ -725,7 +724,7 @@ public class ModelTest {
 									machinesFile.getAbsolutePath());
 							String line;
 
-							HOSTS_TABLE = new Hashtable();
+							HOSTS_TABLE = new Hashtable<String,Integer>();
 							while ((line = machinesInputStream.readLine()) != null) {
 								String hostProcs[] = line.split(":");
 								if (hostProcs.length == 2) {

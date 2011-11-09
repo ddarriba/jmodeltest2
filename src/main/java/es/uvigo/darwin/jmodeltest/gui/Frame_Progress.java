@@ -17,11 +17,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package es.uvigo.darwin.jmodeltest.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -31,8 +34,11 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
+import javax.swing.border.LineBorder;
+import javax.swing.plaf.BorderUIResource;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
@@ -51,17 +57,37 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	private static final int LABEL_HEIGHT = 20;
 	private static final int THREAD_BAR_HEIGHT = 20;
 	private static final int PROGRESS_BAR_HEIGHT = 30;
-	private static final int HEIGHT_PER_THREAD = 45;
-	private static final int COMPONENTS_WIDTH = 300;
-	private static final int SECTIONS_PADDING = 5;
-	private static final int COMPONENTS_MARGIN = 70;
-	private static final int THREADS_SECTIONS_VLOC = 30 + SECTIONS_PADDING;
+	private static final int WINDOW_WIDTH = 400;
+	private static final int H_MARGIN = 20;
+	private static final int V_MARGIN = 10;
+	private static final int V_INNER_MARGIN = 5;
+	private static final int SECTION_WIDTH = WINDOW_WIDTH - 2 * H_MARGIN;
+	private static final int HEADER_HEIGHT = LABEL_HEIGHT + 2 * V_INNER_MARGIN;
+	private static final int FOOTER_HEIGHT = 2 * PROGRESS_BAR_HEIGHT + 3
+			* V_INNER_MARGIN;
+	private static final int THREADS_SECTIONS_VLOC = HEADER_HEIGHT + 2
+			* V_MARGIN;
+	private static final int HEIGHT_PER_THREAD = THREAD_BAR_HEIGHT
+			+ LABEL_HEIGHT + V_INNER_MARGIN;
+	private static final int BUTTON_WIDTH = 100;
+	private static final int THREAD_LABEL_WIDTH = 80;
 
 	private static final String NO_MODEL = "iddle";
+
+	private static final Color[] THREAD_COLOR = { new Color(177, 68, 68),
+			new Color(177, 68, 161), new Color(126, 68, 177),
+			new Color(68, 97, 177), new Color(68, 177, 162),
+			new Color(68, 177, 63), new Color(161, 177, 68),
+			new Color(177, 141, 48), new Color(177, 73, 68) };
 
 	private TextOutputStream stream;
 
 	private int numberOfThreads;
+
+	private JPanel headerPanel = new JPanel();
+	private JPanel threadsActivityPanel = new JPanel();
+	private JPanel footerPanel = new JPanel();
+
 	private JProgressBar threadProgressBar[];
 	private JLabel threadProgressLabel[];
 	private JLabel threadProgressModelLabel[];
@@ -99,117 +125,153 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 		initComponents();
 		setVisible(true);
 
-		this.progressBarLike.setMaximum(maximum);
-		this.progressBarLike.setValue(0);
-		this.progressBarLike.setStringPainted(true);
-		this.progressBarLike.setString(null);
-
 		timer = new Timer(1000, this);
 		timer.setRepeats(true);
 		timer.start();
 	}
 
 	public void initComponents() {
+
 		// TOP LABEL
-		progressBarLikeLabel.setSize(new java.awt.Dimension(120, LABEL_HEIGHT));
-		progressBarLikeLabel.setLocation(new java.awt.Point(40, 10));
+		headerPanel.setSize(SECTION_WIDTH, HEADER_HEIGHT);
+		headerPanel.setLocation(H_MARGIN, V_MARGIN);
+		headerPanel.setBorder(new BorderUIResource.LineBorderUIResource(
+				XManager.PANEL_BORDER_COLOR));
+		headerPanel.setLayout(null);
+		headerPanel.setVisible(true);
+
+		progressBarLikeLabel.setSize(120, LABEL_HEIGHT);
+		progressBarLikeLabel.setLocation(H_MARGIN,
+				V_INNER_MARGIN);
 		progressBarLikeLabel.setVisible(true);
 		progressBarLikeLabel.setFont(XManager.FONT_CONSOLE);
 		progressBarLikeLabel.setText("Completed 0/" + totalModels);
 
-		timerLabel.setSize(new java.awt.Dimension(180, LABEL_HEIGHT));
-		timerLabel.setLocation(new java.awt.Point(160, 10));
+		timerLabel.setSize(180, LABEL_HEIGHT);
+		timerLabel.setLocation(160, V_INNER_MARGIN);
 		timerLabel.setVisible(true);
 		timerLabel.setFont(XManager.FONT_CONSOLE);
 		timerLabel.setAlignmentX(RIGHT_ALIGNMENT);
 
 		// THREAD SECTION
 
+		int threadsPanelHeight = numberOfThreads * HEIGHT_PER_THREAD + 4
+				* V_INNER_MARGIN;
+		threadsActivityPanel.setSize(SECTION_WIDTH, threadsPanelHeight);
+		threadsActivityPanel.setLocation(H_MARGIN, THREADS_SECTIONS_VLOC);
+		threadsActivityPanel
+				.setBorder(new BorderUIResource.TitledBorderUIResource(
+						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
+						"Thread activity", 4, 2, XManager.FONT_LABEL,
+						XManager.LABEL_BLUE_COLOR));
+		threadsActivityPanel.setLayout(null);
+		threadsActivityPanel.setVisible(true);
+		int colorStep = Math.max(THREAD_COLOR.length / numberOfThreads, 1);
 		for (int i = 0; i < numberOfThreads; i++) {
 			threadProgressLabel[i] = new JLabel();
-			threadProgressLabel[i].setSize(new java.awt.Dimension(80,
-					LABEL_HEIGHT));
-			threadProgressLabel[i].setLocation(new java.awt.Point(40,
-					THREADS_SECTIONS_VLOC + (i) * HEIGHT_PER_THREAD));
+			threadProgressLabel[i].setSize(
+					THREAD_LABEL_WIDTH, LABEL_HEIGHT);
+			threadProgressLabel[i].setLocation(H_MARGIN,
+					LABEL_HEIGHT + (i) * HEIGHT_PER_THREAD + V_INNER_MARGIN);
 			threadProgressLabel[i].setVisible(true);
 			threadProgressLabel[i].setFont(XManager.FONT_CONSOLE);
-			threadProgressLabel[i].setText("Thread " + i + ":");
+			threadProgressLabel[i].setText(" Thread " + i + ":");
+			threadProgressLabel[i].setOpaque(true);
+			threadProgressLabel[i].setBackground(THREAD_COLOR[(i * colorStep) % THREAD_COLOR.length]);
+			threadProgressLabel[i].setForeground(Color.WHITE);
 			threadProgressModelLabel[i] = new JLabel();
-			threadProgressModelLabel[i].setSize(new java.awt.Dimension(220,
-					LABEL_HEIGHT));
-			threadProgressModelLabel[i].setLocation(new java.awt.Point(120,
-					THREADS_SECTIONS_VLOC + (i) * HEIGHT_PER_THREAD));
+			threadProgressModelLabel[i].setSize(
+					SECTION_WIDTH - (THREAD_LABEL_WIDTH + 3 * H_MARGIN),
+					LABEL_HEIGHT);
+			threadProgressModelLabel[i].setLocation(
+					THREAD_LABEL_WIDTH + 2 * H_MARGIN, (i) * HEIGHT_PER_THREAD
+							+ 2 * V_INNER_MARGIN);
 			threadProgressModelLabel[i].setVisible(true);
 			threadProgressModelLabel[i].setFont(XManager.FONT_CONSOLE);
 			threadProgressModelLabel[i].setText(NO_MODEL);
-			threadProgressModelLabel[i].setOpaque(true);
+			threadProgressModelLabel[i].setOpaque(false);
 			threadProgressModelLabel[i]
 					.setForeground(XManager.LABEL_FAIL_COLOR);
 			threadProgressBar[i] = new JProgressBar();
-			threadProgressBar[i].setSize(new java.awt.Dimension(220,
-					THREAD_BAR_HEIGHT));
+			threadProgressBar[i].setSize(SECTION_WIDTH
+					- (THREAD_LABEL_WIDTH + 3 * H_MARGIN), THREAD_BAR_HEIGHT);
 			threadProgressBar[i].setStringPainted(false);
 			threadProgressBar[i].setIndeterminate(false);
-			threadProgressBar[i].setLocation(new java.awt.Point(120,
-					THREADS_SECTIONS_VLOC + LABEL_HEIGHT + (i)
-							* HEIGHT_PER_THREAD));
+			threadProgressBar[i].setLocation(
+					THREAD_LABEL_WIDTH + 2 * H_MARGIN, LABEL_HEIGHT + (i)
+							* HEIGHT_PER_THREAD + 2 * V_INNER_MARGIN);
 			threadProgressBar[i].setVisible(true);
 		}
 
 		// BOTTOM SECTION
+		int FOOTER_SECTION_VLOC = THREADS_SECTIONS_VLOC + threadsPanelHeight
+				+ V_MARGIN;
+		footerPanel.setSize(SECTION_WIDTH, FOOTER_HEIGHT);
+		footerPanel.setLocation(H_MARGIN, FOOTER_SECTION_VLOC);
+		footerPanel.setBorder(new BorderUIResource.LineBorderUIResource(
+				XManager.PANEL_BORDER_COLOR));
+		footerPanel.setLayout(null);
+		footerPanel.setVisible(true);
 
-		progressBarLike.setSize(new java.awt.Dimension(COMPONENTS_WIDTH,
-				PROGRESS_BAR_HEIGHT));
-		progressBarLike.setString("");
-		progressBarLike.setLocation(new java.awt.Point(40,
-				THREADS_SECTIONS_VLOC + HEIGHT_PER_THREAD * numberOfThreads
-						+ SECTIONS_PADDING));
+		progressBarLike.setMaximum(maximum);
+		progressBarLike.setValue(0);
+		progressBarLike.setStringPainted(true);
+		progressBarLike.setString(null);
+
+		progressBarLike.setSize(SECTION_WIDTH - 2
+				* H_MARGIN, PROGRESS_BAR_HEIGHT);
+		progressBarLike
+				.setLocation(H_MARGIN, V_INNER_MARGIN);
 		progressBarLike.setVisible(true);
 
 		progressBarCancelButton.setVisible(true);
-		progressBarCancelButton.setSize(new java.awt.Dimension(100, 30));
+		progressBarCancelButton.setSize(BUTTON_WIDTH,
+				PROGRESS_BAR_HEIGHT);
 		progressBarCancelButton.setText("Cancel");
-		progressBarCancelButton.setLocation(new java.awt.Point(140,
-				THREADS_SECTIONS_VLOC + HEIGHT_PER_THREAD * numberOfThreads
-						+ SECTIONS_PADDING + PROGRESS_BAR_HEIGHT + 5));
+		progressBarCancelButton.setLocation(
+				(SECTION_WIDTH - BUTTON_WIDTH) / 2, PROGRESS_BAR_HEIGHT + 2
+						* V_INNER_MARGIN);
 
 		// MAIN WINDOW
 
-		setLocation(new java.awt.Point(281, 80));
+		setLocation(281, 80);
 		getContentPane().setLayout(null);
 		setTitle("Progress");
 
 		for (JProgressBar progressBar : threadProgressBar) {
-			getContentPane().add(progressBar);
+			threadsActivityPanel.add(progressBar);
 		}
 
 		for (JLabel progressLabel : threadProgressLabel) {
-			getContentPane().add(progressLabel);
+			threadsActivityPanel.add(progressLabel);
 		}
 
 		for (JLabel progressModelLabel : threadProgressModelLabel) {
-			getContentPane().add(progressModelLabel);
+			threadsActivityPanel.add(progressModelLabel);
 		}
 
-		getContentPane().add(progressBarLike);
-		getContentPane().add(progressBarLikeLabel);
-		getContentPane().add(progressBarCancelButton);
-		getContentPane().add(timerLabel);
+		headerPanel.add(progressBarLikeLabel);
+		headerPanel.add(timerLabel);
+		getContentPane().add(headerPanel);
+		getContentPane().add(threadsActivityPanel);
+		footerPanel.add(progressBarLike);
+		footerPanel.add(progressBarCancelButton);
+		getContentPane().add(footerPanel);
 
-		setSize(new java.awt.Dimension(COMPONENTS_WIDTH + COMPONENTS_MARGIN,
-				152 + HEIGHT_PER_THREAD * numberOfThreads));
+		setSize(WINDOW_WIDTH, FOOTER_SECTION_VLOC
+				+ FOOTER_HEIGHT + 4 * V_MARGIN);
 		setResizable(false);
 
 		// event handling
-		addWindowListener(new java.awt.event.WindowAdapter() {
-			public void windowClosing(java.awt.event.WindowEvent e) {
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
 				thisWindowClosing(e);
 			}
 		});
 
 		progressBarCancelButton
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent e) {
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						progressBarCancel(e);
 					}
 				});
@@ -245,13 +307,13 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	}
 
 	// Close the window when the close box is clicked
-	private void thisWindowClosing(java.awt.event.WindowEvent e) {
+	private void thisWindowClosing(WindowEvent e) {
 		setVisible(false);
 		dispose();
 		// System.exit(0);
 	}
 
-	private void progressBarCancel(java.awt.event.ActionEvent e) {
+	private void progressBarCancel(ActionEvent e) {
 		try {
 			frameCalcLike.getRunPhyml().interruptThread();
 			frameCalcLike.cancelTask();
@@ -293,18 +355,6 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 						break;
 					}
 				}
-				/*
-				 * stream.println("\nMaximum likelihod estimation for the " +
-				 * info.getModel().getName() + " model.");
-				 * 
-				 * if (options.userTopologyExists)
-				 * stream.println("  User tree topology"); else if
-				 * (options.fixedTopology)
-				 * stream.println("  BIONJ-JC tree topology"); else if
-				 * (options.optimizeMLTopology)
-				 * stream.println("  ML optimized tree topology"); else
-				 * stream.println("  BIONJ tree topology");
-				 */
 				break;
 
 			case ProgressInfo.OPTIMIZATION_INIT:

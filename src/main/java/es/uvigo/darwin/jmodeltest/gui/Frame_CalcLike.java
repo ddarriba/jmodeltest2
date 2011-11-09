@@ -112,8 +112,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelCalcLike.setSize(new java.awt.Dimension(460, 360));
 		PanelCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
-						new LineBorder(new java.awt.Color(
-								153, 153, 153), 1, false),
+						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
 						"Likelihood settings", 4, 2, new java.awt.Font(
 								"Application", 1, 10), new java.awt.Color(102,
 								102, 153)));
@@ -160,11 +159,10 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelNumberModelsCalcLike.setSize(new java.awt.Dimension(270, 50));
 		PanelNumberModelsCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
-						new LineBorder(new java.awt.Color(
-								153, 153, 153), 1, false),
+						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
 						"Number of substitution schemes", 4, 2,
 						new java.awt.Font("Application", 1, 10),
-						new java.awt.Color(102, 102, 153)));
+						XManager.LABEL_BLUE_COLOR));
 		PanelNumberModelsCalcLike.setVisible(true);
 		PanelNumberModelsCalcLike.setLayout(null);
 		Button3SubsTypeCalcLike.setVisible(true);
@@ -192,10 +190,9 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelFrequenciesCalcLike.setSize(new java.awt.Dimension(110, 50));
 		PanelFrequenciesCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
-						new LineBorder(new java.awt.Color(
-								153, 153, 153), 1, false), "Base frequencies",
+						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false), "Base frequencies",
 						4, 2, new java.awt.Font("Application", 1, 10),
-						new java.awt.Color(102, 102, 153)));
+						XManager.LABEL_BLUE_COLOR));
 		PanelFrequenciesCalcLike.setLocation(new java.awt.Point(20, 80));
 		PanelFrequenciesCalcLike.setVisible(true);
 		PanelFrequenciesCalcLike.setLayout(null);
@@ -209,10 +206,9 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelRateVariationCalcLike.setSize(new java.awt.Dimension(180, 50));
 		PanelRateVariationCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
-						new LineBorder(new java.awt.Color(
-								153, 153, 153), 1, false), "Rate variation", 4,
+						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false), "Rate variation", 4,
 						2, new java.awt.Font("Application", 1, 10),
-						new java.awt.Color(102, 102, 153)));
+						XManager.LABEL_BLUE_COLOR));
 		PanelRateVariationCalcLike.setVisible(true);
 		PanelRateVariationCalcLike.setLayout(null);
 		jCheckBoxPinv.setLocation(new java.awt.Point(20, 20));
@@ -230,10 +226,9 @@ public class Frame_CalcLike extends JModelTestFrame {
 				.setToolTipText("Number of rate categories for the discrete gamma distribution");
 		TextFieldNcat
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
-						new LineBorder(new java.awt.Color(
-								153, 153, 153), 1, false), "nCat", 4, 2,
+						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false), "nCat", 4, 2,
 						new java.awt.Font("Application", 1, 10),
-						new java.awt.Color(102, 102, 153)));
+						XManager.LABEL_BLUE_COLOR));
 		TextFieldNcat.setVisible(true);
 		TextFieldNcat.setSize(new java.awt.Dimension(40, 35));
 		TextFieldNcat.setText("4");
@@ -244,11 +239,10 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelTreeOptimizationCalcLike.setSize(new java.awt.Dimension(350, 90));
 		PanelTreeOptimizationCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
-						new LineBorder(new java.awt.Color(
-								153, 153, 153), 1, false),
+						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
 						"Base tree for likelihood calculations", 4, 2,
 						new java.awt.Font("Application", 1, 10),
-						new java.awt.Color(102, 102, 153)));
+						XManager.LABEL_BLUE_COLOR));
 		PanelTreeOptimizationCalcLike.setVisible(true);
 		PanelTreeOptimizationCalcLike.setLayout(null);
 
@@ -304,11 +298,10 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelTreeOptimizationMethod.setSize(new java.awt.Dimension(250, 60));
 		PanelTreeOptimizationMethod
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
-						new LineBorder(new java.awt.Color(
-								153, 153, 153), 1, false),
+						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
 						"Base tree search", 4, 2,
 						new java.awt.Font("Application", 1, 10),
-						new java.awt.Color(102, 102, 153)));
+						XManager.LABEL_BLUE_COLOR));
 		PanelTreeOptimizationMethod.setVisible(true);
 		PanelTreeOptimizationMethod.setLayout(null);
 		
@@ -617,7 +610,6 @@ public class Frame_CalcLike extends JModelTestFrame {
 			progressFrame = new Frame_Progress(options.numModels, this, options);
 
 			setVisible(false);
-			dispose();
 
 			// scroll to the bottom
 			XManager.getInstance()

@@ -45,6 +45,7 @@ public class XManager {
 	public static final Color LABEL_BLUE_COLOR = new Color(102,102,153);
 	public static final Color LABEL_FAIL_COLOR = new Color(153, 0, 0);
 	public static final Color LABEL_GREEN_COLOR = new Color(0, 153, 0);
+	public static final Color PANEL_BORDER_COLOR = new Color(153, 153, 153);
 	public static final Color MENU_COLOR = new Color(130,130,150);//(199, 199, 220);
 	public static final Color MENU_FG_COLOR = new Color(0,0,0);
 	public static final Color PANE_BACK_COLOR = Color.WHITE;
