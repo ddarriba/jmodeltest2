@@ -13,6 +13,9 @@ public abstract class ModelTestConfiguration {
     public static final String LOG_DIR = "log-dir";
     public static final String EXE_DIR = "exe-dir";
     public static final String GLOBAL_PHYML_EXE = "global-phyml-exe";
+    public static final String G_THREADS = "gamma-threads";
+    public static final String I_THREADS = "inv-threads";
+    public static final String U_THREADS = "uniform-threads";
     
     static {
         APPLICATION_PROPERTIES = new Properties();

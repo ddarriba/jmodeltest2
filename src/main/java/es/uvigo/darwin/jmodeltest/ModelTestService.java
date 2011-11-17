@@ -19,17 +19,17 @@ package es.uvigo.darwin.jmodeltest;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Properties;
+import java.io.PrintStream;
 
 import parser.ParseException;
 import converter.Converter;
 import converter.DefaultFactory;
 import converter.Factory;
+import es.uvigo.darwin.jmodeltest.io.NullPrintStream;
 import es.uvigo.darwin.jmodeltest.selection.AIC;
 import es.uvigo.darwin.jmodeltest.selection.AICc;
 import es.uvigo.darwin.jmodeltest.selection.BIC;
@@ -97,6 +97,8 @@ public class ModelTestService {
         Factory factory = new DefaultFactory();
         Converter converter;
 
+		PrintStream outPS = System.err;
+		System.setErr(new PrintStream(new NullPrintStream()));
         try {
             converter = factory.getConverter(inO, inP, inF, autodetect,
                     collapse, gaps, missing, limit,
@@ -107,7 +109,8 @@ public class ModelTestService {
         } catch (ParseException ex) {
             throw new AlignmentParseException("There's some error in your data: " + ex.getMessage());
         }
-
+        System.setErr(outPS);
+        
         if (outputFile.exists()) {
         	outputFile.delete();
         }

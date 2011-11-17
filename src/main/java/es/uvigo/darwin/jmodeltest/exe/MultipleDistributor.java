@@ -29,6 +29,7 @@ import mpi.MPI;
 import mpi.Request;
 import mpi.Status;
 import es.uvigo.darwin.jmodeltest.ModelTest;
+import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.model.ModelComparator;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
@@ -39,6 +40,9 @@ public class MultipleDistributor extends Observable implements Runnable {
 	public static final int DEFAULT_PROCESSORS_IG = 4;
 	public static final int DEFAULT_PROCESSORS_I = 2;
 	public static final int DEFAULT_PROCESSORS_UNIFORM = 1;
+	public static int PROCESSORS_IG;
+	public static int PROCESSORS_I;
+	public static int PROCESSORS_UNIFORM;
 
 	/** MPJ Tag for requesting a new model. */
 	public static final int TAG_SEND_REQUEST = 1;
@@ -49,7 +53,7 @@ public class MultipleDistributor extends Observable implements Runnable {
 	public static final int TAG_EXIST_MORE_MODELS = 3;
 
 	private List<Model> modelsToSend;
-	private RunPhymlHibrid caller;
+	private RunPhymlHybrid caller;
 
 	private static boolean assumeHyperThreading;
 	private static boolean homogeneousDistribution;
@@ -78,7 +82,31 @@ public class MultipleDistributor extends Observable implements Runnable {
 	 */
 	private int[] displs;
 
-	public MultipleDistributor(List<Model> models, RunPhymlHibrid caller,
+	static {
+		String gammaThreadsStr = ModelTestConfiguration
+				.getProperty(ModelTestConfiguration.G_THREADS);
+		String invThreadsStr = ModelTestConfiguration
+				.getProperty(ModelTestConfiguration.I_THREADS);
+		String uniformThreadsStr = ModelTestConfiguration
+				.getProperty(ModelTestConfiguration.U_THREADS);
+		try {
+			PROCESSORS_IG = Integer
+					.parseInt(gammaThreadsStr != null ? gammaThreadsStr
+							: String.valueOf(DEFAULT_PROCESSORS_IG));
+			PROCESSORS_I = Integer
+					.parseInt(invThreadsStr != null ? invThreadsStr : String
+							.valueOf(DEFAULT_PROCESSORS_I));
+			PROCESSORS_UNIFORM = Integer
+					.parseInt(uniformThreadsStr != null ? uniformThreadsStr
+							: String.valueOf(DEFAULT_PROCESSORS_UNIFORM));
+		} catch (NumberFormatException e) {
+			PROCESSORS_IG = DEFAULT_PROCESSORS_IG;
+			PROCESSORS_I = DEFAULT_PROCESSORS_I;
+			PROCESSORS_UNIFORM = DEFAULT_PROCESSORS_UNIFORM;
+		}
+	}
+
+	public MultipleDistributor(List<Model> models, RunPhymlHybrid caller,
 			int mpjMe, int mpjSize) {
 		this.mpjMe = mpjMe;
 		this.mpjSize = mpjSize;
@@ -87,19 +115,26 @@ public class MultipleDistributor extends Observable implements Runnable {
 		this.itemsPerProc = new int[mpjSize];
 		this.displs = new int[mpjSize];
 
-		this.numberOfHosts = ModelTest.HOSTS_TABLE.size();
-		Enumeration procsPerHost = ModelTest.HOSTS_TABLE.elements();
-		while (procsPerHost.hasMoreElements()) {
-			int procs = (Integer) procsPerHost.nextElement();
-			totalNumberOfThreads += procs;
-			if (procs < minProcs)
-				minProcs = procs;
-			if (procs > maxProcs)
-				maxProcs = procs;
+		if (ModelTest.HOSTS_TABLE != null) {
+			numberOfHosts = ModelTest.HOSTS_TABLE.size();
+			Enumeration<Integer> procsPerHost = ModelTest.HOSTS_TABLE
+					.elements();
+			while (procsPerHost.hasMoreElements()) {
+				int procs = procsPerHost.nextElement();
+				totalNumberOfThreads += procs;
+				if (procs < minProcs)
+					minProcs = procs;
+				if (procs > maxProcs)
+					maxProcs = procs;
+			}
+			homogeneousDistribution = (minProcs == maxProcs);
+			assumeHyperThreading = (maxProcs > 8);
+			avgProcs = totalNumberOfThreads / numberOfHosts;
+		} else {
+			homogeneousDistribution = true;
+			assumeHyperThreading = false;
+			avgProcs = 1;
 		}
-		homogeneousDistribution = (minProcs == maxProcs);
-		assumeHyperThreading = (maxProcs > 8);
-		avgProcs = totalNumberOfThreads / numberOfHosts;
 
 		Collections.sort(this.modelsToSend, new ModelComparator());
 	}
@@ -260,11 +295,11 @@ public class MultipleDistributor extends Observable implements Runnable {
 	public static int getPEs(Model model, int maxAvailableThreads) {
 		int numberOfThreads;
 		if (model.ispG()) {
-			numberOfThreads = DEFAULT_PROCESSORS_IG;
+			numberOfThreads = PROCESSORS_IG;
 		} else if (model.ispI()) {
-			numberOfThreads = DEFAULT_PROCESSORS_I;
+			numberOfThreads = PROCESSORS_I;
 		} else {
-			numberOfThreads = DEFAULT_PROCESSORS_UNIFORM;
+			numberOfThreads = PROCESSORS_UNIFORM;
 		}
 		if (assumeHyperThreading && maxAvailableThreads > 8) {
 			numberOfThreads *= 2;

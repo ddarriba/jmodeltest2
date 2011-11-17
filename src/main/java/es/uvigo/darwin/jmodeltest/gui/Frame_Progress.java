@@ -141,8 +141,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 		headerPanel.setVisible(true);
 
 		progressBarLikeLabel.setSize(120, LABEL_HEIGHT);
-		progressBarLikeLabel.setLocation(H_MARGIN,
-				V_INNER_MARGIN);
+		progressBarLikeLabel.setLocation(H_MARGIN, V_INNER_MARGIN);
 		progressBarLikeLabel.setVisible(true);
 		progressBarLikeLabel.setFont(XManager.FONT_CONSOLE);
 		progressBarLikeLabel.setText("Completed 0/" + totalModels);
@@ -169,23 +168,21 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 		int colorStep = Math.max(THREAD_COLOR.length / numberOfThreads, 1);
 		for (int i = 0; i < numberOfThreads; i++) {
 			threadProgressLabel[i] = new JLabel();
-			threadProgressLabel[i].setSize(
-					THREAD_LABEL_WIDTH, LABEL_HEIGHT);
-			threadProgressLabel[i].setLocation(H_MARGIN,
-					LABEL_HEIGHT + (i) * HEIGHT_PER_THREAD + V_INNER_MARGIN);
+			threadProgressLabel[i].setSize(THREAD_LABEL_WIDTH, LABEL_HEIGHT);
+			threadProgressLabel[i].setLocation(H_MARGIN, LABEL_HEIGHT + (i)
+					* HEIGHT_PER_THREAD + V_INNER_MARGIN);
 			threadProgressLabel[i].setVisible(true);
 			threadProgressLabel[i].setFont(XManager.FONT_CONSOLE);
 			threadProgressLabel[i].setText(" Thread " + i + ":");
 			threadProgressLabel[i].setOpaque(true);
-			threadProgressLabel[i].setBackground(THREAD_COLOR[(i * colorStep) % THREAD_COLOR.length]);
+			threadProgressLabel[i].setBackground(THREAD_COLOR[(i * colorStep)
+					% THREAD_COLOR.length]);
 			threadProgressLabel[i].setForeground(Color.WHITE);
 			threadProgressModelLabel[i] = new JLabel();
-			threadProgressModelLabel[i].setSize(
-					SECTION_WIDTH - (THREAD_LABEL_WIDTH + 3 * H_MARGIN),
-					LABEL_HEIGHT);
-			threadProgressModelLabel[i].setLocation(
-					THREAD_LABEL_WIDTH + 2 * H_MARGIN, (i) * HEIGHT_PER_THREAD
-							+ 2 * V_INNER_MARGIN);
+			threadProgressModelLabel[i].setSize(SECTION_WIDTH
+					- (THREAD_LABEL_WIDTH + 3 * H_MARGIN), LABEL_HEIGHT);
+			threadProgressModelLabel[i].setLocation(THREAD_LABEL_WIDTH + 2
+					* H_MARGIN, (i) * HEIGHT_PER_THREAD + 2 * V_INNER_MARGIN);
 			threadProgressModelLabel[i].setVisible(true);
 			threadProgressModelLabel[i].setFont(XManager.FONT_CONSOLE);
 			threadProgressModelLabel[i].setText(NO_MODEL);
@@ -197,9 +194,10 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 					- (THREAD_LABEL_WIDTH + 3 * H_MARGIN), THREAD_BAR_HEIGHT);
 			threadProgressBar[i].setStringPainted(false);
 			threadProgressBar[i].setIndeterminate(false);
-			threadProgressBar[i].setLocation(
-					THREAD_LABEL_WIDTH + 2 * H_MARGIN, LABEL_HEIGHT + (i)
-							* HEIGHT_PER_THREAD + 2 * V_INNER_MARGIN);
+			threadProgressBar[i]
+					.setLocation(THREAD_LABEL_WIDTH + 2 * H_MARGIN,
+							LABEL_HEIGHT + (i) * HEIGHT_PER_THREAD + 2
+									* V_INNER_MARGIN);
 			threadProgressBar[i].setVisible(true);
 		}
 
@@ -218,19 +216,16 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 		progressBarLike.setStringPainted(true);
 		progressBarLike.setString(null);
 
-		progressBarLike.setSize(SECTION_WIDTH - 2
-				* H_MARGIN, PROGRESS_BAR_HEIGHT);
-		progressBarLike
-				.setLocation(H_MARGIN, V_INNER_MARGIN);
+		progressBarLike.setSize(SECTION_WIDTH - 2 * H_MARGIN,
+				PROGRESS_BAR_HEIGHT);
+		progressBarLike.setLocation(H_MARGIN, V_INNER_MARGIN);
 		progressBarLike.setVisible(true);
 
 		progressBarCancelButton.setVisible(true);
-		progressBarCancelButton.setSize(BUTTON_WIDTH,
-				PROGRESS_BAR_HEIGHT);
+		progressBarCancelButton.setSize(BUTTON_WIDTH, PROGRESS_BAR_HEIGHT);
 		progressBarCancelButton.setText("Cancel");
-		progressBarCancelButton.setLocation(
-				(SECTION_WIDTH - BUTTON_WIDTH) / 2, PROGRESS_BAR_HEIGHT + 2
-						* V_INNER_MARGIN);
+		progressBarCancelButton.setLocation((SECTION_WIDTH - BUTTON_WIDTH) / 2,
+				PROGRESS_BAR_HEIGHT + 2 * V_INNER_MARGIN);
 
 		// MAIN WINDOW
 
@@ -258,8 +253,8 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 		footerPanel.add(progressBarCancelButton);
 		getContentPane().add(footerPanel);
 
-		setSize(WINDOW_WIDTH, FOOTER_SECTION_VLOC
-				+ FOOTER_HEIGHT + 4 * V_MARGIN);
+		setSize(WINDOW_WIDTH, FOOTER_SECTION_VLOC + FOOTER_HEIGHT + 4
+				* V_MARGIN);
 		setResizable(false);
 
 		// event handling
@@ -269,12 +264,11 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 			}
 		});
 
-		progressBarCancelButton
-				.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						progressBarCancel(e);
-					}
-				});
+		progressBarCancelButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				progressBarCancel(e);
+			}
+		});
 	}
 
 	private boolean mShown = false;
@@ -373,21 +367,26 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 
 			case ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED:
 				this.completedModels++;
-				int value = (completedModels * 100) / totalModels;
-				for (int i = 0; i < numberOfThreads; i++) {
-					JLabel progressLabel = threadProgressModelLabel[i];
-					if (progressLabel.getText().equals(
-							"Computing " + info.getModel().getName() + "...")) {
-						progressLabel.setText(NO_MODEL);
-						progressLabel.setForeground(XManager.LABEL_FAIL_COLOR);
-						threadProgressBar[i].setIndeterminate(false);
-						break;
+				try {
+					for (int i = 0; i < numberOfThreads; i++) {
+						JLabel progressLabel = threadProgressModelLabel[i];
+						if (progressLabel.getText().equals(
+								"Computing " + info.getModel().getName()
+										+ "...")) {
+							progressLabel.setText(NO_MODEL);
+							progressLabel
+									.setForeground(XManager.LABEL_FAIL_COLOR);
+							threadProgressBar[i].setIndeterminate(false);
+							break;
+						}
 					}
-				}
+					progressBarLikeLabel.setText("Completed " + completedModels
+							+ "/" + totalModels);
 
-				progressBarLikeLabel.setText("Completed " + completedModels
-						+ "/" + totalModels);
-				progressBarLike.setValue(value);
+					progressBarLike.setValue(completedModels);
+				} catch (NullPointerException e) {
+					// Ignore...
+				}
 
 				stream.println(info.getModel().getName()
 						+ "\t\t"

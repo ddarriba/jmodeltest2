@@ -31,12 +31,15 @@ public class ConsoleProgressObserver implements Observer {
 	private TextOutputStream stream;
 	/** Timer for calculate the elapsed time **/
 	private long startTime;
-	private ApplicationOptions options;
+	private int totalModels;
+	private int completedModels = 0;
+	private boolean threadScheduling;
 
 	public ConsoleProgressObserver(ApplicationOptions options) {
-		this.options = options;
 		this.startTime = System.currentTimeMillis();
 		this.stream = ModelTest.getMainConsole();
+		this.totalModels = options.numModels;
+		this.threadScheduling = options.threadScheduling;
 	}
 
 	@Override
@@ -59,7 +62,9 @@ public class ConsoleProgressObserver implements Observer {
 				break;
 
 			case ProgressInfo.OPTIMIZATION_INIT:
-				stream.println("\n\n::Progress::\n");
+				stream.println(" ");stream.println(" ");
+				stream.println("::Progress::");
+				stream.println(" ");
 				stream.println("Model \t\t Exec. Time \t Total Time \t -lnL");
 				stream.println("-------------------------------------------------------------------------");
 				break;
@@ -68,12 +73,18 @@ public class ConsoleProgressObserver implements Observer {
 				break;
 
 			case ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED:
+				completedModels++;
 				stream.print(info.getModel().getName() + "\t");
 				if (info.getModel().getName().length()<8)
 					stream.print("\t");
-				stream.println(info.getMessage() + "\t" 
+				stream.print(info.getMessage() + "\t" 
 						+ Utilities.calculateRuntime(startTime, System.currentTimeMillis()) + "\t" 
 						+ String.format("%5.4f", info.getModel().getLnL()));
+				if (ModelTest.MPJ_RUN && threadScheduling) {
+					stream.println(" ");
+				} else {
+					stream.println("\t (" + completedModels + "/" + totalModels + ")");
+				}
 				break;
 			case ProgressInfo.INTERRUPTED:
 				stream.println(" ");

@@ -28,12 +28,13 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import mpi.MPI;
+import mpi.MPIException;
 import pal.alignment.Alignment;
 import pal.tree.Tree;
 import pal.tree.TreeParseException;
 import es.uvigo.darwin.jmodeltest.exe.RunConsense;
 import es.uvigo.darwin.jmodeltest.exe.RunPhyml;
-import es.uvigo.darwin.jmodeltest.exe.RunPhymlHibrid;
+import es.uvigo.darwin.jmodeltest.exe.RunPhymlHybrid;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlMPJ;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlThread;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
@@ -157,28 +158,37 @@ public class ModelTest {
 
 	public static void main(String[] args) {
 		// initializing MPJ environment (if available)
-		System.err.println("[MPJ] "+ hostname +" Attempting to initialize MPJ environment...");
+		System.err.println("[MPI] Testing MPI environment... (" + hostname + ")");
 		try {
 			arguments = MPI.Init(args);
-			System.err.println("[MPJ] MPJ succesfully initialized... ["+hostname+" ("+MPJ_ME+")]");
+			System.err.println("[MPI] ... OK! ["+hostname+" ("+MPJ_ME+")]");
 			MPJ_ME = MPI.COMM_WORLD.Rank();
 			MPJ_SIZE = MPI.COMM_WORLD.Size();
 			MPJ_RUN = true;
+		} catch (MPIException e) {
+			System.err.println("[MPI] Proceed without MPI");
+			MPJ_ME = 0;
+			MPJ_SIZE = 1;
+			MPJ_RUN = false;
+			arguments = args;
 		} catch (Exception e) {
-			//System.err.println("[MPJ] Unknown exception");
+			System.err.println("[MPI] Unknown exception!");
+			System.err.println(e.getMessage());
+			System.exit(-1);
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
 			arguments = args;
 		} catch (ExceptionInInitializerError e) {
-			e.printStackTrace();
+			System.err.println("[MPI] Initializer error!");
+			System.err.println(e.getMessage());
 			System.exit(-1);
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
 			arguments = args;
 		} catch (NoClassDefFoundError e) {
-			//System.err.println("[MPJ] NoClassDefFoundError");
+			System.err.println("[MPI] Proceed without MPI");
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
@@ -247,17 +257,15 @@ public class ModelTest {
 				options.numModels *= 4;
 			else if (options.doI || options.doG)
 				options.numModels *= 2;
-
-			// build set of models
 			options.setCandidateModels();
-
 		}
+		// build set of models
 
 		// calculate likelihoods with phyml in the command line
 		RunPhyml runPhyml;
 		if (MPJ_RUN) {
 			if (options.threadScheduling && options.getNumberOfThreads() > 0) {
-				runPhyml = new RunPhymlHibrid(MPJ_ME, MPJ_SIZE,
+				runPhyml = new RunPhymlHybrid(MPJ_ME, MPJ_SIZE,
 						new ConsoleProgressObserver(options), options,
 						getCandidateModels(), options.getNumberOfThreads());
 			} else {
@@ -1008,8 +1016,6 @@ public class ModelTest {
 
 			try {
 
-				// File outputFile = File
-				// .createTempFile("jmodeltest", "input.aln");
 				ModelTestService.readAlignment(inputFile,
 						options.getAlignmentFile());
 

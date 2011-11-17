@@ -182,6 +182,8 @@ public class RunPhymlMPJ extends RunPhyml {
 		ApplicationOptions.setInstance(this.options);
 
 		if (ModelTest.MPJ_ME == 0) {
+			notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0,
+					models[0], null);
 			distribute();
 		} else {
 			try {

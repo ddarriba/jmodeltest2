@@ -32,7 +32,7 @@ import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 
-public class RunPhymlHibrid extends RunPhyml {
+public class RunPhymlHybrid extends RunPhyml {
 
 	private List<Model> myModels;
 
@@ -51,7 +51,7 @@ public class RunPhymlHibrid extends RunPhyml {
 	int[] itemsPerProc;
 	int[] displs;
 
-	public RunPhymlHibrid(Observer progress, ApplicationOptions options,
+	public RunPhymlHybrid(Observer progress, ApplicationOptions options,
 			Model[] models) {
 		super(progress, options, models);
 		// this.deleteObserver(progress);
@@ -59,15 +59,11 @@ public class RunPhymlHibrid extends RunPhyml {
 
 	}
 
-	public RunPhymlHibrid(int mpjMe, int mpjSize, Observer progress,
+	public RunPhymlHybrid(int mpjMe, int mpjSize, Observer progress,
 			ApplicationOptions options, Model[] models, int numberOfThreads) {
 		super(progress, options, models);
 		// this.deleteObserver(progress);
 		myModels = new ArrayList<Model>();
-		if (mpjSize == 1) {
-			throw new RuntimeException("Dynamic Distribution Strategy"
-					+ " requires at least 2 processors");
-		}
 
 		this.mpjMe = mpjMe;
 		this.mpjSize = mpjSize;
@@ -88,6 +84,10 @@ public class RunPhymlHibrid extends RunPhyml {
 		distributor = new MultipleDistributor(modelList, this,
 				ModelTest.MPJ_ME, ModelTest.MPJ_SIZE);
 		distributor.addObserver(progress);
+		
+		notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0,
+				models[0], null);
+		
 		Thread distributorThread = new Thread(distributor);
 		distributorThread.start();
 		request();
@@ -104,7 +104,7 @@ public class RunPhymlHibrid extends RunPhyml {
 
 	public void request() {
 
-		List<PhymlSingleModel> phymlEstimatorList = new ArrayList<PhymlSingleModel>();
+//		List<PhymlSingleModel> phymlEstimatorList = new ArrayList<PhymlSingleModel>();
 
 		Model[] lastComputedModel = new Model[1];
 		while (true) {

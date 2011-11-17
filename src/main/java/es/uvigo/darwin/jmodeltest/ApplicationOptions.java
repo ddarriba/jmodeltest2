@@ -20,6 +20,8 @@ package es.uvigo.darwin.jmodeltest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Vector;
@@ -136,6 +138,7 @@ public class ApplicationOptions implements Serializable {
 		}
 		try {
 			ModelTestService.readAlignment(inputDataFile, alignmentFile);
+
 			Alignment alignment = AlignmentReader.readAlignment(
 					new PrintWriter(System.err),
 					alignmentFile.getAbsolutePath(), true);
@@ -392,10 +395,10 @@ public class ApplicationOptions implements Serializable {
 
 	public void setMachinesFile(File machinesFile) throws FileNotFoundException {
 		if (ModelTest.HOSTS_TABLE.containsKey(ModelTest.getHostname())) {
-			
+
 			setNumberOfThreads((Integer) ModelTest.HOSTS_TABLE.get(ModelTest
 					.getHostname()));
-			
+
 		} else {
 			System.err.println("");
 			System.err.println("WARNING: Machines File format is wrong.");
@@ -406,5 +409,4 @@ public class ApplicationOptions implements Serializable {
 			this.numberOfThreads = 1;
 		}
 	}
-
 }

@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest.exe;
 
 import java.util.Collections;
@@ -68,7 +68,7 @@ public class Distributor extends Observable implements Runnable {
 		this.caller = caller;
 		this.itemsPerProc = new int[mpjSize];
 		this.displs = new int[mpjSize];
-		
+
 		Collections.sort(this.models, new ModelComparator());
 	}
 
@@ -77,10 +77,10 @@ public class Distributor extends Observable implements Runnable {
 		for (Model model : models) {
 			// check root processor
 			//
-			// This strategy is an easy way to avoid the problem of 
-			// thread-safety in MPJ-Express. It works correctly, but 
-			// it also causes to introduce coupling between this class 
-			// and RunPhymlMPJ having to define two volatile attributes: 
+			// This strategy is an easy way to avoid the problem of
+			// thread-safety in MPJ-Express. It works correctly, but
+			// it also causes to introduce coupling between this class
+			// and RunPhymlMPJ having to define two volatile attributes:
 			// rootModelRequest and rootModel.
 			if (caller.rootModelRequest || mpjSize == 1) {
 				while (!caller.rootModelRequest) {
@@ -93,13 +93,14 @@ public class Distributor extends Observable implements Runnable {
 				}
 				if (caller.rootModel != null) {
 					// finalized model optimization
-					notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, index,
-							caller.rootModel, Utilities.displayRuntime(
-									caller.rootModel.getComputationTime()));
+					notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED,
+							index, caller.rootModel,
+							Utilities.displayRuntime(caller.rootModel
+									.getComputationTime()));
 				}
-				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index, model,
-						null);
-				
+				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index,
+						model, null);
+
 				caller.rootModel = model;
 				caller.rootModelRequest = false;
 				itemsPerProc[mpjMe]++;
@@ -116,22 +117,23 @@ public class Distributor extends Observable implements Runnable {
 				if (computedModel[0] != null) {
 					// finalized model optimization
 					int recvIndex = models.indexOf(computedModel[0]);
-					notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, index,
-							computedModel[0], Utilities.displayRuntime(
-									computedModel[0].getComputationTime()));
+					notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED,
+							index, computedModel[0],
+							Utilities.displayRuntime(computedModel[0]
+									.getComputationTime()));
 					models.set(recvIndex, computedModel[0]);
 				}
 				// send model
 				Request modelSend = MPI.COMM_WORLD.Isend(modelToSend, 0, 1,
 						MPI.OBJECT, requestStatus.source, TAG_SEND_MODEL);
-				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index, model,
-						null);
+				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index,
+						model, null);
 				// update structures
 				itemsPerProc[requestStatus.source]++;
 				// wait for send
 				modelSend.Wait();
 			}
-			index ++;
+			index++;
 		}
 		displs[0] = 0;
 		for (int i = 1; i < mpjSize; i++)
@@ -148,9 +150,10 @@ public class Distributor extends Observable implements Runnable {
 			Status requestStatus = modelRequest.Wait();
 			if (computedModel[0] != null) {
 				int recvIndex = models.indexOf(computedModel[0]);
-				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, index,
-						computedModel[0], Utilities.displayRuntime(
-								computedModel[0].getComputationTime()));
+				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED,
+						index, computedModel[0],
+						Utilities.displayRuntime(computedModel[0]
+								.getComputationTime()));
 				models.set(recvIndex, computedModel[0]);
 			}
 			// send null model
@@ -166,6 +169,11 @@ public class Distributor extends Observable implements Runnable {
 			} catch (InterruptedException e) {
 				throw e;
 			}
+		}
+		if (caller.rootModel != null) {
+			notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, index,
+					caller.rootModel, Utilities.displayRuntime(caller.rootModel
+							.getComputationTime()));
 		}
 		caller.rootModel = null;
 		caller.rootModelRequest = false;
