@@ -9,6 +9,10 @@ David Posada (dposada@uvigo.es)
 (c) Phylogenomics, Universidade de Vigo, Vigo, Spain
 (c) Grupo de Arquitectura de Computadores, UDC, A Coruna, Spain
 
+Project homepage:       http://code.google.com/p/jmodeltest2
+Extended documentation: http://code.google.com/p/jmodeltest2/wiki/GettingStarted
+Discussion group:       http://groups.google.com/group/jmodeltest
+
 -----------------------------------------------------------------------------
 
 TOC
@@ -80,25 +84,35 @@ Inside the jModelTest 2 directory you should find the following structure:
 $JMODELTEST_HOME/
   |
   |
+  |--conf/
+     # configuration files
+  	 | jmodeltest.conf
   |--exe/
      |--phyml/
         # auxiliary binaries to calculate models likelihood
         | phyml
   |--example-data/
      # some test alignments
+  |--extra/
+     # additional files for distributed memory execution
+     | filecluster8.conf.template  # machines file template for 8 node cluster
+     | machines                    # machines file for cluster execution
+     | mpj.tar.gz                  # MPJ Express distribution
+  |--trees/
+     # some test input trees
   |
   | COPYING                     # jModelTest 2 license
   | jModelTest.jar              # jModelTest package
-  | filecluster8.conf.template  # machines file template for 8 node cluster
-  | machines                    # machines file for cluster execution
   | README                      # this README file
   | THIRDPARTYLICENSES          # Licenses for the used sources and binaries
   | runjmodeltest-cluster.sh    # basic script for jModelTest cluster execution
-  | runjmodeltest-gui.sh        # basic script for jModelTEst graphical version
+  | runjmodeltest-gui.sh        # basic script for jModelTest graphical version
   
 - The external applications should be located on "exe" directory under the 
 jModelTest root, where at least the one which matches your computer architecture
-must exist.
+must exist (named "PhyML_3.0_[ARCH]" or "phyml"). If you prefer to use another
+binaries location or a system-wide installation of phyml (e.g., phyml installed
+through software repositories), just edit conf/jmodeltest.conf file.
 
 -----------------------------------------------------------------------------
 4. How to run

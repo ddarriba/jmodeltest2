@@ -20,8 +20,6 @@ package es.uvigo.darwin.jmodeltest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Vector;
@@ -146,7 +144,6 @@ public class ApplicationOptions implements Serializable {
 			numSites = alignment.getSiteCount();
 			numBranches = 2 * numTaxa - 3;
 		} catch (AlignmentParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -408,5 +405,9 @@ public class ApplicationOptions implements Serializable {
 			System.err.println("");
 			this.numberOfThreads = 1;
 		}
+	}
+	
+	public File getMachinesFile() {
+		return machinesFile;
 	}
 }

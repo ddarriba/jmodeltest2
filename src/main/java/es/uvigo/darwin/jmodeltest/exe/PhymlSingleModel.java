@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest.exe;
 
 import java.io.File;
@@ -37,13 +37,13 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	private static final String CURRENT_DIRECTORY = System
 			.getProperty("user.dir");
 
-	public static String PHYML_PATH = CURRENT_DIRECTORY + "/exe/phyml/";
+	public String PHYML_PATH = CURRENT_DIRECTORY + "/exe/phyml/";
 
 	private String phymlStatFileName;
 	private String phymlTreeFileName;
 
-	private static boolean PHYML_GLOBAL = false;
-	
+	private boolean PHYML_GLOBAL = false;
+
 	private Model model;
 	private long startTime;
 	private long endTime;
@@ -54,25 +54,6 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	private ApplicationOptions options;
 	private int numberOfThreads = -1;
 
-	static {
-		PHYML_GLOBAL = ModelTestConfiguration.getProperty(
-				ModelTestConfiguration.GLOBAL_PHYML_EXE).equalsIgnoreCase("true");
-		if (PHYML_GLOBAL) {
-			PHYML_PATH = "";
-		} else {
-			String path = ModelTestConfiguration.getProperty(
-					ModelTestConfiguration.EXE_DIR);
-			if (!path.startsWith(File.separator)) {
-				PHYML_PATH = CURRENT_DIRECTORY + File.separator + path;
-			} else {
-				PHYML_PATH = path;
-			}
-			if (!PHYML_PATH.endsWith(File.separator)) {
-				PHYML_PATH += File.separator;
-			}
-		}
-	}
-	
 	public Model getModel() {
 		return model;
 	}
@@ -83,6 +64,21 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		this.model = model;
 		this.index = index;
 		this.justGetJCTree = justGetJCTree;
+
+		PHYML_GLOBAL = ModelTestConfiguration.isGlobalPhymlBinary();
+		if (PHYML_GLOBAL) {
+			PHYML_PATH = "";
+		} else {
+			String path = ModelTestConfiguration.getExeDir();
+			if (!path.startsWith(File.separator)) {
+				PHYML_PATH = CURRENT_DIRECTORY + File.separator + path;
+			} else {
+				PHYML_PATH = path;
+			}
+			if (!PHYML_PATH.endsWith(File.separator)) {
+				PHYML_PATH += File.separator;
+			}
+		}
 
 		this.phymlStatFileName = options.getAlignmentFile().getAbsolutePath()
 				+ RunPhyml.PHYML_STATS_SUFFIX + model.getName() + ".txt";
@@ -190,7 +186,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		if (numberOfThreads > 0) {
 			commandLine += " --num_threads " + numberOfThreads;
 		}
-		
+
 		// avoid memory warning
 		commandLine += " --no_memory_check";
 
@@ -234,19 +230,19 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	 ***********************************************************************/
 
 	private void executeCommandLine() {
+		String[] executable = new String[1];
 		try {
 			File dir = new File(PHYML_PATH);
 
-			String[] executable = new String[1];
-			
-			File phymlBinary = new File (PHYML_PATH + "phyml");
-			if (phymlBinary.exists() && phymlBinary.canExecute())
-			{
-				executable[0] = phymlBinary.getAbsolutePath();
-			}
-			else
-			{
-				executable[0] = PHYML_PATH + Utilities.getBinaryVersion();
+			if (PHYML_GLOBAL) {
+				executable[0] = "phyml";
+			} else {
+				File phymlBinary = new File(PHYML_PATH + "phyml");
+				if (phymlBinary.exists() && phymlBinary.canExecute()) {
+					executable[0] = phymlBinary.getAbsolutePath();
+				} else {
+					executable[0] = PHYML_PATH + Utilities.getBinaryVersion();
+				}
 			}
 			String[] tokenizedCommandLine = commandLine.split(" ");
 			String[] cmd = Utilities.specialConcatStringArrays(executable,
@@ -254,9 +250,9 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 			// get process and execute command line
 			Runtime rt = Runtime.getRuntime();
-			Process proc = rt.exec(cmd, null, dir);
+			Process proc = rt.exec(cmd, null, PHYML_PATH.equals("")?null:dir);
 			ProcessManager.getInstance().registerProcess(proc);
-			
+
 			// any error message?
 			StreamGobbler errorGobbler = new StreamGobbler(
 					proc.getErrorStream(), "ERROR", System.err);
@@ -288,8 +284,10 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			notifyObservers(ProgressInfo.INTERRUPTED, index, model, null);
 			interrupted = true;
 		} catch (Throwable t) {
-			notifyObservers(ProgressInfo.ERROR, index, model, "Cannot run the Phyml command line for some reason: "+ PHYML_PATH + Utilities.getBinaryVersion());  
-			interrupted = true;			
+			notifyObservers(ProgressInfo.ERROR, index, model,
+					"Cannot run the Phyml command line for some reason: "
+							+ t.getMessage());
+			interrupted = true;
 		}
 
 	}
@@ -311,7 +309,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 		// Get model likelihood and parameter estimates
 		try {
-		TextInputStream phymlStatFile = new TextInputStream(phymlStatFileName);
+			TextInputStream phymlStatFile = new TextInputStream(
+					phymlStatFileName);
 			while ((line = phymlStatFile.readLine()) != null) {
 				if (line.length() > 0 && line.startsWith(". Log-likelihood")) {
 					currentModel.setLnL((-1.0)
@@ -432,14 +431,19 @@ public class PhymlSingleModel extends Observable implements Runnable {
 					}
 				}
 			}
-		phymlStatFile.close();
+			phymlStatFile.close();
 		} catch (FileNotFoundException e) {
-			notifyObservers(ProgressInfo.ERROR, index, model, "Optimization results file does not exist: "
-					+ phymlStatFileName);
-			
+			notifyObservers(ProgressInfo.ERROR, index, model,
+					"Optimization results file does not exist: "
+							+ phymlStatFileName);
+
 		} catch (NullPointerException e) {
-			notifyObservers(ProgressInfo.ERROR, index, model, "Error while parsing result data from "
-					+ currentModel.getName());
+			notifyObservers(
+					ProgressInfo.ERROR,
+					index,
+					model,
+					"Error while parsing result data from "
+							+ currentModel.getName());
 		}
 
 		try {
@@ -453,8 +457,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			notifyObservers(ProgressInfo.ERROR, index, model, null);
 			System.err.println("Optimized tree file does not exist: "
 					+ phymlTreeFileName);
-			
-		}catch (TreeParseException e) {
+
+		} catch (TreeParseException e) {
 			notifyObservers(ProgressInfo.ERROR, index, model, "ML tree for "
 					+ currentModel.getName() + " is invalid.");
 		}

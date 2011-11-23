@@ -9,6 +9,10 @@ public abstract class ModelTestConfiguration {
 	 /** The application APPLICATION_PROPERTIES. */
     private static final Properties APPLICATION_PROPERTIES;
     
+    public static final String DEFAULT_EXE_DIR = "exe/phyml";
+    public static final String DEFAULT_LOG_DIR = "log";
+    public static final boolean DEFAULT_GLOBAL_PHYML = false;
+    
     public static final String AUTO_LOG = "auto-logging";
     public static final String LOG_DIR = "log-dir";
     public static final String EXE_DIR = "exe-dir";
@@ -32,8 +36,27 @@ public abstract class ModelTestConfiguration {
     	return APPLICATION_PROPERTIES.getProperty(key);
     }
     
+    public static String getExeDir() {
+    	String exeDir = getProperty(EXE_DIR);
+    	return exeDir != null?exeDir : DEFAULT_EXE_DIR;
+    }
+        
+    public static boolean isGlobalPhymlBinary() {
+    	String propValue = getProperty(GLOBAL_PHYML_EXE); 
+    	return (propValue != null && propValue.equalsIgnoreCase("true"));
+    }
+    
     public static boolean isAutoLogEnabled() {
     	return getProperty(AUTO_LOG).equalsIgnoreCase("enabled");
+    }
+    
+    public static String getLogDir() {
+    	String logDir = getProperty(LOG_DIR);
+    	return logDir != null?logDir : DEFAULT_LOG_DIR;
+    }
+    
+    public static Properties getProperties() {
+    	return APPLICATION_PROPERTIES;
     }
     
 }

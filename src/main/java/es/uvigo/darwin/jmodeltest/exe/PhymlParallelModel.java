@@ -25,7 +25,6 @@ import java.util.Observer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
@@ -85,7 +84,6 @@ public class PhymlParallelModel extends Observable implements Observer {
 
 	        boolean added = estimatorList.add(estimator);
 	        c.add(Executors.callable(estimator));
-	        Collection<Future<Object>> futures = null;
 
 			threadPool.execute(estimator);
 

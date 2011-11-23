@@ -82,6 +82,7 @@ public class ModelTest {
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
+	public static final String DISCUSSION_GROUP = "http://groups.google.com/group/jmodeltest";
 	public static final String CONFIG_FILE = "conf/jmodeltest.conf";
 	public static final String UNKNOWN_HOSTNAME = "UNKNOWN";
 

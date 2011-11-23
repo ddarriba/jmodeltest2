@@ -19,6 +19,7 @@ package es.uvigo.darwin.jmodeltest;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Point;
 import java.io.PrintStream;
 import java.util.Calendar;
 
@@ -30,6 +31,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import es.uvigo.darwin.jmodeltest.gui.FrameMain;
+import es.uvigo.darwin.jmodeltest.gui.FramePreferences;
 import es.uvigo.darwin.jmodeltest.gui.FrameResults;
 import es.uvigo.darwin.jmodeltest.io.DocumentOutputStream;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
@@ -51,13 +53,17 @@ public class XManager {
 	public static final Color PANE_BACK_COLOR = Color.WHITE;
 	public static final Color INNER_BORDER_COLOR = new Color(182,182,182); //182
 	public static final Color OUTER_BORDER_COLOR = new Color(89,89,89); //89
+	public static final Color DARK_GRAY_COLOR = new Color(89,89,89); //89
 	public static final Color STATUS_BACK_COLOR = new Color(220,220,220); //220
+	
+	public static final Point MAIN_LOCATION = new Point(281, 80);
 	
 	public static SimpleAttributeSet redText;
 	public static SimpleAttributeSet blackText;
 
 	public FrameMain frame;
 	public FrameResults resultsFrame;
+	private FramePreferences preferencesFrame;
 	public static boolean resultsFrameBuilt = false;
 	private JTextPane PANE;
 
@@ -162,6 +168,13 @@ public class XManager {
 			instance = new XManager();
 		}
 		return instance;
+	}
+	
+	public void loadFramePreferences() {
+		if (preferencesFrame == null) {
+			preferencesFrame = new FramePreferences();			
+		}
+		preferencesFrame.setVisible(true);
 	}
 	
 	public void setLikeLabelText(String text) {

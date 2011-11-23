@@ -312,7 +312,6 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 			frameCalcLike.getRunPhyml().interruptThread();
 			frameCalcLike.cancelTask();
 			setVisible(false);
-			dispose();
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
@@ -510,10 +509,8 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 				// continue
 
 			case ProgressInfo.OPTIMIZATION_COMPLETED_INTERRUPTED:
-				// dispose
 				ExternalExecutionManager.getInstance().killProcesses();
 				setVisible(false);
-				dispose();
 				break;
 			}
 		} else {

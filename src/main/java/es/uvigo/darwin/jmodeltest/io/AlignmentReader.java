@@ -30,8 +30,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
-import es.uvigo.darwin.jmodeltest.exception.InputFileException;
-import es.uvigo.darwin.jmodeltest.gui.JModelTestFrame;
 
 public abstract class AlignmentReader {
 	private static ApplicationOptions options = ApplicationOptions

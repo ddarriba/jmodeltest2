@@ -20,6 +20,7 @@ package es.uvigo.darwin.jmodeltest.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Insets;
@@ -29,6 +30,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.net.URI;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -46,12 +48,12 @@ import javax.swing.KeyStroke;
 import javax.swing.plaf.BorderUIResource;
 
 import pal.alignment.Alignment;
+import edu.stanford.ejalbert.BrowserLauncher;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.ModelTestService;
 import es.uvigo.darwin.jmodeltest.XManager;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
-import es.uvigo.darwin.jmodeltest.utilities.BrowserLauncher;
 import es.uvigo.darwin.jmodeltest.utilities.InitialFocusSetter;
 import es.uvigo.darwin.jmodeltest.utilities.PrintUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
@@ -60,6 +62,7 @@ import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 /* This class sets the main GUI */
 public class FrameMain extends JModelTestFrame {
 
+	private static final int HOTKEY_MODIFIER;
 	private static final long serialVersionUID = 201103171450L;
 	public static final File LOG_DIR = new File(System.getProperty("user.dir")
 			+ File.separator + "log" + File.separator);
@@ -85,6 +88,8 @@ public class FrameMain extends JModelTestFrame {
 	private JSeparator menuEditSeparator1 = new JSeparator();
 	private JMenuItem menuEditSaveConsole = new JMenuItem();
 	private JMenuItem menuEditPrintConsole = new JMenuItem();
+	private JSeparator menuEditSeparator2 = new JSeparator();
+	private JMenuItem menuEditPreferences = new JMenuItem();
 	private JMenu menuAnalysis = new JMenu();
 	private JMenuItem menuAnalysisCalculateLikelihoods = new JMenuItem();
 	private JSeparator menuAnalysisSeparator1 = new JSeparator();
@@ -101,7 +106,9 @@ public class FrameMain extends JModelTestFrame {
 	private JMenu menuAbout = new JMenu();
 	private JMenuItem menuAboutModelTest = new JMenuItem();
 	private JMenuItem menuAboutWWW = new JMenuItem();
+	private JMenuItem menuHelpDiscussionGroup = new JMenuItem();
 	private JMenuItem menuAboutCredits = new JMenuItem();
+	private JSeparator menuAboutSeparator = new JSeparator();
 	private JMenu menuResults = new JMenu();
 	private JMenuItem menuResultsShowModelTable = new JMenuItem();
 
@@ -114,6 +121,16 @@ public class FrameMain extends JModelTestFrame {
 	private JMenuItem menuhLRT;
 	private JMenuItem menuShowModelTable;
 	private JMenuItem menuAveraging;
+
+	static {
+		String os = System.getProperty("os.name");
+
+		if (os.startsWith("Mac")) {
+			HOTKEY_MODIFIER = ActionEvent.META_MASK;
+		} else {
+			HOTKEY_MODIFIER = ActionEvent.CTRL_MASK;
+		}
+	}
 
 	public FrameMain() {
 		// LabelStatusLike = LabelStatusLikelihoods;
@@ -144,7 +161,7 @@ public class FrameMain extends JModelTestFrame {
 		menuFileOpenDataFile.setVisible(true);
 		menuFileOpenDataFile.setText("Load DNA alignment");
 		menuFileOpenDataFile.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_O, ActionEvent.META_MASK));
+				KeyEvent.VK_O, HOTKEY_MODIFIER));
 
 		menuFileSeparator1
 				.setBorder(new BorderUIResource.EmptyBorderUIResource(
@@ -156,7 +173,7 @@ public class FrameMain extends JModelTestFrame {
 		menuFileQuit.setVisible(true);
 		menuFileQuit.setText("Quit");
 		menuFileQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 
 		// menu Edit
 		menuEdit.setVisible(true);
@@ -167,31 +184,31 @@ public class FrameMain extends JModelTestFrame {
 		menuEditCut.setVisible(true);
 		menuEditCut.setText("Cut");
 		menuEditCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 		menuEditCopy.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(3, 3, 3, 3)));
 		menuEditCopy.setVisible(true);
 		menuEditCopy.setText("Copy");
 		menuEditCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 		menuEditPaste.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(3, 3, 3, 3)));
 		menuEditPaste.setVisible(true);
 		menuEditPaste.setText("Paste");
 		menuEditPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 		menuEditSelectAll.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(3, 3, 3, 3)));
 		menuEditSelectAll.setVisible(true);
 		menuEditSelectAll.setText("Select All");
 		menuEditSelectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 		menuEditClear.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(3, 3, 6, 3)));
 		menuEditClear.setVisible(true);
 		menuEditClear.setText("Clear");
 		menuEditClear.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 		menuEditSeparator1
 				.setBorder(new BorderUIResource.EmptyBorderUIResource(
 						new java.awt.Insets(6, 3, 6, 3)));
@@ -202,14 +219,23 @@ public class FrameMain extends JModelTestFrame {
 		menuEditSaveConsole.setVisible(true);
 		menuEditSaveConsole.setText("Save console");
 		menuEditSaveConsole.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_S, ActionEvent.META_MASK));
+				KeyEvent.VK_S, HOTKEY_MODIFIER));
 		menuEditPrintConsole
 				.setBorder(new BorderUIResource.EmptyBorderUIResource(
 						new java.awt.Insets(6, 3, 6, 3)));
 		menuEditPrintConsole.setVisible(true);
 		menuEditPrintConsole.setText("Print console");
 		menuEditPrintConsole.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_P, ActionEvent.META_MASK));
+				KeyEvent.VK_P, HOTKEY_MODIFIER));
+		menuEditSeparator2
+				.setBorder(new BorderUIResource.EmptyBorderUIResource(
+						new java.awt.Insets(6, 3, 6, 3)));
+		menuEditSeparator2.setVisible(true);
+		menuEditPreferences
+				.setBorder(new BorderUIResource.EmptyBorderUIResource(
+						new java.awt.Insets(6, 3, 3, 3)));
+		menuEditPreferences.setVisible(true);
+		menuEditPreferences.setText("Preferences");
 
 		// menu Analysis
 		menuAnalysis.setVisible(true);
@@ -225,7 +251,7 @@ public class FrameMain extends JModelTestFrame {
 		menuAnalysisCalculateLikelihoods.setText("Compute likelihood scores");
 		menuAnalysisCalculateLikelihoods.setEnabled(false);
 		menuAnalysisCalculateLikelihoods.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_L, ActionEvent.META_MASK));
+				KeyEvent.VK_L, HOTKEY_MODIFIER));
 		menuAnalysisSeparator1.setVisible(true);
 		menuAnalysisAIC.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(5, 5, 5, 5)));
@@ -233,21 +259,21 @@ public class FrameMain extends JModelTestFrame {
 		menuAnalysisAIC.setVisible(true);
 		menuAnalysisAIC.setEnabled(false);
 		menuAnalysisAIC.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 		menuAnalysisBIC.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(5, 5, 5, 5)));
 		menuAnalysisBIC.setText("Do BIC calculations ...");
 		menuAnalysisBIC.setVisible(true);
 		menuAnalysisBIC.setEnabled(false);
 		menuAnalysisBIC.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 		menuAnalysisDT.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(5, 5, 5, 5)));
 		menuAnalysisDT.setText("Do DT calculations ...");
 		menuAnalysisDT.setVisible(true);
 		menuAnalysisDT.setEnabled(false);
 		menuAnalysisDT.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 		menuAnalysishLRT.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(5, 5, 5, 5)));
 		menuAnalysishLRT.setText("Do hLRT calculations ...");
@@ -256,7 +282,7 @@ public class FrameMain extends JModelTestFrame {
 		menuAnalysishLRT.setVisible(true);
 		menuAnalysishLRT.setEnabled(false);
 		menuAnalysishLRT.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 
 		menuAnalysisSeparator2.setVisible(true);
 		menuAnalysisAveraging.setVisible(true);
@@ -268,7 +294,7 @@ public class FrameMain extends JModelTestFrame {
 				.setToolTipText("Compute a model-averaged phylogeny with the candidate models");
 		menuAnalysisAveraging.setEnabled(false);
 		menuAnalysisAveraging.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_Z, ActionEvent.META_MASK));
+				KeyEvent.VK_Z, HOTKEY_MODIFIER));
 
 		// menu Results
 		menuResults.setVisible(true);
@@ -292,15 +318,15 @@ public class FrameMain extends JModelTestFrame {
 		menuResultsShowModelTable.setText("Show results table");
 		menuResultsShowModelTable.setEnabled(false);
 		menuResultsShowModelTable.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_M, ActionEvent.META_MASK));
+				KeyEvent.VK_M, HOTKEY_MODIFIER));
 		menuResultsHtmlOutput
 				.setBorder(new BorderUIResource.EmptyBorderUIResource(
 						new java.awt.Insets(6, 3, 6, 3)));
 		menuResultsHtmlOutput.setVisible(true);
 		menuResultsHtmlOutput.setText("Build HTML log");
 		menuResultsHtmlOutput.setEnabled(false);
-		menuResultsHtmlOutput.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,
-				ActionEvent.META_MASK));
+		menuResultsHtmlOutput.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_H, HOTKEY_MODIFIER));
 
 		// menu Tools
 		menuTools.setVisible(true);
@@ -312,7 +338,7 @@ public class FrameMain extends JModelTestFrame {
 		menuToolsLRT.setText("LRT calculator");
 		menuToolsLRT.setEnabled(true);
 		menuToolsLRT.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 
 		// menu Help
 		menuHelp.setBorder(new BorderUIResource.EmptyBorderUIResource(
@@ -325,7 +351,7 @@ public class FrameMain extends JModelTestFrame {
 		menuHelpOpen.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(5, 5, 5, 5)));
 		menuHelpOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 
 		// menu About
 		menuAbout.setVisible(true);
@@ -338,20 +364,27 @@ public class FrameMain extends JModelTestFrame {
 		menuAboutWWW.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(5, 5, 5, 5)));
 		menuAboutWWW.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
+		menuHelpDiscussionGroup.setVisible(true);
+		menuHelpDiscussionGroup.setText("Discussion group");
+		menuHelpDiscussionGroup.setBorder(new BorderUIResource.EmptyBorderUIResource(
+				new java.awt.Insets(5, 5, 5, 5)));
+		menuHelpDiscussionGroup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G,
+				HOTKEY_MODIFIER));
 		menuAboutCredits.setVisible(true);
 		menuAboutCredits.setText("Credits");
 		menuAboutCredits.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(5, 5, 5, 5)));
 		menuAboutCredits.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
+		menuAboutSeparator.setVisible(true);
 		menuAboutModelTest.setVisible(true);
 		menuAboutModelTest.setText("jModelTest");
 		menuAboutModelTest
 				.setBorder(new BorderUIResource.EmptyBorderUIResource(
 						new java.awt.Insets(5, 5, 5, 5)));
 		menuAboutModelTest.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F,
-				ActionEvent.META_MASK));
+				HOTKEY_MODIFIER));
 
 		Panel.setBorder(new BorderUIResource.EmptyBorderUIResource(
 				new java.awt.Insets(20, 20, 20, 20)));
@@ -420,6 +453,8 @@ public class FrameMain extends JModelTestFrame {
 		menuEdit.add(menuEditSeparator1);
 		menuEdit.add(menuEditSaveConsole);
 		menuEdit.add(menuEditPrintConsole);
+		menuEdit.add(menuEditSeparator2);
+		menuEdit.add(menuEditPreferences);
 
 		menuAnalysis.add(menuAnalysisCalculateLikelihoods);
 		menuAnalysis.add(menuAnalysisSeparator1);
@@ -435,9 +470,11 @@ public class FrameMain extends JModelTestFrame {
 		menuResults.add(menuResultsHtmlOutput);
 
 		menuHelp.add(menuHelpOpen);
-
+		menuHelp.add(menuHelpDiscussionGroup);
+		
 		menuAbout.add(menuAboutWWW);
 		menuAbout.add(menuAboutCredits);
+		menuAbout.add(menuAboutSeparator);
 		menuAbout.add(menuAboutModelTest);
 
 		menuTools.add(menuToolsLRT);
@@ -451,7 +488,7 @@ public class FrameMain extends JModelTestFrame {
 		setLayout(new BorderLayout());
 		getContentPane().add(Panel);
 
-		setLocation(new java.awt.Point(281, 80));
+		setLocation(XManager.MAIN_LOCATION);
 		setJMenuBar(menuBar);
 		// getContentPane().setLayout(null);
 		getContentPane().setLayout(new BorderLayout());
@@ -473,6 +510,13 @@ public class FrameMain extends JModelTestFrame {
 			}
 		});
 
+		menuEditPreferences
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent e) {
+						menuEditPreferencesActionPerformed(e);
+					}
+				});
+
 		menuEditCut.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				menuEditCutActionPerformed(e);
@@ -481,11 +525,6 @@ public class FrameMain extends JModelTestFrame {
 		menuEditCopy.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				menuEditCopyActionPerformed(e);
-			}
-		});
-		menuEditCut.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent e) {
-				menuEditCutActionPerformed(e);
 			}
 		});
 		menuEditPaste.addActionListener(new java.awt.event.ActionListener() {
@@ -580,6 +619,12 @@ public class FrameMain extends JModelTestFrame {
 		menuAboutWWW.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				menuAboutWWWActionPerformed(e);
+			}
+		});
+		
+		menuHelpDiscussionGroup.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				menuAboutDiscussionGroupActionPerformed(e);
 			}
 		});
 
@@ -720,6 +765,14 @@ public class FrameMain extends JModelTestFrame {
 		}
 	}
 
+	private void menuEditPreferencesActionPerformed(java.awt.event.ActionEvent e) {
+		try {
+			XManager.getInstance().loadFramePreferences();
+		} catch (Exception f) {
+			f.printStackTrace();
+		}
+	}
+
 	private void menuEditCopyActionPerformed(java.awt.event.ActionEvent e) {
 		try {
 			mainEditorPane.copy();
@@ -793,14 +846,16 @@ public class FrameMain extends JModelTestFrame {
 		}
 	}
 
-	private void menuResultsHtmlOutputActionPerformed(java.awt.event.ActionEvent e) {
+	private void menuResultsHtmlOutputActionPerformed(
+			java.awt.event.ActionEvent e) {
 
 		FileDialog dialog;
 		try {
 			try {
 				dialog = new FileDialog(this, "Open file to save HTML log",
 						FileDialog.SAVE);
-				dialog.setFile(options.getInputFile().getName() + ".jmodeltest.html");
+				dialog.setFile(options.getInputFile().getName()
+						+ ".jmodeltest.html");
 				dialog.setDirectory("log");
 				dialog.setVisible(true);
 			} catch (Throwable f) {
@@ -810,16 +865,22 @@ public class FrameMain extends JModelTestFrame {
 				return;
 			}
 
-			if (!dialog.getDirectory().equals(LOG_DIR.getAbsolutePath() + File.separator)) {
+			if (!dialog.getDirectory().equals(
+					LOG_DIR.getAbsolutePath() + File.separator)) {
 				Utilities
-				.printRed("\nWarning: If you save the log files out from the log directory, make sure to copy the \"log"
-							+ File.separator
-							+ "resources\" folder with the log file\n");
+						.printRed("\nWarning: If you save the log files out from the log directory, make sure to copy the \"log"
+								+ File.separator
+								+ "resources\" folder with the log file\n");
 			}
 
-			if (dialog.getFile() != null && ModelTestConfiguration.isAutoLogEnabled()) /* a file was selected */
+			if (dialog.getFile() != null
+					&& ModelTestConfiguration.isAutoLogEnabled()) /*
+																 * a file was
+																 * selected
+																 */
 			{
-				HtmlReporter.buildReport(options, ModelTest.getCandidateModels(),
+				HtmlReporter.buildReport(options,
+						ModelTest.getCandidateModels(),
 						new File(dialog.getDirectory() + dialog.getFile()));
 			}
 		} catch (Exception f) {
@@ -912,16 +973,45 @@ public class FrameMain extends JModelTestFrame {
 
 	private void menuHelpOpenActionPerformed(java.awt.event.ActionEvent e) {
 		try {
-			BrowserLauncher.openURL(ModelTest.WIKI);
+			if (Desktop.isDesktopSupported()) {
+				Desktop desktop = Desktop.getDesktop();
+				URI wikiURI = new URI(ModelTest.WIKI);
+				desktop.browse(wikiURI);
+			} else {
+				BrowserLauncher launcher = new BrowserLauncher();
+				launcher.openURLinBrowser(ModelTest.WIKI);
+			}
 		} catch (Exception f) {
 			JOptionPane.showMessageDialog(new JFrame(), f.getMessage(),
 					"Error loading webpage", JOptionPane.ERROR_MESSAGE);
 		}
 	}
-
+		
+	private void menuAboutDiscussionGroupActionPerformed(java.awt.event.ActionEvent e) {
+		try {
+			if (Desktop.isDesktopSupported()) {
+				Desktop desktop = Desktop.getDesktop();
+				URI groupURI = new URI(ModelTest.DISCUSSION_GROUP);
+				desktop.browse(groupURI);
+			} else {
+				BrowserLauncher launcher = new BrowserLauncher();
+				launcher.openURLinBrowser(ModelTest.DISCUSSION_GROUP);
+			}
+		} catch (Exception f) {
+			JOptionPane.showMessageDialog(new JFrame(), f.getMessage(),
+					"Error loading webpage", JOptionPane.ERROR_MESSAGE);
+		}
+	}
 	private void menuAboutWWWActionPerformed(java.awt.event.ActionEvent e) {
 		try {
-			BrowserLauncher.openURL(ModelTest.URL);
+			if (Desktop.isDesktopSupported()) {
+				Desktop desktop = Desktop.getDesktop();
+				URI jModelTestURI = new URI(ModelTest.URL);
+				desktop.browse(jModelTestURI);
+			} else {
+				BrowserLauncher launcher = new BrowserLauncher();
+				launcher.openURLinBrowser(ModelTest.URL);
+			}
 		} catch (Exception f) {
 			JOptionPane.showMessageDialog(new JFrame(), f.getMessage(),
 					"Error loading webpage", JOptionPane.ERROR_MESSAGE);
@@ -930,11 +1020,11 @@ public class FrameMain extends JModelTestFrame {
 
 	private void menuAboutCreditsActionPerformed(java.awt.event.ActionEvent e) {
 		try {
-			String credits = "-- Likelihood calculations with Phyml by Stephane Guindon\n";
-			credits += "-- Alignment conversion with ALTER by Daniel Glez-Pe�a\n";
-			credits += "-- Phylogenetic trees management with PAL: Phylogenetic Analysis Library by A. Drummond and K. Strimmer\n";
-			credits += "-- Table utilities by Philip Milne\n";
-			credits += "-- BrowserLauncher by Eric Albert\n";
+			String credits = "Likelihood calculations with Phyml by Stephane Guindon\n";
+			credits += "Alignment conversion with ALTER by Daniel Glez-Peña\n";
+			credits += "Phylogenetic trees management with PAL: Phylogenetic Analysis Library by A. Drummond and K. Strimmer\n";
+			credits += "Table utilities by Philip Milne\n";
+			credits += "BrowserLauncher by Eric Albert and Jeff Chapman\n";
 
 			JOptionPane.showMessageDialog(new JFrame(), credits,
 					"jModelTest - CREDITS", JOptionPane.INFORMATION_MESSAGE);
@@ -993,7 +1083,7 @@ public class FrameMain extends JModelTestFrame {
 	public void enableMenuShowModelTable(boolean enabled) {
 		menuShowModelTable.setEnabled(enabled);
 	}
-	
+
 	public void enableMenuHtmlOutput(boolean enabled) {
 		menuResultsHtmlOutput.setEnabled(enabled);
 	}

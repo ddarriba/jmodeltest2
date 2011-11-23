@@ -97,7 +97,6 @@ public class Frame_CalcLike extends JModelTestFrame {
 
 	public void cancelTask() {
 		task.interrupt();
-		this.dispose();
 	}
 	
 	public RunPhyml getRunPhyml() {
@@ -113,55 +112,34 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
-						"Likelihood settings", 4, 2, new java.awt.Font(
-								"Application", 1, 10), new java.awt.Color(102,
-								102, 153)));
+						"Likelihood settings", 4, 2, XManager.FONT_LABEL,
+						XManager.LABEL_BLUE_COLOR));
 		PanelCalcLike.setVisible(true);
 		PanelCalcLike.setLayout(null);
 
 		JButtonDefaultCalcLike.setText("Default Settings");
-		JButtonDefaultCalcLike.setLocation(new java.awt.Point(10, 310));
-		JButtonDefaultCalcLike.setSize(new java.awt.Dimension(141, 40));
+		JButtonDefaultCalcLike.setLocation(10, 310);
+		JButtonDefaultCalcLike.setSize(141, 40);
 		JButtonDefaultCalcLike.setVisible(true);
 
 		CancelButtonCalcLike.setText("Cancel");
-		CancelButtonCalcLike.setLocation(new java.awt.Point(160, 310));
-		CancelButtonCalcLike.setSize(new java.awt.Dimension(110, 40));
+		CancelButtonCalcLike.setLocation(160, 310);
+		CancelButtonCalcLike.setSize(110, 40);
 		CancelButtonCalcLike.setVisible(true);
 
 		RunButtonCalcLike.setText("Compute Likelihods");
-		RunButtonCalcLike.setLocation(new java.awt.Point(280, 310));
-		RunButtonCalcLike.setSize(new java.awt.Dimension(170, 40));
+		RunButtonCalcLike.setLocation(280, 310);
+		RunButtonCalcLike.setSize(170, 40);
 		RunButtonCalcLike.setVisible(true);
 		getRootPane().setDefaultButton(RunButtonCalcLike);
 
-		/*
-		 * CheckBoxBLengthsAsParameters.setVisible(true);
-		 * CheckBoxBLengthsAsParameters.setSize(new java.awt.Dimension(280,
-		 * 20)); CheckBoxBLengthsAsParameters.setText(
-		 * "Consider branch lengths as parameters");
-		 * CheckBoxBLengthsAsParameters.setSelected(true);
-		 * CheckBoxBLengthsAsParameters.setLocation(new java.awt.Point(30, 90));
-		 * CheckBoxFixedTopology.setVisible(true);
-		 * CheckBoxFixedTopology.setSize(new java.awt.Dimension(340, 20));
-		 * CheckBoxFixedTopology
-		 * .setText("Use a BIONJ-JC tree to optimize all models");
-		 * CheckBoxFixedTopology.setSelected(false);
-		 * CheckBoxFixedTopology.setLocation(new java.awt.Point(30, 120));
-		 * CheckBoxOptimizeTopology.setVisible(true);
-		 * CheckBoxOptimizeTopology.setSize(new java.awt.Dimension(340, 20));
-		 * CheckBoxOptimizeTopology
-		 * .setText("Optimize by ML the topology for each model");
-		 * CheckBoxOptimizeTopology.setSelected(true);
-		 * CheckBoxOptimizeTopology.setLocation(new java.awt.Point(30, 150));
-		 */
 		PanelNumberModelsCalcLike.setLocation(new java.awt.Point(20, 20));
 		PanelNumberModelsCalcLike.setSize(new java.awt.Dimension(270, 50));
 		PanelNumberModelsCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
 						"Number of substitution schemes", 4, 2,
-						new java.awt.Font("Application", 1, 10),
+						XManager.FONT_LABEL,
 						XManager.LABEL_BLUE_COLOR));
 		PanelNumberModelsCalcLike.setVisible(true);
 		PanelNumberModelsCalcLike.setLayout(null);
@@ -191,7 +169,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelFrequenciesCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false), "Base frequencies",
-						4, 2, new java.awt.Font("Application", 1, 10),
+						4, 2, XManager.FONT_LABEL,
 						XManager.LABEL_BLUE_COLOR));
 		PanelFrequenciesCalcLike.setLocation(new java.awt.Point(20, 80));
 		PanelFrequenciesCalcLike.setVisible(true);
@@ -207,7 +185,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelRateVariationCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false), "Rate variation", 4,
-						2, new java.awt.Font("Application", 1, 10),
+						2, XManager.FONT_LABEL,
 						XManager.LABEL_BLUE_COLOR));
 		PanelRateVariationCalcLike.setVisible(true);
 		PanelRateVariationCalcLike.setLayout(null);
@@ -227,7 +205,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		TextFieldNcat
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false), "nCat", 4, 2,
-						new java.awt.Font("Application", 1, 10),
+						XManager.FONT_LABEL,
 						XManager.LABEL_BLUE_COLOR));
 		TextFieldNcat.setVisible(true);
 		TextFieldNcat.setSize(new java.awt.Dimension(40, 35));
@@ -241,7 +219,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
 						"Base tree for likelihood calculations", 4, 2,
-						new java.awt.Font("Application", 1, 10),
+						XManager.FONT_LABEL,
 						XManager.LABEL_BLUE_COLOR));
 		PanelTreeOptimizationCalcLike.setVisible(true);
 		PanelTreeOptimizationCalcLike.setLayout(null);
@@ -290,7 +268,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		jLabelNumModels.setFont(XManager.FONT_LABEL_BIG);
 		jLabelNumModels.setText("Number of models = 88");
 
-		setLocation(new java.awt.Point(281, 80));
+		setLocation(XManager.MAIN_LOCATION);
 		getContentPane().setLayout(null);
 		setTitle("Likelihood settings");
 
@@ -300,7 +278,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
 						"Base tree search", 4, 2,
-						new java.awt.Font("Application", 1, 10),
+						XManager.FONT_LABEL,
 						XManager.LABEL_BLUE_COLOR));
 		PanelTreeOptimizationMethod.setVisible(true);
 		PanelTreeOptimizationMethod.setLayout(null);

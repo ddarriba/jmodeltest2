@@ -175,7 +175,7 @@ public abstract class HtmlReporter {
 		File resourcesDir = new File("resources" + File.separator + "template");
 		File logDir = new File(
 				ModelTestConfiguration
-						.getProperty(ModelTestConfiguration.LOG_DIR));
+						.getLogDir());
 		if (!logDir.exists() || !logDir.isDirectory()) {
 			logDir.delete();
 			logDir.mkdir();
