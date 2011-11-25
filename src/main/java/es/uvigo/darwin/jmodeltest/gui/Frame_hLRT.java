@@ -43,7 +43,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.BorderUIResource;
 
 import es.uvigo.darwin.jmodeltest.ModelTest;
-import es.uvigo.darwin.jmodeltest.XManager;
 import es.uvigo.darwin.jmodeltest.selection.HLRT;
 
 public class Frame_hLRT extends JModelTestFrame {

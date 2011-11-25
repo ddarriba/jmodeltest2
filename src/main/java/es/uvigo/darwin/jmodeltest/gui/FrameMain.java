@@ -52,7 +52,6 @@ import edu.stanford.ejalbert.BrowserLauncher;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.ModelTestService;
-import es.uvigo.darwin.jmodeltest.XManager;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
 import es.uvigo.darwin.jmodeltest.utilities.InitialFocusSetter;
 import es.uvigo.darwin.jmodeltest.utilities.PrintUtilities;
@@ -70,6 +69,7 @@ public class FrameMain extends JModelTestFrame {
 	public static JPanel Panel = new JPanel();
 	private JScrollPane scrollPane = new JScrollPane();
 	private JTextPane mainEditorPane = new JTextPane();
+	
 	private JPanel StatusPanel = new JPanel();
 	private JLabel LabelStatusLikelihoods = new JLabel();
 	private JLabel LabelStatusData = new JLabel();
@@ -357,8 +357,6 @@ public class FrameMain extends JModelTestFrame {
 		menuAbout.setVisible(true);
 		menuAbout.setText("About");
 		menuAbout.setBackground(XManager.MENU_COLOR);
-		menuAboutModelTest.setVisible(true);
-		menuAboutModelTest.setText("About jModelTest");
 		menuAboutWWW.setVisible(true);
 		menuAboutWWW.setText("WWW home page");
 		menuAboutWWW.setBorder(new BorderUIResource.EmptyBorderUIResource(
@@ -801,6 +799,7 @@ public class FrameMain extends JModelTestFrame {
 		try {
 			mainEditorPane.setText("");
 			ModelTest.printHeader(ModelTest.getMainConsole());
+			ModelTest.printCitation(ModelTest.getMainConsole());
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
@@ -1020,14 +1019,15 @@ public class FrameMain extends JModelTestFrame {
 
 	private void menuAboutCreditsActionPerformed(java.awt.event.ActionEvent e) {
 		try {
-			String credits = "Likelihood calculations with Phyml by Stephane Guindon\n";
-			credits += "Alignment conversion with ALTER by Daniel Glez-Peña\n";
+			String credits = "Likelihood calculations with Phyml by Stephane Guindon et al.\n";
+			credits += "Alignment conversion with ALTER by Daniel Glez-Peña et al.\n";
 			credits += "Phylogenetic trees management with PAL: Phylogenetic Analysis Library by A. Drummond and K. Strimmer\n";
 			credits += "Table utilities by Philip Milne\n";
 			credits += "BrowserLauncher by Eric Albert and Jeff Chapman\n";
 
 			JOptionPane.showMessageDialog(new JFrame(), credits,
-					"jModelTest - CREDITS", JOptionPane.INFORMATION_MESSAGE);
+					"jModelTest - CREDITS", JOptionPane.INFORMATION_MESSAGE,
+					XManager.makeIcon("JMT48", "JMT2"));
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
@@ -1038,7 +1038,8 @@ public class FrameMain extends JModelTestFrame {
 			String about = "jModelTest " + ModelTest.CURRENT_VERSION + "\n";
 			about += "Copyright Diego Darriba and David Posada 2011 onwards ";
 			JOptionPane.showMessageDialog(new JFrame(), about,
-					"jModelTest - ABOUT", JOptionPane.INFORMATION_MESSAGE);
+					"jModelTest", JOptionPane.INFORMATION_MESSAGE,
+					XManager.makeIcon("JMT48", "JMT2"));
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
@@ -1091,4 +1092,5 @@ public class FrameMain extends JModelTestFrame {
 	public void selectedMenuResultsBLasParameters(boolean selected) {
 		menuResultsBLasParameters.setSelected(selected);
 	}
+	
 }

@@ -42,7 +42,6 @@ import javax.swing.plaf.BorderUIResource;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
-import es.uvigo.darwin.jmodeltest.XManager;
 import es.uvigo.darwin.jmodeltest.exe.ProcessManager;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;

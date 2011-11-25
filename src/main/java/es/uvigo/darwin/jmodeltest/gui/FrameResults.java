@@ -28,7 +28,6 @@ import java.util.Date;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
-import es.uvigo.darwin.jmodeltest.XManager;
 import es.uvigo.darwin.jmodeltest.utilities.MyTableCellRenderer;
 import es.uvigo.darwin.jmodeltest.utilities.MyTableModel;
 import es.uvigo.darwin.jmodeltest.utilities.TableSorter;

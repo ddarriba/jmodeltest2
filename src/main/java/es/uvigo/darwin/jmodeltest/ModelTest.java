@@ -37,6 +37,7 @@ import es.uvigo.darwin.jmodeltest.exe.RunPhyml;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlHybrid;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlMPJ;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlThread;
+import es.uvigo.darwin.jmodeltest.gui.XManager;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
 import es.uvigo.darwin.jmodeltest.io.TextInputStream;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;

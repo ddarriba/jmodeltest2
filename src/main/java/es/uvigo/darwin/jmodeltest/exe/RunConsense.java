@@ -30,7 +30,7 @@ import pal.tree.ReadTree;
 import pal.tree.Tree;
 import pal.tree.TreeParseException;
 import es.uvigo.darwin.jmodeltest.ModelTest;
-import es.uvigo.darwin.jmodeltest.XManager;
+import es.uvigo.darwin.jmodeltest.gui.XManager;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;

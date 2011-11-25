@@ -30,7 +30,7 @@ import java.util.StringTokenizer;
 import javax.swing.text.Document;
 
 import es.uvigo.darwin.jmodeltest.ModelTest;
-import es.uvigo.darwin.jmodeltest.XManager;
+import es.uvigo.darwin.jmodeltest.gui.XManager;
 
 public final class Utilities {
 

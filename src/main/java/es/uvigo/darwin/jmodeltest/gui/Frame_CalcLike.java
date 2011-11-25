@@ -41,7 +41,6 @@ import pal.tree.Tree;
 import pal.tree.TreeParseException;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
-import es.uvigo.darwin.jmodeltest.XManager;
 import es.uvigo.darwin.jmodeltest.exe.RunPhyml;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlThread;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;

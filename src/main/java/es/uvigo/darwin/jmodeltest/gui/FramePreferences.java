@@ -26,7 +26,6 @@ import javax.swing.plaf.BorderUIResource.TitledBorderUIResource;
 
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
-import es.uvigo.darwin.jmodeltest.XManager;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
 public class FramePreferences extends JModelTestFrame {
@@ -128,7 +127,7 @@ public class FramePreferences extends JModelTestFrame {
 		tfPathToPhyml.setLocation(2 * MARGIN + 120, MARGIN + 4 * COMPONENTS_HEIGHT);
 		tfPathToPhyml.setFont(XManager.FONT_LABEL);
 		
-		btnOpen = makeGeneralButton("Open16", "Explore", "...");
+		btnOpen = XManager.makeIconButton("Open16", "Explore", "...");
 		btnOpen.setLocation(2 * MARGIN + 400, MARGIN + 4 * COMPONENTS_HEIGHT);
 		
 		btnSetDefault.setText("Default Settings");
@@ -162,7 +161,7 @@ public class FramePreferences extends JModelTestFrame {
 
 		getContentPane().setLayout(null);
 		getContentPane().add(preferencesPanel);
-		setTitle("jModelTest 2 Preferences");
+		setTitle("Preferences");
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		setLocation(XManager.MAIN_LOCATION);
 		getRootPane().setDefaultButton(btnAccept);
@@ -324,27 +323,4 @@ public class FramePreferences extends JModelTestFrame {
 		}
 	}
 
-	protected JButton makeGeneralButton(String imageName,
-		      String toolTipText, String altText) {
-		    //Look for the image.
-		    String imgLocation = "icons/" + imageName
-		        + ".gif";
-		    URL imageURL = FramePreferences.class.getResource(imgLocation);
-
-		    //Create and initialize the button.
-		    JButton button = new JButton();
-		    button.setToolTipText(toolTipText);
-		    button.setLayout(null);
-		    button.setOpaque(false);
-		    button.setSize(20,20);
-		    button.setVisible(true);
-
-		    if (imageURL != null) { //image found
-		      button.setIcon(new ImageIcon(imageURL, altText));
-		    } else { //no image found
-		      button.setText(altText);
-		    }
-
-		    return button;
-		  }
 }

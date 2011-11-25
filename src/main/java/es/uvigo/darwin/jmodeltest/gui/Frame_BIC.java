@@ -35,7 +35,6 @@ import javax.swing.plaf.BorderUIResource;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
-import es.uvigo.darwin.jmodeltest.XManager;
 import es.uvigo.darwin.jmodeltest.selection.BIC;
 
 public class Frame_BIC extends JModelTestFrame {

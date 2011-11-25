@@ -25,7 +25,6 @@ import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 
 import es.uvigo.darwin.jmodeltest.ModelTest;
-import es.uvigo.darwin.jmodeltest.XManager;
 import es.uvigo.darwin.jmodeltest.exe.RunConsense;
 import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
 

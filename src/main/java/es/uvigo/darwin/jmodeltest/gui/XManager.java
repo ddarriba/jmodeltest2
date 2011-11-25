@@ -15,14 +15,17 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-package es.uvigo.darwin.jmodeltest;
+package es.uvigo.darwin.jmodeltest.gui;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.Calendar;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
@@ -30,9 +33,7 @@ import javax.swing.UIManager;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import es.uvigo.darwin.jmodeltest.gui.FrameMain;
-import es.uvigo.darwin.jmodeltest.gui.FramePreferences;
-import es.uvigo.darwin.jmodeltest.gui.FrameResults;
+import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.io.DocumentOutputStream;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
@@ -221,4 +222,37 @@ public class XManager {
 		frame.selectedMenuResultsBLasParameters(selected);
 	}
 	
+	public static ImageIcon makeIcon(String imageName, String altText) {
+		//Look for the image.
+	    String imgLocation = "icons/" + imageName
+	        + ".gif";
+	    URL imageURL = XManager.class.getResource(imgLocation);
+	    ImageIcon icon = null;
+	    if (imageURL != null) {
+	    	icon = new ImageIcon(imageURL, altText);
+	    }
+	    return icon;
+	}
+	
+	public static JButton makeIconButton(String imageName,
+		      String toolTipText, String altText) {
+
+		    ImageIcon icon = makeIcon(imageName, altText);
+		    
+		    //Create and initialize the button.
+		    JButton button = new JButton();
+		    button.setToolTipText(toolTipText);
+		    button.setLayout(null);
+		    button.setOpaque(false);
+		    button.setSize(20,20);
+		    button.setVisible(true);
+
+		    if (icon != null) { //image found
+		      button.setIcon(icon);
+		    } else { //no image found
+		      button.setText(altText);
+		    }
+
+		    return button;
+	  }
 }
