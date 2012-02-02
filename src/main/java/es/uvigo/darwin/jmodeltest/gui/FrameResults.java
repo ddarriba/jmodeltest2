@@ -279,7 +279,8 @@ public class FrameResults extends JModelTestFrame {
  		 sorterModels.addMouseListenerToHeaderInTable(tableModels);
  		 sorterAIC.addMouseListenerToHeaderInTable(tableAIC);
  		 sorterAICc.addMouseListenerToHeaderInTable(tableAICc);
- 		 sorterBIC.addMouseListenerToHeaderInTable(tableBIC);			
+ 		 sorterBIC.addMouseListenerToHeaderInTable(tableBIC);
+ 		 sorterDT.addMouseListenerToHeaderInTable(tableDT);	
 
 		// set date
 		Date today = new Date();

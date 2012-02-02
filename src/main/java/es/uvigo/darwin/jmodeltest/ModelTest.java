@@ -20,6 +20,7 @@ package es.uvigo.darwin.jmodeltest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -61,7 +62,7 @@ import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
  *         ddarriba@udc.es
  * @author David Posada, University of Vigo, Spain dposada@uvigo.es |
  *         darwin.uvigo.es
- * @version 2.0.1 (Jul 2011)
+ * @version 2.0.2 (Feb 2012)
  */
 public class ModelTest {
 
@@ -79,7 +80,7 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.0.1";
+	public static final String CURRENT_VERSION = "2.0.2";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
@@ -116,7 +117,7 @@ public class ModelTest {
 	private static Model minAIC, minAICc, minBIC, minDT, minHLRT, minDLRT;
 
 	private static String hostname;
-	public static Hashtable<String,Integer> HOSTS_TABLE;
+	public static Hashtable<String, Integer> HOSTS_TABLE;
 
 	// We can work under a GUI or in the command line
 	public static boolean buildGUI = true;
@@ -174,9 +175,7 @@ public class ModelTest {
 			MPJ_RUN = false;
 			arguments = args;
 		} catch (Exception e) {
-			System.err.println("[MPI] Unknown exception!");
-			System.err.println(e.getMessage());
-			System.exit(-1);
+			System.err.println("[MPI] Proceed without MPI");
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
@@ -225,9 +224,6 @@ public class ModelTest {
 
 			// print notice information
 			printNotice(MAIN_CONSOLE);
-
-			// check expiration date
-			// CheckExpiration (mainConsole);
 
 			// print the command line
 			MAIN_CONSOLE.println(" ");
@@ -361,8 +357,165 @@ public class ModelTest {
 
 			MAIN_CONSOLE.println(" ");
 			MAIN_CONSOLE.println("Program is done.");
+			MAIN_CONSOLE.println(" ");MAIN_CONSOLE.println(" ");
+			MAIN_CONSOLE.println("::Selection Summary::");
 			MAIN_CONSOLE.println(" ");
-
+			if (myAIC == null && myAICc == null && 
+					myBIC == null && myDT == null) {
+				MAIN_CONSOLE.println("No information criterion was selected.");
+			}
+			
+			MAIN_CONSOLE.println("\tModel \t\tf(a) \tf(c) \tf(g) \tf(t) \tkappa \ttitv " +
+			"\tRa \tRb \tRc \tRd \tRe \tRf \tpInv \tgamma");
+			MAIN_CONSOLE.println("----------------------------------------------------------------------------------------------------------------------------------------");
+			if (myAIC != null) {
+//				MAIN_CONSOLE.println("BestAICmodelAVG "
+//						+ myAIC.getMinModel().getName() + " " + Utilities.RoundDoubleTo(myAIC.getAfA(),4)
+//						+ " " + myAIC.getAfC() + " " + myAIC.getAfG() + " "
+//						+ myAIC.getAfT() + " " + myAIC.getAkappa() + " "
+//						+ myAIC.getAtitv() + " " + myAIC.getaRa() + " "
+//						+ myAIC.getaRb() + " " + myAIC.getaRc() + " "
+//						+ myAIC.getaRd() + " " + myAIC.getaRe() + " "
+//						+ myAIC.getaRf() + " " + myAIC.getApinvI() + " "
+//						+ myAIC.getApinvIG() + " " + myAIC.getAshapeG() + " "
+//						+ myAIC.getAshapeIG() + " "
+//						+ myAIC.getMinModel().getPartition());
+				Model minModel = myAIC.getMinModel();
+				MAIN_CONSOLE.print("AIC \t" +
+						  minModel.getName() + "\t");
+				if (minModel.getName().length()<8)
+					System.err.print("\t");
+				MAIN_CONSOLE.print(minModel.getfA()
+						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
+						+ minModel.getfT() + "\t" + minModel.getKappa() + "\t"
+						+ minModel.getTitv() + "\t" + minModel.getRa() + "\t"
+						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
+						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
+						+ minModel.getRf() + "\t");
+				if (minModel.ispI()) {
+					MAIN_CONSOLE.print(minModel.getPinv());
+				} else {
+					MAIN_CONSOLE.print("N/A");
+				}
+				MAIN_CONSOLE.print("\t");
+				if (minModel.ispG()) {
+					MAIN_CONSOLE.print(minModel.getShape());
+				} else {
+					MAIN_CONSOLE.print("N/A");
+				}
+				MAIN_CONSOLE.print("\n");
+			}
+			if (myBIC != null) {
+//				System.err.println("BestBICmodelAVG "
+//						+ myBIC.getMinModel().getName() + " " + myBIC.getAfA()
+//						+ " " + myBIC.getAfC() + " " + myBIC.getAfG() + " "
+//						+ myBIC.getAfT() + " " + myBIC.getAkappa() + " "
+//						+ myBIC.getAtitv() + " " + myBIC.getaRa() + " "
+//						+ myBIC.getaRb() + " " + myBIC.getaRc() + " "
+//						+ myBIC.getaRd() + " " + myBIC.getaRe() + " "
+//						+ myBIC.getaRf() + " " + myBIC.getApinvI() + " "
+//						+ myBIC.getApinvIG() + " " + myBIC.getAshapeG() + " "
+//						+ myBIC.getAshapeIG() + " "
+//						+ myBIC.getMinModel().getPartition());
+				Model minModel = myBIC.getMinModel();
+				MAIN_CONSOLE.print("BIC \t" +
+						  minModel.getName() + "\t");
+				if (minModel.getName().length()<8)
+					System.err.print("\t");
+				MAIN_CONSOLE.print(minModel.getfA()
+						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
+						+ minModel.getfT() + "\t" + minModel.getKappa() + "\t"
+						+ minModel.getTitv() + "\t" + minModel.getRa() + "\t"
+						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
+						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
+						+ minModel.getRf() + "\t");
+				if (minModel.ispI()) {
+					MAIN_CONSOLE.print(minModel.getPinv());
+				} else {
+					MAIN_CONSOLE.print("N/A");
+				}
+				MAIN_CONSOLE.print("\t");
+				if (minModel.ispG()) {
+					MAIN_CONSOLE.print(minModel.getShape());
+				} else {
+					MAIN_CONSOLE.print("N/A");
+				}
+				MAIN_CONSOLE.print("\n");
+			}
+			if (myAICc != null) {
+//				System.err.println("BestAICcmodelAVG "
+//						+ myAICc.getMinModel().getName() + " "
+//						+ myAICc.getAfA() + " " + myAICc.getAfC() + " "
+//						+ myAICc.getAfG() + " " + myAICc.getAfT() + " "
+//						+ myAICc.getAkappa() + " " + myAICc.getAtitv() + " "
+//						+ myAICc.getaRa() + " " + myAICc.getaRb() + " "
+//						+ myAICc.getaRc() + " " + myAICc.getaRd() + " "
+//						+ myAICc.getaRe() + " " + myAICc.getaRf() + " "
+//						+ myAICc.getApinvI() + " " + myAICc.getApinvIG() + " "
+//						+ myAICc.getAshapeG() + " " + myAICc.getAshapeIG()
+//						+ " " + myAICc.getMinModel().getPartition());
+				Model minModel = myAICc.getMinModel();
+				MAIN_CONSOLE.print("AICc \t" +
+						  minModel.getName() + "\t");
+				if (minModel.getName().length()<8)
+					System.err.print("\t");
+				MAIN_CONSOLE.print(minModel.getfA()
+						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
+						+ minModel.getfT() + "\t" + minModel.getKappa() + "\t"
+						+ minModel.getTitv() + "\t" + minModel.getRa() + "\t"
+						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
+						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
+						+ minModel.getRf() + "\t");
+				if (minModel.ispI()) {
+					MAIN_CONSOLE.print(minModel.getPinv());
+				} else {
+					MAIN_CONSOLE.print("N/A");
+				}
+				MAIN_CONSOLE.print("\t");
+				if (minModel.ispG()) {
+					MAIN_CONSOLE.print(minModel.getShape());
+				} else {
+					MAIN_CONSOLE.print("N/A");
+				}
+				MAIN_CONSOLE.print("\n");
+			}
+			if (myDT != null) {
+//				System.err.println("BestDTmodelAVG "
+//						+ myDT.getMinModel().getName() + " " + myDT.getAfA()
+//						+ " " + myDT.getAfC() + " " + myDT.getAfG() + " "
+//						+ myDT.getAfT() + " " + myDT.getAkappa() + " "
+//						+ myDT.getAtitv() + " " + myDT.getaRa() + " "
+//						+ myDT.getaRb() + " " + myDT.getaRc() + " "
+//						+ myDT.getaRd() + " " + myDT.getaRe() + " "
+//						+ myDT.getaRf() + " " + myDT.getApinvI() + " "
+//						+ myDT.getApinvIG() + " " + myDT.getAshapeG() + " "
+//						+ myDT.getAshapeIG() + " "
+//						+ myDT.getMinModel().getPartition());
+				Model minModel = myDT.getMinModel();
+				MAIN_CONSOLE.print("DT \t" +
+						  minModel.getName() + "\t");
+				if (minModel.getName().length()<8)
+					System.err.print("\t");
+				MAIN_CONSOLE.print(minModel.getfA()
+						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
+						+ minModel.getfT() + "\t" + minModel.getKappa() + "\t"
+						+ minModel.getTitv() + "\t" + minModel.getRa() + "\t"
+						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
+						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
+						+ minModel.getRf() + "\t");
+				if (minModel.ispI()) {
+					MAIN_CONSOLE.print(minModel.getPinv());
+				} else {
+					MAIN_CONSOLE.print("N/A");
+				}
+				MAIN_CONSOLE.print("\t");
+				if (minModel.ispG()) {
+					MAIN_CONSOLE.print(minModel.getShape());
+				} else {
+					MAIN_CONSOLE.print("N/A");
+				}
+				MAIN_CONSOLE.print("\n");
+			}
 		} // end root
 
 	} // end of runCommandLine
@@ -734,7 +887,7 @@ public class ModelTest {
 									machinesFile.getAbsolutePath());
 							String line;
 
-							HOSTS_TABLE = new Hashtable<String,Integer>();
+							HOSTS_TABLE = new Hashtable<String, Integer>();
 							while ((line = machinesInputStream.readLine()) != null) {
 								String hostProcs[] = line.split(":");
 								if (hostProcs.length == 2) {
@@ -819,7 +972,8 @@ public class ModelTest {
 
 			} // while
 			if (!isInputFile) {
-				System.err.println(error + "Input File is required (-d argument)");
+				System.err.println(error
+						+ "Input File is required (-d argument)");
 				PrintUsage();
 			}
 		} catch (Exception e) {
@@ -1314,5 +1468,14 @@ public class ModelTest {
 		return hostname;
 	}
 
+	public class NullPrinter extends OutputStream {
+
+		@Override
+		public void write(int arg0) throws IOException {
+			// DO NOTHING
+
+		}
+
+	}
 } // class ModelTest
 

@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.swing.text.Document;
@@ -306,7 +307,7 @@ public final class Utilities {
 		if (value == NA)
 			return "  -  ";
 		else {
-			String s = String.format("%8.4f", value);
+			String s = String.format(Locale.ENGLISH, "%8.4f", value);
 			return s;
 		}
 	}

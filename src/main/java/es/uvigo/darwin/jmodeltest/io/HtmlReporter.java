@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
@@ -291,7 +292,7 @@ public abstract class HtmlReporter {
 		}
 
 		datamodel.put("confidenceInterval",
-				String.format("%5.2f", options.confidenceInterval * 100));
+				String.format(Locale.ENGLISH, "%5.2f", options.confidenceInterval * 100));
 	}
 
 	private static void fillInWithSortedModels(Model[] models) {
@@ -303,36 +304,36 @@ public abstract class HtmlReporter {
 			modelMap.put("index", String.valueOf(index++));
 			modelMap.put("name", model.getName());
 			modelMap.put("partition", model.getPartition());
-			modelMap.put("lnl", String.format("%5.4f", model.getLnL()));
+			modelMap.put("lnl", String.format(Locale.ENGLISH, "%5.4f", model.getLnL()));
 			modelMap.put("k", String.valueOf(model.getK()));
 			modelMap.put("fA",
-					model.ispF() ? String.format("%5.4f", model.getfA()) : "-");
+					model.ispF() ? String.format(Locale.ENGLISH, "%5.4f", model.getfA()) : "-");
 			modelMap.put("fC",
-					model.ispF() ? String.format("%5.4f", model.getfC()) : "-");
+					model.ispF() ? String.format(Locale.ENGLISH, "%5.4f", model.getfC()) : "-");
 			modelMap.put("fG",
-					model.ispF() ? String.format("%5.4f", model.getfG()) : "-");
+					model.ispF() ? String.format(Locale.ENGLISH, "%5.4f", model.getfG()) : "-");
 			modelMap.put("fT",
-					model.ispF() ? String.format("%5.4f", model.getfT()) : "-");
+					model.ispF() ? String.format(Locale.ENGLISH, "%5.4f", model.getfT()) : "-");
 			modelMap.put("titv",
-					model.ispT() ? String.format("%5.4f", model.getTitv())
+					model.ispT() ? String.format(Locale.ENGLISH, "%5.4f", model.getTitv())
 							: "-");
 			modelMap.put("rA",
-					model.ispR() ? String.format("%5.4f", model.getRa()) : "-");
+					model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRa()) : "-");
 			modelMap.put("rB",
-					model.ispR() ? String.format("%5.4f", model.getRb()) : "-");
+					model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRb()) : "-");
 			modelMap.put("rC",
-					model.ispR() ? String.format("%5.4f", model.getRc()) : "-");
+					model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRc()) : "-");
 			modelMap.put("rD",
-					model.ispR() ? String.format("%5.4f", model.getRd()) : "-");
+					model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRd()) : "-");
 			modelMap.put("rE",
-					model.ispR() ? String.format("%5.4f", model.getRe()) : "-");
+					model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRe()) : "-");
 			modelMap.put("rF",
-					model.ispR() ? String.format("%5.4f", model.getRf()) : "-");
+					model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRf()) : "-");
 			modelMap.put("pInv",
-					model.ispI() ? String.format("%5.4f", model.getPinv())
+					model.ispI() ? String.format(Locale.ENGLISH, "%5.4f", model.getPinv())
 							: "-");
 			modelMap.put("shape",
-					model.ispG() ? String.format("%6.4f", model.getShape())
+					model.ispG() ? String.format(Locale.ENGLISH, "%6.4f", model.getShape())
 							: "-");
 			modelMap.put("tree", model.getTreeString());
 			sortedModels.add(modelMap);
@@ -349,40 +350,40 @@ public abstract class HtmlReporter {
 		bestModel.put("index", String.valueOf(1));
 		bestModel.put("name", model.getName());
 		bestModel.put("partition", model.getPartition());
-		bestModel.put("lnl", String.format("%5.4f", model.getLnL()));
+		bestModel.put("lnl", String.format(Locale.ENGLISH, "%5.4f", model.getLnL()));
 		bestModel.put("k", String.valueOf(model.getK()));
 		bestModel.put("fA",
-				model.ispF() ? String.format("%5.4f", model.getfA()) : "-");
+				model.ispF() ? String.format(Locale.ENGLISH, "%5.4f", model.getfA()) : "-");
 		bestModel.put("fC",
-				model.ispF() ? String.format("%5.4f", model.getfC()) : "-");
+				model.ispF() ? String.format(Locale.ENGLISH, "%5.4f", model.getfC()) : "-");
 		bestModel.put("fG",
-				model.ispF() ? String.format("%5.4f", model.getfG()) : "-");
+				model.ispF() ? String.format(Locale.ENGLISH, "%5.4f", model.getfG()) : "-");
 		bestModel.put("fT",
-				model.ispF() ? String.format("%5.4f", model.getfT()) : "-");
+				model.ispF() ? String.format(Locale.ENGLISH, "%5.4f", model.getfT()) : "-");
 		bestModel.put("titv",
-				model.ispT() ? String.format("%5.4f", model.getTitv()) : "-");
+				model.ispT() ? String.format(Locale.ENGLISH, "%5.4f", model.getTitv()) : "-");
 		bestModel.put("rA",
-				model.ispR() ? String.format("%5.4f", model.getRa()) : "-");
+				model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRa()) : "-");
 		bestModel.put("rB",
-				model.ispR() ? String.format("%5.4f", model.getRb()) : "-");
+				model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRb()) : "-");
 		bestModel.put("rC",
-				model.ispR() ? String.format("%5.4f", model.getRc()) : "-");
+				model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRc()) : "-");
 		bestModel.put("rD",
-				model.ispR() ? String.format("%5.4f", model.getRd()) : "-");
+				model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRd()) : "-");
 		bestModel.put("rE",
-				model.ispR() ? String.format("%5.4f", model.getRe()) : "-");
+				model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRe()) : "-");
 		bestModel.put("rF",
-				model.ispR() ? String.format("%5.4f", model.getRf()) : "-");
+				model.ispR() ? String.format(Locale.ENGLISH, "%5.4f", model.getRf()) : "-");
 		bestModel.put("pInv",
-				model.ispI() ? String.format("%5.4f", model.getPinv()) : "-");
+				model.ispI() ? String.format(Locale.ENGLISH, "%5.4f", model.getPinv()) : "-");
 		bestModel.put("shape",
-				model.ispG() ? String.format("%6.4f", model.getShape()) : "-");
-		bestModel.put("value", String.format("%5.4f", ic.getValue(model)));
-		bestModel.put("delta", String.format("%5.4f", ic.getDelta(model)));
-		bestModel.put("weight", String.format("%5.4f", ic.getWeight(model)));
+				model.ispG() ? String.format(Locale.ENGLISH, "%6.4f", model.getShape()) : "-");
+		bestModel.put("value", String.format(Locale.ENGLISH, "%5.4f", ic.getValue(model)));
+		bestModel.put("delta", String.format(Locale.ENGLISH, "%5.4f", ic.getDelta(model)));
+		bestModel.put("weight", String.format(Locale.ENGLISH, "%5.4f", ic.getWeight(model)));
 		bestModel.put("tree", model.getTreeString());
 		bestModel.put("cumWeight",
-				String.format("%5.4f", ic.getCumWeight(model)));
+				String.format(Locale.ENGLISH, "%5.4f", ic.getCumWeight(model)));
 		sortedModels.add(bestModel);
 		for (int i = 1; i < ic.getNumModels(); i++) {
 			model = ic.getModel(i);
@@ -390,13 +391,13 @@ public abstract class HtmlReporter {
 			modelMap.put("index", String.valueOf(i + 1));
 			modelMap.put("name", model.getName());
 			modelMap.put("partition", model.getPartition());
-			modelMap.put("lnl", String.format("%5.4f", model.getLnL()));
+			modelMap.put("lnl", String.format(Locale.ENGLISH, "%5.4f", model.getLnL()));
 			modelMap.put("k", String.valueOf(model.getK()));
-			modelMap.put("value", String.format("%5.4f", ic.getValue(model)));
-			modelMap.put("delta", String.format("%5.4f", ic.getDelta(model)));
-			modelMap.put("weight", String.format("%5.4f", ic.getWeight(model)));
+			modelMap.put("value", String.format(Locale.ENGLISH, "%5.4f", ic.getValue(model)));
+			modelMap.put("delta", String.format(Locale.ENGLISH, "%5.4f", ic.getDelta(model)));
+			modelMap.put("weight", String.format(Locale.ENGLISH, "%5.4f", ic.getWeight(model)));
 			modelMap.put("cumWeight",
-					String.format("%5.4f", ic.getCumWeight(model)));
+					String.format(Locale.ENGLISH, "%5.4f", ic.getCumWeight(model)));
 			modelMap.put("tree", model.getTreeString());
 			sortedModels.add(modelMap);
 		}

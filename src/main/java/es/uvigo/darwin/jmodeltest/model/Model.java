@@ -159,7 +159,35 @@ public class Model implements Serializable {
 		}
 	}
 
-	
+	public String printForTesting() {
+		StringBuilder str = new StringBuilder();
+		str.append(getName() + " ");
+		str.append(
+				ispF()?
+						(getfA() + " " + getfC() + " " + getfG() + " " + getfT() + " ")
+						:("NA NA NA NA ")
+				);
+		str.append(
+				ispT()?
+						(getKappa() + " " + getTitv() + " ")
+						:("NA NA ")
+				);
+
+		str.append(
+				ispR()?
+						(getRa() + " " + getRb() + " " + getRc() + " " + 
+						getRd() + " " + getRe() + " " + getRf() + " ")
+						:("NA NA NA NA NA NA ")
+				);
+		str.append(
+				ispI()?(getPinv() + " "):("NA ")
+				);
+		str.append(
+				ispG()?(getShape() + " "):("NA ")
+				);
+		str.append(getPartition());
+		return str.toString();
+	}
 
 
 
@@ -440,10 +468,6 @@ public class Model implements Serializable {
 		return Rb;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	public int getId() {
 		return id;
 	}
@@ -456,64 +480,32 @@ public class Model implements Serializable {
 		return numGammaCat;
 	}
 
-	public void setK(int k) {
-		K = k;
-	}
-
 	public int getK() {
 		return K;
-	}
-
-	public void setNumTi(int numTi) {
-		this.numTi = numTi;
 	}
 
 	public int getNumTi() {
 		return numTi;
 	}
 
-	public void setpV(boolean pV) {
-		this.pV = pV;
-	}
-
 	public boolean ispV() {
 		return pV;
-	}
-
-	public void setpG(boolean pG) {
-		this.pG = pG;
 	}
 
 	public boolean ispG() {
 		return pG;
 	}
 
-	public void setpI(boolean pI) {
-		this.pI = pI;
-	}
-
 	public boolean ispI() {
 		return pI;
-	}
-
-	public void setpR(boolean pR) {
-		this.pR = pR;
 	}
 
 	public boolean ispR() {
 		return pR;
 	}
 
-	public void setpT(boolean pT) {
-		this.pT = pT;
-	}
-
 	public boolean ispT() {
 		return pT;
-	}
-
-	public void setpF(boolean pF) {
-		this.pF = pF;
 	}
 
 	public boolean ispF() {

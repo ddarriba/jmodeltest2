@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------------
-jModelTest 2.0.1 Readme -	2/Nov/2011
+jModelTest 2.0.2 Readme -	Feb/1/2011
 
 Diego Darriba (ddarriba@udc.es)
 Guillermo L. Taboada (taboada@udc.es)
@@ -37,7 +37,7 @@ TOC
 
 Console version
 
-$ tar zvxf jmodeltest-2.0.1-yyyymmdd.tar.gz
+$ tar zvxf jmodeltest-2.0.2-yyyymmdd.tar.gz
 (Linux/Unix/OS X)
 $ export JMODELTEST_HOME=$PWD/jmodeltest2
 (Windows)
@@ -47,7 +47,7 @@ $ java -jar jModelTest.jar -d example-data/aP6.fas -f -i -g 4 -s 11 -AIC -a
 
 Graphical version
 
-$ tar zvxf jmodeltest-2.0.1-yyyymmdd.tar.gz
+$ tar zvxf jmodeltest-2.0.2-yyyymmdd.tar.gz
 (Linux/Unix/OS X)
 $ export JMODELTEST_HOME=$PWD/jmodeltest2
 (Windows)

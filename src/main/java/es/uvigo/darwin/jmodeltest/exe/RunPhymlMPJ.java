@@ -41,7 +41,7 @@ import es.uvigo.darwin.prottest.util.exception.ProtTestInternalException;
  * 					ddarriba@udc.es
  * @author			David Posada, University of Vigo, Spain  
  *					dposada@uvigo.es | darwin.uvigo.es
- * @version			2.0 (July 2011)
+ * @version			2.0.2 (Feb 2012)
  */
 public class RunPhymlMPJ extends RunPhyml {
 

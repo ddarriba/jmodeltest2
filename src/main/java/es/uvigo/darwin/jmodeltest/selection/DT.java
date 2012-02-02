@@ -66,7 +66,7 @@ public class DT extends InformationCriterion {
 
 		/* exactly as in DT-ModSel.pl */
 		// get BICs and min BIC
-		double minBIC = min = 9999;
+		double minBIC = min = Double.MAX_VALUE;
 		for (i = 0; i < numModels; i++) {
 			if (options.countBLasParameters)
 				BIC[i] = models[i].getLnL() + models[i].getK() / 2.0

@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 package es.uvigo.darwin.jmodeltest.observer;
 
+import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -79,7 +80,7 @@ public class ConsoleProgressObserver implements Observer {
 					stream.print("\t");
 				stream.print(info.getMessage() + "\t" 
 						+ Utilities.calculateRuntime(startTime, System.currentTimeMillis()) + "\t" 
-						+ String.format("%5.4f", info.getModel().getLnL()));
+						+ String.format(Locale.ENGLISH, "%5.4f", info.getModel().getLnL()));
 				if (ModelTest.MPJ_RUN && threadScheduling) {
 					stream.println(" ");
 				} else {

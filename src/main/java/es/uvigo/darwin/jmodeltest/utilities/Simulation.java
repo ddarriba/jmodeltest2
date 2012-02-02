@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Locale;
 
 import pal.alignment.Alignment;
 import pal.tree.Tree;
@@ -356,7 +357,7 @@ public class Simulation {
 		if (value == Utilities.NA)
 			return "-";
 		else {
-			String s = String.format("%.4f", value);
+			String s = String.format(Locale.ENGLISH, "%.4f", value);
 			return s;
 		}
 	}

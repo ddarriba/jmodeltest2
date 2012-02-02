@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest.exe;
 
 import java.util.Arrays;
@@ -29,73 +29,72 @@ import es.uvigo.darwin.jmodeltest.model.ModelComparator;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
-/** 
+/**
  * RunPhyml.java
- *
- * Description:		Makes phyml calculate likelihood scores for competing models
- * @author			Diego Darriba, University of Vigo / University of A Coruna, Spain
- * 					ddarriba@udc.es
- * @author			David Posada, University of Vigo, Spain  
- *					dposada@uvigo.es | darwin.uvigo.es
- * @version			2.0 (July 2011)
+ * 
+ * Description: Makes phyml calculate likelihood scores for competing models
+ * 
+ * @author Diego Darriba, University of Vigo / University of A Coruna, Spain
+ *         ddarriba@udc.es
+ * @author David Posada, University of Vigo, Spain dposada@uvigo.es |
+ *         darwin.uvigo.es
+ * @version 2.0.2 (Feb 2012)
  */
 public abstract class RunPhyml extends Observable implements Observer {
 
 	protected ApplicationOptions options;
 	protected Model[] models;
-	
+
 	public static final String PHYML_VERSION = "3.0";
 
 	public static String PHYML_TREE_SUFFIX = "_phyml_tree_";
 	public static String PHYML_STATS_SUFFIX = "_phyml_stats_";
 
 	protected Observer progress;
-	
-	public RunPhyml(Observer progress, ApplicationOptions options, Model[] models) {
+
+	public RunPhyml(Observer progress, ApplicationOptions options,
+			Model[] models) {
 		if (models != null)
-		this.models = new Model[models.length];
+			this.models = new Model[models.length];
 		else
-	    this.models = new Model[0];
-		for (int i=0; i < this.models.length; i++)
+			this.models = new Model[0];
+		for (int i = 0; i < this.models.length; i++)
 			this.models[i] = models[i];
 		this.options = options;
 		this.progress = progress;
 		this.addObserver(progress);
 		Arrays.sort(this.models, new ModelComparator());
 	}
-	
+
 	public void execute() {
 		// remove stuff from exe directories before starting
 		deleteFiles();
 		printSettings(ModelTest.getMainConsole());
-		
+
 		// estimate a NJ-JC tree if needed
 		if (options.fixedTopology) {
-			notifyObservers(ProgressInfo.BASE_TREE_INIT, 0, models[0],
-					null);
+			notifyObservers(ProgressInfo.BASE_TREE_INIT, 0, models[0], null);
 
-			PhymlSingleModel jcModel = new PhymlSingleModel(models[0],
-					0, true, options);
+			PhymlSingleModel jcModel = new PhymlSingleModel(models[0], 0, true,
+					options);
 			jcModel.run();
 
 			// create JCtree file
-			TextOutputStream JCtreeFile = new TextOutputStream(
-					options.getTreeFile().getAbsolutePath(), false);
+			TextOutputStream JCtreeFile = new TextOutputStream(options
+					.getTreeFile().getAbsolutePath(), false);
 			JCtreeFile.print(models[0].getTreeString() + "\n");
 			JCtreeFile.close();
 
-			notifyObservers(ProgressInfo.BASE_TREE_COMPUTED, 0,
-					models[0], null);
+			notifyObservers(ProgressInfo.BASE_TREE_COMPUTED, 0, models[0], null);
 
 		}
 
 		// compute likelihood scores for all models
-		System.out.print("computing likelihood scores for "
-				+ models.length + " models with Phyml " + PHYML_VERSION);
-		
-		notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0,
-				models[0], null);
-		
+		// System.out.print("computing likelihood scores for "
+		// + models.length + " models with Phyml " + PHYML_VERSION);
+
+		notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0, models[0], null);
+
 		doPhyml();
 	}
 
@@ -106,7 +105,8 @@ public abstract class RunPhyml extends Observable implements Observer {
 
 	protected void printSettings(TextOutputStream stream) {
 
-		stream.println(" ");stream.println(" ");
+		stream.println(" ");
+		stream.println(" ");
 		stream.println("---------------------------------------------------------------");
 		stream.println("*                                                             *");
 		stream.println("*        COMPUTATION OF LIKELIHOOD SCORES WITH PHYML          *");
@@ -157,7 +157,8 @@ public abstract class RunPhyml extends Observable implements Observer {
 		if (options.userTopologyExists) {
 			stream.println("fixed user tree topology.");
 			stream.println(" ");
-			stream.print("User tree " + "(" + options.getInputTreeFile().getName() + ") = ");
+			stream.print("User tree " + "("
+					+ options.getInputTreeFile().getName() + ") = ");
 			stream.println(options.getUserTree());
 			stream.println(" ");
 		}
@@ -171,18 +172,20 @@ public abstract class RunPhyml extends Observable implements Observer {
 			stream.println("ML tree");
 		else
 			stream.println("BIONJ tree");
-		
-		stream.print(" Tree topology search operation = ");
-		switch (options.treeSearchOperations) {
-		case NNI:
-			stream.println("NNI");
-			break;
-		case SPR:
-			stream.println("SPR");
-			break;
-		case BEST:
-			stream.println("BEST");
-			break;
+
+		if (options.optimizeMLTopology) {
+			stream.print(" Tree topology search operation = ");
+			switch (options.treeSearchOperations) {
+			case NNI:
+				stream.println("NNI");
+				break;
+			case SPR:
+				stream.println("SPR");
+				break;
+			case BEST:
+				stream.println("BEST");
+				break;
+			}
 		}
 	}
 

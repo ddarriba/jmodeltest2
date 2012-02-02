@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -392,7 +393,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 						+ "\t"
 						+ Utilities.calculateRuntime(startTime,
 								System.currentTimeMillis()) + "\t"
-						+ String.format("%5.4f", info.getModel().getLnL()));
+						+ String.format(Locale.ENGLISH, "%5.4f", info.getModel().getLnL()));
 
 				// scroll to the bottom
 				XManager.getInstance()
