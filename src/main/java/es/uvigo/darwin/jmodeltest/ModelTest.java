@@ -994,7 +994,7 @@ public class ModelTest {
 					+ "\n -g: include models with rate variation among sites and number of categories (e.g., -g 8) (default is false & 4 categories)"
 					+ "\n -t: base tree for likelihood calculations (fixed (BIONJ-JC), BIONJ, ML) (e.g., -t BIONJ) (default is ML)"
 					+ "\n -u: user tree for likelihood calculations  (e.g., -u data.tre)"
-					+ "\n -S: tree topology search operation option (NNI (fast), SPR (a bit slower), BEST (best of NNI and SPR)) (default is NNI)"
+					+ "\n -S: tree topology search operation option (NNI (fast), SPR (a bit slower), BEST (best of NNI and SPR)) (default is BEST)"
 					+ "\n -n: sample size (-n235) (default is  the number of sites)"
 					+ "\n -AIC: calculate the Akaike Information Criterion (e.g., -AIC) (default is false)"
 					+ "\n -AICc: calculate the corrected Akaike Information Criterion (e.g., -AICc) (default is false)"

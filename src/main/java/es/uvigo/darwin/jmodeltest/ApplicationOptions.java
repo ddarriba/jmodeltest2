@@ -99,7 +99,7 @@ public class ApplicationOptions implements Serializable {
 	// whether to optimize the BIONJ-model tree by ML
 	public boolean optimizeMLTopology = true;
 
-	public TreeSearch treeSearchOperations = TreeSearch.NNI;
+	public TreeSearch treeSearchOperations = TreeSearch.BEST;
 
 	public int numSites;
 	public int numTaxa;

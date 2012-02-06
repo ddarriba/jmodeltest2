@@ -286,7 +286,6 @@ public class Frame_CalcLike extends JModelTestFrame {
 		ButtonNNICalcLike.setLocation(new java.awt.Point(20, 20));
 		ButtonNNICalcLike.setSize(new java.awt.Dimension(70, 20));
 		ButtonNNICalcLike.setVisible(true);
-		ButtonNNICalcLike.setSelected(true);
 		
 		ButtonSPRCalcLike.setText("SPR");
 		ButtonSPRCalcLike.setLocation(new java.awt.Point(90, 20));
@@ -297,6 +296,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		ButtonBestCalcLike.setLocation(new java.awt.Point(160, 20));
 		ButtonBestCalcLike.setSize(new java.awt.Dimension(70, 20));
 		ButtonBestCalcLike.setVisible(true);
+		ButtonBestCalcLike.setSelected(true);
 		
 		ButtonGroupTreeSearchCalcLike.add(ButtonNNICalcLike);
 		ButtonGroupTreeSearchCalcLike.add(ButtonSPRCalcLike);
