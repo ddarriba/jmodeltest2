@@ -17,10 +17,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 package es.uvigo.darwin.jmodeltest.gui;
 
+
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -33,8 +39,11 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.BorderUIResource;
 
 import pal.tree.Tree;
@@ -50,8 +59,14 @@ import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
 public class Frame_CalcLike extends JModelTestFrame {
 
 	private static final long serialVersionUID = 201103091058L;
-
+	private static final int TOTAL_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
+	private static final int DEFAULT_NUMBER_OF_THREADS = TOTAL_NUMBER_OF_THREADS; 
+	
 	private ApplicationOptions options = ApplicationOptions.getInstance();
+	
+	private JPanel PanelProcessors = new JPanel();
+	private JSlider SliderProcessors = new JSlider(1,TOTAL_NUMBER_OF_THREADS,DEFAULT_NUMBER_OF_THREADS);
+	private JLabel jLabelNumProcessors = new JLabel();
 	
 	private JPanel PanelCalcLike = new JPanel();
 	JButton RunButtonCalcLike = new JButton();
@@ -106,8 +121,30 @@ public class Frame_CalcLike extends JModelTestFrame {
 	}
 
 	public void initComponents() throws Exception {
-		PanelCalcLike.setLocation(new java.awt.Point(10, 10));
-		PanelCalcLike.setSize(new java.awt.Dimension(460, 360));
+		PanelProcessors.setLocation(10, 10);
+		PanelProcessors.setSize(460, 80);
+		PanelProcessors
+				.setBorder(new BorderUIResource.TitledBorderUIResource(
+						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
+						"Number of processors requested", 4, 2, XManager.FONT_LABEL,
+						XManager.LABEL_BLUE_COLOR));
+		PanelProcessors.setVisible(true);
+		PanelProcessors.setLayout(null);
+		
+		SliderProcessors.setValue(SliderProcessors.getMaximum());
+		SliderProcessors.setLocation(10, 20);
+		SliderProcessors.setSize(400, 45);
+		SliderProcessors.setPaintLabels(false);
+		
+		jLabelNumProcessors.setText(String.valueOf(SliderProcessors.getValue()));
+		jLabelNumProcessors.setLocation(420, 25);
+		jLabelNumProcessors.setSize(20,40);
+		
+		PanelProcessors.add(SliderProcessors);
+		PanelProcessors.add(jLabelNumProcessors);
+		
+		PanelCalcLike.setLocation(10, 100);
+		PanelCalcLike.setSize(460, 360);
 		PanelCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
@@ -132,8 +169,8 @@ public class Frame_CalcLike extends JModelTestFrame {
 		RunButtonCalcLike.setVisible(true);
 		getRootPane().setDefaultButton(RunButtonCalcLike);
 
-		PanelNumberModelsCalcLike.setLocation(new java.awt.Point(20, 20));
-		PanelNumberModelsCalcLike.setSize(new java.awt.Dimension(270, 50));
+		PanelNumberModelsCalcLike.setLocation(20, 20);
+		PanelNumberModelsCalcLike.setSize(420, 50);
 		PanelNumberModelsCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
@@ -143,44 +180,51 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelNumberModelsCalcLike.setVisible(true);
 		PanelNumberModelsCalcLike.setLayout(null);
 		Button3SubsTypeCalcLike.setVisible(true);
-		Button3SubsTypeCalcLike.setSize(new java.awt.Dimension(50, 20));
+		Button3SubsTypeCalcLike.setSize(50, 20);
 		Button3SubsTypeCalcLike.setText("3");
-		Button3SubsTypeCalcLike.setLocation(new java.awt.Point(20, 20));
+		Button3SubsTypeCalcLike.setLocation(20, 20);
 		Button5SubsTypeCalcLike.setVisible(true);
-		Button5SubsTypeCalcLike.setSize(new java.awt.Dimension(50, 20));
+		Button5SubsTypeCalcLike.setSize(50, 20);
 		Button5SubsTypeCalcLike.setText("5");
-		Button5SubsTypeCalcLike.setLocation(new java.awt.Point(80, 20));
+		Button5SubsTypeCalcLike.setLocation(70, 20);
 		Button7SubsTypeCalcLike.setVisible(true);
-		Button7SubsTypeCalcLike.setSize(new java.awt.Dimension(50, 20));
+		Button7SubsTypeCalcLike.setSize(50, 20);
 		Button7SubsTypeCalcLike.setText("7");
-		Button7SubsTypeCalcLike.setLocation(new java.awt.Point(140, 20));
+		Button7SubsTypeCalcLike.setLocation(120, 20);
 		Button11SubsTypeCalcLike.setVisible(true);
-		Button11SubsTypeCalcLike.setSize(new java.awt.Dimension(50, 20));
+		Button11SubsTypeCalcLike.setSize(50, 20);
 		Button11SubsTypeCalcLike.setText("11");
-		Button11SubsTypeCalcLike.setLocation(new java.awt.Point(200, 20));
+		Button11SubsTypeCalcLike.setLocation(170, 20);
 		Button11SubsTypeCalcLike.setSelected(true);
 		ButtonGroupNumberModelsCalcLike.add(Button3SubsTypeCalcLike);
 		ButtonGroupNumberModelsCalcLike.add(Button5SubsTypeCalcLike);
 		ButtonGroupNumberModelsCalcLike.add(Button7SubsTypeCalcLike);
 		ButtonGroupNumberModelsCalcLike.add(Button11SubsTypeCalcLike);
-
-		PanelFrequenciesCalcLike.setSize(new java.awt.Dimension(110, 50));
+		jLabelNumModels.setSize(160, 20);
+		jLabelNumModels.setLocation(240, 20);
+		jLabelNumModels.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		jLabelNumModels.setAlignmentY(JLabel.CENTER_ALIGNMENT);
+		jLabelNumModels.setVisible(true);
+		jLabelNumModels.setForeground(Color.gray);
+		jLabelNumModels.setFont(XManager.FONT_LABEL_BIG);
+		
+		PanelFrequenciesCalcLike.setSize(130, 50);
 		PanelFrequenciesCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false), "Base frequencies",
 						4, 2, XManager.FONT_LABEL,
 						XManager.LABEL_BLUE_COLOR));
-		PanelFrequenciesCalcLike.setLocation(new java.awt.Point(20, 80));
+		PanelFrequenciesCalcLike.setLocation(20, 80);
 		PanelFrequenciesCalcLike.setVisible(true);
 		PanelFrequenciesCalcLike.setLayout(null);
 		jCheckBoxFrequencies.setVisible(true);
-		jCheckBoxFrequencies.setSize(new java.awt.Dimension(50, 20));
+		jCheckBoxFrequencies.setSize(50, 20);
 		jCheckBoxFrequencies.setText("+F");
-		jCheckBoxFrequencies.setLocation(new java.awt.Point(20, 20));
+		jCheckBoxFrequencies.setLocation(20, 20);
 		jCheckBoxFrequencies.setSelected(true);
 
-		PanelRateVariationCalcLike.setLocation(new java.awt.Point(150, 80));
-		PanelRateVariationCalcLike.setSize(new java.awt.Dimension(180, 50));
+		PanelRateVariationCalcLike.setLocation(170, 80);
+		PanelRateVariationCalcLike.setSize(270, 50);
 		PanelRateVariationCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false), "Rate variation", 4,
@@ -188,15 +232,15 @@ public class Frame_CalcLike extends JModelTestFrame {
 						XManager.LABEL_BLUE_COLOR));
 		PanelRateVariationCalcLike.setVisible(true);
 		PanelRateVariationCalcLike.setLayout(null);
-		jCheckBoxPinv.setLocation(new java.awt.Point(20, 20));
-		jCheckBoxPinv.setSize(new java.awt.Dimension(50, 20));
+		jCheckBoxPinv.setLocation(20, 20);
+		jCheckBoxPinv.setSize(50, 20);
 		jCheckBoxPinv.setText("+I");
 		jCheckBoxPinv.setVisible(true);
 		jCheckBoxPinv.setSelected(true);
 		jCheckBoxGamma.setVisible(true);
-		jCheckBoxGamma.setSize(new java.awt.Dimension(55, 20));
+		jCheckBoxGamma.setSize(55, 20);
 		jCheckBoxGamma.setText("+G");
-		jCheckBoxGamma.setLocation(new java.awt.Point(70, 20));
+		jCheckBoxGamma.setLocation(70, 20);
 		jCheckBoxGamma.setSelected(true);
 		TextFieldNcat.setEnabled(true);
 		TextFieldNcat
@@ -207,13 +251,13 @@ public class Frame_CalcLike extends JModelTestFrame {
 						XManager.FONT_LABEL,
 						XManager.LABEL_BLUE_COLOR));
 		TextFieldNcat.setVisible(true);
-		TextFieldNcat.setSize(new java.awt.Dimension(40, 35));
+		TextFieldNcat.setSize(60, 35);
 		TextFieldNcat.setText("4");
 		TextFieldNcat.setHorizontalAlignment(JTextField.RIGHT);
-		TextFieldNcat.setLocation(new java.awt.Point(122, 10));
+		TextFieldNcat.setLocation(122, 10);
 
-		PanelTreeOptimizationCalcLike.setLocation(new java.awt.Point(20, 140));
-		PanelTreeOptimizationCalcLike.setSize(new java.awt.Dimension(350, 90));
+		PanelTreeOptimizationCalcLike.setLocation(20, 140);
+		PanelTreeOptimizationCalcLike.setSize(420, 90);
 		PanelTreeOptimizationCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
@@ -224,33 +268,33 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelTreeOptimizationCalcLike.setLayout(null);
 
 		ButtonFixedCalcLike.setText("Fixed BIONJ-JC");
-		ButtonFixedCalcLike.setSize(new java.awt.Dimension(130, 20));
-		ButtonFixedCalcLike.setLocation(new java.awt.Point(20, 20));
+		ButtonFixedCalcLike.setSize(160, 20);
+		ButtonFixedCalcLike.setLocation(20, 20);
 		ButtonFixedCalcLike.setVisible(true);
 
 		ButtonFixedUserTopologyCalcLike.setText("Fixed user topology");
 		ButtonFixedUserTopologyCalcLike
-				.setLocation(new java.awt.Point(170, 20));
+				.setLocation(200, 20);
 		ButtonFixedUserTopologyCalcLike
-				.setSize(new java.awt.Dimension(160, 20));
+				.setSize(200, 20);
 		ButtonFixedUserTopologyCalcLike.setVisible(true);
 
 		ButtonBIONJCalcLike.setText("BIONJ");
-		ButtonBIONJCalcLike.setLocation(new java.awt.Point(20, 57));
-		ButtonBIONJCalcLike.setSize(new java.awt.Dimension(90, 20));
+		ButtonBIONJCalcLike.setLocation(20, 57);
+		ButtonBIONJCalcLike.setSize(160, 20);
 		ButtonBIONJCalcLike.setVisible(true);
 
 		ButtonMLCalcLike.setText("ML optimized");
-		ButtonMLCalcLike.setLocation(new java.awt.Point(170, 57));
-		ButtonMLCalcLike.setSize(new java.awt.Dimension(130, 20));
+		ButtonMLCalcLike.setLocation(200, 57);
+		ButtonMLCalcLike.setSize(200, 20);
 		ButtonMLCalcLike.setVisible(true);
 		ButtonMLCalcLike.setSelected(true);
 		
 		enableTreeSearching(ButtonMLCalcLike.isSelected());
 
-		jLabelUserTopology.setLocation(new java.awt.Point(194, 22));
-		jLabelUserTopology.setSize(new java.awt.Dimension(300, 50));
-		jLabelUserTopology.setForeground(java.awt.Color.gray);
+		jLabelUserTopology.setLocation(194, 22);
+		jLabelUserTopology.setSize(300, 50);
+		jLabelUserTopology.setForeground(Color.gray);
 		jLabelUserTopology.setFont(XManager.FONT_LABEL_BIG);
 		jLabelUserTopology.setVisible(true);
 
@@ -260,19 +304,12 @@ public class Frame_CalcLike extends JModelTestFrame {
 		ButtonGroupTreeOptimizationCalcLike
 				.add(ButtonFixedUserTopologyCalcLike);
 
-		jLabelNumModels.setSize(new java.awt.Dimension(400, 50));
-		jLabelNumModels.setLocation(new java.awt.Point(310, 25));
-		jLabelNumModels.setVisible(true);
-		jLabelNumModels.setForeground(java.awt.Color.gray);
-		jLabelNumModels.setFont(XManager.FONT_LABEL_BIG);
-		jLabelNumModels.setText("Number of models = 88");
-
 		setLocation(XManager.MAIN_LOCATION);
 		getContentPane().setLayout(null);
 		setTitle("Likelihood settings");
 
-		PanelTreeOptimizationMethod.setLocation(new java.awt.Point(20, 240));
-		PanelTreeOptimizationMethod.setSize(new java.awt.Dimension(250, 60));
+		PanelTreeOptimizationMethod.setLocation(95, 240);
+		PanelTreeOptimizationMethod.setSize(250, 60);
 		PanelTreeOptimizationMethod
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
@@ -283,20 +320,21 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelTreeOptimizationMethod.setLayout(null);
 		
 		ButtonNNICalcLike.setText("NNI");
-		ButtonNNICalcLike.setLocation(new java.awt.Point(20, 20));
-		ButtonNNICalcLike.setSize(new java.awt.Dimension(70, 20));
+		ButtonNNICalcLike.setLocation(20, 20);
+		ButtonNNICalcLike.setSize(70, 20);
 		ButtonNNICalcLike.setVisible(true);
 		
 		ButtonSPRCalcLike.setText("SPR");
-		ButtonSPRCalcLike.setLocation(new java.awt.Point(90, 20));
-		ButtonSPRCalcLike.setSize(new java.awt.Dimension(70, 20));
+		ButtonSPRCalcLike.setLocation(90, 20);
+		ButtonSPRCalcLike.setSize(70, 20);
 		ButtonSPRCalcLike.setVisible(true);
 		
 		ButtonBestCalcLike.setText("Best");
-		ButtonBestCalcLike.setLocation(new java.awt.Point(160, 20));
-		ButtonBestCalcLike.setSize(new java.awt.Dimension(70, 20));
+		ButtonBestCalcLike.setLocation(160, 20);
+		ButtonBestCalcLike.setSize(70, 20);
 		ButtonBestCalcLike.setVisible(true);
 		ButtonBestCalcLike.setSelected(true);
+		ButtonBestCalcLike.setToolTipText("Best of NNI and SPR algorithms. Tests both of them (Slowest).");
 		
 		ButtonGroupTreeSearchCalcLike.add(ButtonNNICalcLike);
 		ButtonGroupTreeSearchCalcLike.add(ButtonSPRCalcLike);
@@ -310,12 +348,12 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelCalcLike.add(PanelTreeOptimizationMethod);
 		PanelCalcLike.add(PanelRateVariationCalcLike);
 		PanelCalcLike.add(PanelFrequenciesCalcLike);
-		PanelCalcLike.add(jLabelNumModels);
 
 		PanelNumberModelsCalcLike.add(Button3SubsTypeCalcLike);
 		PanelNumberModelsCalcLike.add(Button5SubsTypeCalcLike);
 		PanelNumberModelsCalcLike.add(Button7SubsTypeCalcLike);
 		PanelNumberModelsCalcLike.add(Button11SubsTypeCalcLike);
+		PanelNumberModelsCalcLike.add(jLabelNumModels);
 		PanelRateVariationCalcLike.add(jCheckBoxPinv);
 		PanelRateVariationCalcLike.add(jCheckBoxGamma);
 		PanelRateVariationCalcLike.add(TextFieldNcat);
@@ -331,65 +369,78 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelTreeOptimizationCalcLike.add(jLabelUserTopology);
 		PanelTreeOptimizationCalcLike.add(jLabelUserTree);
 
+		getContentPane().add(PanelProcessors);
 		getContentPane().add(PanelCalcLike);
 
-		setSize(new java.awt.Dimension(480, 410));
+		setSize(480, 500);
 		setResizable(false);
 
+		// Update number of models
+		CalculateNumberOfModels(null);
+		
 		// event handling
 		RunButtonCalcLike
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent e) {
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						RunButtonCalcLikeActionPerformed(e);
 					}
 				});
 
 		CancelButtonCalcLike
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent e) {
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						CancelButtonCalcLikeActionPerformed(e);
 					}
 				});
 
 		JButtonDefaultCalcLike
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent e) {
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						JButtonDefaultCalcLikeActionPerformed(e);
 					}
 				});
+		
+		SliderProcessors
+		.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				SliderChangeListener(e);
+			}
+		});
 
 		// common event handling for set of models
 		Button3SubsTypeCalcLike
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent e) {
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						CalculateNumberOfModels(e);
 					}
 				});
 		Button5SubsTypeCalcLike
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent e) {
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						CalculateNumberOfModels(e);
 					}
 				});
 		Button7SubsTypeCalcLike
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent e) {
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						CalculateNumberOfModels(e);
 					}
 				});
 		Button11SubsTypeCalcLike
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent e) {
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						CalculateNumberOfModels(e);
 					}
 				});
-		jCheckBoxPinv.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent e) {
+		jCheckBoxPinv.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				CalculateNumberOfModels(e);
 			}
 		});
-		jCheckBoxGamma.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent e) {
+		jCheckBoxGamma.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 
 				if (jCheckBoxGamma.isSelected())
 					TextFieldNcat.setEnabled(true);
@@ -401,67 +452,67 @@ public class Frame_CalcLike extends JModelTestFrame {
 		});
 
 		jCheckBoxFrequencies
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent e) {
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						CalculateNumberOfModels(e);
 					}
 				});
 
 		ButtonFixedUserTopologyCalcLike
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent e) {
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						ReadUserTopologyCalcLike(e);
 					}
 				});
 		
 		ButtonBIONJCalcLike
-		.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent e) {
+		.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				enableTreeSearching(false);
 			}
 		});
 		
 		ButtonFixedCalcLike
-		.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent e) {
+		.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				enableTreeSearching(false);
 			}
 		});
 		
 		ButtonFixedUserTopologyCalcLike
-		.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent e) {
+		.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				enableTreeSearching(false);
 			}
 		});
 		
 		ButtonMLCalcLike
-		.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent e) {
+		.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				enableTreeSearching(true);
 			}
 		});
 		
 		/*
 		 * ButtonFixedUserTreeCalcLike.addActionListener(new
-		 * java.awt.event.ActionListener() { public void
-		 * actionPerformed(java.awt.event.ActionEvent e) {
+		 * ActionListener() { public void
+		 * actionPerformed(ActionEvent e) {
 		 * ReadUserTreeCalcLike(e); } });
 		 * 
 		 * 
 		 * CheckBoxFixedTopology.addActionListener(new
-		 * java.awt.event.ActionListener() { public void
-		 * actionPerformed(java.awt.event.ActionEvent e) {
+		 * ActionListener() { public void
+		 * actionPerformed(ActionEvent e) {
 		 * CheckBoxFixedTopologyActionPerformed(e); } });
 		 * 
 		 * 
 		 * CheckBoxOptimizeTopology.addActionListener(new
-		 * java.awt.event.ActionListener() { public void
-		 * actionPerformed(java.awt.event.ActionEvent e) {
+		 * ActionListener() { public void
+		 * actionPerformed(ActionEvent e) {
 		 * CheckBoxOptimizeTopologyActionPerformed(e); } });
 		 */
-		addWindowListener(new java.awt.event.WindowAdapter() {
-			public void windowClosing(java.awt.event.WindowEvent e) {
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
 				thisWindowClosing(e);
 			}
 		});
@@ -505,14 +556,17 @@ public class Frame_CalcLike extends JModelTestFrame {
 	}
 
 	// Close the window when the close box is clicked
-	void thisWindowClosing(java.awt.event.WindowEvent e) {
+	void thisWindowClosing(WindowEvent e) {
 		setVisible(false);
 		dispose();
 		// System.exit(0);
 	}
 
-	public void RunButtonCalcLikeActionPerformed(java.awt.event.ActionEvent e) {
+	public void RunButtonCalcLikeActionPerformed(ActionEvent e) {
 		try {
+			// set number of processors
+			options.setNumberOfThreads(SliderProcessors.getValue());
+			
 			// get parameters
 			if (Button3SubsTypeCalcLike.isSelected())
 				options.setSubstTypeCode(0);
@@ -606,18 +660,21 @@ public class Frame_CalcLike extends JModelTestFrame {
 	}
 
 	public void JButtonDefaultCalcLikeActionPerformed(
-			java.awt.event.ActionEvent e) {
+			ActionEvent e) {
 		try {
+			SliderProcessors.setValue(DEFAULT_NUMBER_OF_THREADS);
 			Button11SubsTypeCalcLike.setSelected(true);
 			ButtonMLCalcLike.setSelected(true);
-
+			enableTreeSearching(ButtonMLCalcLike.isSelected());
+			ButtonBestCalcLike.setSelected(true);
+			
 			jCheckBoxFrequencies.setSelected(true);
 			jCheckBoxPinv.setSelected(true);
 			jCheckBoxGamma.setSelected(true);
 			TextFieldNcat.setEnabled(true);
 			TextFieldNcat.setText("4");
 
-			jLabelNumModels.setText("Number of models = " + 88);
+			CalculateNumberOfModels(null);
 			jLabelUserTopology.setText("");
 			jLabelUserTree.setText("");
 
@@ -626,7 +683,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		}
 	}
 
-	public void CancelButtonCalcLikeActionPerformed(java.awt.event.ActionEvent e) {
+	public void CancelButtonCalcLikeActionPerformed(ActionEvent e) {
 		try {
 			setVisible(false);
 			dispose();
@@ -635,7 +692,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		}
 	}
 
-	public void CalculateNumberOfModels(java.awt.event.ActionEvent e) {
+	public void CalculateNumberOfModels(ActionEvent e) {
 		int numberOfModels;
 		try {
 			if (Button3SubsTypeCalcLike.isSelected())
@@ -664,7 +721,11 @@ public class Frame_CalcLike extends JModelTestFrame {
 		}
 	}
 
-	public void ReadUserTopologyCalcLike(java.awt.event.ActionEvent e) {
+	private void SliderChangeListener(ChangeEvent e) {
+		jLabelNumProcessors.setText(String.valueOf(SliderProcessors.getValue()));
+	}
+	
+	public void ReadUserTopologyCalcLike(ActionEvent e) {
 		FileDialog fc = new FileDialog(this,
 				"Load Newick tree file with branch lengths", FileDialog.LOAD);
 		fc.setDirectory(System.getProperty("user.dir"));
