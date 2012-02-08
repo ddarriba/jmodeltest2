@@ -328,11 +328,17 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 			case ProgressInfo.BASE_TREE_INIT:
 				stream.print("\nEstimating a BIONJ-JC tree ... ");
 				System.out.print("estimating a BIONJ-JC tree ... ");
+				threadProgressModelLabel[0].setText("Computing BIONJ tree for JC");
+				threadProgressModelLabel[0].setForeground(XManager.LABEL_GREEN_COLOR);
+				threadProgressBar[0].setIndeterminate(true);
 				break;
 
 			case ProgressInfo.BASE_TREE_COMPUTED:
 				stream.println("OK");
 				System.out.println("OK");
+				threadProgressModelLabel[0].setText(NO_MODEL);
+				threadProgressModelLabel[0].setForeground(XManager.LABEL_FAIL_COLOR);
+				threadProgressBar[0].setIndeterminate(false);
 				stream.print(info.getModel().getName() + " tree: "
 						+ info.getModel().getTreeString() + "\n");
 				break;
