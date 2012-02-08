@@ -73,19 +73,30 @@ public abstract class RunPhyml extends Observable implements Observer {
 
 		// estimate a NJ-JC tree if needed
 		if (options.fixedTopology) {
-			notifyObservers(ProgressInfo.BASE_TREE_INIT, 0, models[0], null);
+			Model jcModel = null;
+			for (Model model : models) {
+				if (model.getName().equals("JC")) {
+					jcModel = model;
+					break;
+				}
+			}
 
-			PhymlSingleModel jcModel = new PhymlSingleModel(models[0], 0, true,
-					options);
-			jcModel.run();
+			if (jcModel != null) {
+				notifyObservers(ProgressInfo.BASE_TREE_INIT, 0, jcModel, null);
 
-			// create JCtree file
-			TextOutputStream JCtreeFile = new TextOutputStream(options
-					.getTreeFile().getAbsolutePath(), false);
-			JCtreeFile.print(models[0].getTreeString() + "\n");
-			JCtreeFile.close();
+				PhymlSingleModel jcModelPhyml = new PhymlSingleModel(jcModel,
+						0, true, options);
+				jcModelPhyml.run();
 
-			notifyObservers(ProgressInfo.BASE_TREE_COMPUTED, 0, models[0], null);
+				// create JCtree file
+				TextOutputStream JCtreeFile = new TextOutputStream(options
+						.getTreeFile().getAbsolutePath(), false);
+				JCtreeFile.print(jcModel.getTreeString() + "\n");
+				JCtreeFile.close();
+
+				notifyObservers(ProgressInfo.BASE_TREE_COMPUTED, 0, jcModel,
+						null);
+			}
 
 		}
 
