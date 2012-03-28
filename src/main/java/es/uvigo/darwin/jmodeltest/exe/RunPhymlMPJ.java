@@ -53,9 +53,9 @@ public class RunPhymlMPJ extends RunPhyml {
 	volatile Model rootModel = null;
 	volatile boolean rootModelRequest = false;
 
-	public RunPhymlMPJ(Observer progress, ApplicationOptions options,
+	public RunPhymlMPJ(Observer progress, ModelTest modelTest,
 			Model[] models) {
-		super(progress, options, models);
+		super(progress, modelTest, models);
 		// this.deleteObserver(progress);
 		myModels = new ArrayList<Model>();
 
@@ -71,7 +71,7 @@ public class RunPhymlMPJ extends RunPhyml {
 		distributorThread.start();
 		request();
 
-		for (Model model : ModelTest.getCandidateModels()) {
+		for (Model model : modelTest.getCandidateModels()) {
 			model.update(modelList.get(modelList.indexOf(model)));
 		}
 
@@ -145,7 +145,7 @@ public class RunPhymlMPJ extends RunPhyml {
 	public void execute() {
 
 		if (ModelTest.MPJ_ME == 0) {
-			printSettings(ModelTest.getMainConsole());
+			printSettings(modelTest.getMainConsole());
 
 			// TODO: Send topology to each processor
 			// estimate a NJ-JC tree if needed
@@ -179,7 +179,6 @@ public class RunPhymlMPJ extends RunPhyml {
 		optionsBCast[0] = options;
 		MPI.COMM_WORLD.Bcast(optionsBCast, 0, 1, MPI.OBJECT, 0);
 		this.options = optionsBCast[0];
-		ApplicationOptions.setInstance(this.options);
 
 		if (ModelTest.MPJ_ME == 0) {
 			notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0,

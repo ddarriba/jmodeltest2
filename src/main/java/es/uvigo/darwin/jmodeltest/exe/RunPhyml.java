@@ -51,8 +51,9 @@ public abstract class RunPhyml extends Observable implements Observer {
 	public static String PHYML_STATS_SUFFIX = "_phyml_stats_";
 
 	protected Observer progress;
+	protected ModelTest modelTest;
 
-	public RunPhyml(Observer progress, ApplicationOptions options,
+	public RunPhyml(Observer progress, ModelTest modelTest,
 			Model[] models) {
 		if (models != null)
 			this.models = new Model[models.length];
@@ -60,7 +61,8 @@ public abstract class RunPhyml extends Observable implements Observer {
 			this.models = new Model[0];
 		for (int i = 0; i < this.models.length; i++)
 			this.models[i] = models[i];
-		this.options = options;
+		this.modelTest = modelTest;
+		this.options = modelTest.getApplicationOptions();
 		this.progress = progress;
 		this.addObserver(progress);
 		Arrays.sort(this.models, new ModelComparator());
@@ -69,7 +71,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 	public void execute() {
 		// remove stuff from exe directories before starting
 		deleteFiles();
-		printSettings(ModelTest.getMainConsole());
+		printSettings(modelTest.getMainConsole());
 
 		// estimate a NJ-JC tree if needed
 		if (options.fixedTopology) {
@@ -214,7 +216,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 		// IS_INTERRUPTED = true;
 	}
 
-	private void deleteFiles() {
+	protected void deleteFiles() {
 		/* phymlFolder */
 		options.getLogFile().delete();
 	}

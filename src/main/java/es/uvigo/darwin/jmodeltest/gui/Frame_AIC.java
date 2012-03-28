@@ -58,7 +58,8 @@ public class Frame_AIC extends JModelTestFrame {
 	private AIC myAIC;
 	private AICc myAICc;
 
-	public Frame_AIC() {
+	public Frame_AIC(ModelTest modelTest) {
+		super(modelTest);
 	}
 
 	public void initComponents() throws Exception {
@@ -305,8 +306,8 @@ public class Frame_AIC extends JModelTestFrame {
 		TextFieldSizeAICc.setEnabled(false);
 		TextFieldSizeAICc.setText("" + options.sampleSize);
 		RunButtonAIC.setText("Do AIC calculations");
-		ApplicationOptions.getInstance().countBLasParameters = true;
-		XManager.getInstance().selectedMenuResultsBLasParameters(true);
+		modelTest.getApplicationOptions().countBLasParameters = true;
+		XManager.getInstance(modelTest).selectedMenuResultsBLasParameters(true);
 		jCheckBoxPAUPblock.setSelected(false);
 		jCheckBoxAveraging.setSelected(true);
 		jCheckBoxImportance.setSelected(true);
@@ -340,24 +341,24 @@ public class Frame_AIC extends JModelTestFrame {
 				options.sampleSize = Integer.parseInt(TextFieldSizeAICc
 						.getText());
 				myAICc = new AICc(writePAUPblock, doImportances,
-						doModelAveraging, credibleInterval);
+						doModelAveraging, credibleInterval, modelTest);
 				myAICc.compute();
-				myAICc.print(ModelTest.getCurrentOutStream());
-				ModelTest.setMyAICc(myAICc);
+				myAICc.print(modelTest.getCurrentOutStream());
+				modelTest.setMyAICc(myAICc);
 				options.doAICc = myAICc != null;
-				XManager.getInstance().resultsFrame.enablePane(FrameResults.TAB_AICc);
-				XManager.getInstance().resultsFrame.populate(FrameResults.TAB_AICc);
+				XManager.getInstance(modelTest).resultsFrame.enablePane(FrameResults.TAB_AICc);
+				XManager.getInstance(modelTest).resultsFrame.populate(FrameResults.TAB_AICc);
 			} else {
 				myAIC = new AIC(writePAUPblock, doImportances,
-						doModelAveraging, credibleInterval);
+						doModelAveraging, credibleInterval, modelTest);
 				myAIC.compute();
-				myAIC.print(ModelTest.getCurrentOutStream());
-				ModelTest.setMyAIC(myAIC);
+				myAIC.print(modelTest.getCurrentOutStream());
+				modelTest.setMyAIC(myAIC);
 				options.doAIC = myAIC != null;
-				XManager.getInstance().resultsFrame.enablePane(FrameResults.TAB_AIC);
-				XManager.getInstance().resultsFrame.populate(FrameResults.TAB_AIC);
+				XManager.getInstance(modelTest).resultsFrame.enablePane(FrameResults.TAB_AIC);
+				XManager.getInstance(modelTest).resultsFrame.populate(FrameResults.TAB_AIC);
 			}
-			XManager.getInstance().enableMenuAveraging(!options.fixedTopology);
+			XManager.getInstance(modelTest).enableMenuAveraging(!options.fixedTopology);
 			
 		} catch (Exception f) {
 			f.printStackTrace();

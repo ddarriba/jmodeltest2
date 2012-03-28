@@ -34,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.BorderUIResource;
 
+import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.statistics.Statistics;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
@@ -55,7 +56,8 @@ public class Frame_LRTcalculator extends JModelTestFrame {
 	private JRadioButton ButtonMixedChi = new JRadioButton();
 	private ButtonGroup ButtonGroupChi = new ButtonGroup();
 
-	public Frame_LRTcalculator() {
+	public Frame_LRTcalculator(ModelTest modelTest) {
+		super(modelTest);
 	}
 
 	public void initComponents() throws Exception {

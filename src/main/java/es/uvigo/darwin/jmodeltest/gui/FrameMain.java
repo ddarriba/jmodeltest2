@@ -132,9 +132,10 @@ public class FrameMain extends JModelTestFrame {
 		}
 	}
 
-	public FrameMain() {
+	public FrameMain(ModelTest modelTest) {
 		// LabelStatusLike = LabelStatusLikelihoods;
-
+		super(modelTest);
+		
 		menuAIC = menuAnalysisAIC;
 		menuBIC = menuAnalysisBIC;
 		menuDT = menuAnalysisDT;
@@ -700,7 +701,7 @@ public class FrameMain extends JModelTestFrame {
 		if (dataFileName != null) // menu not canceled
 		{
 			String dataFileNameComplete = fc.getDirectory() + dataFileName;
-			ModelTest.getMainConsole().print(
+			modelTest.getMainConsole().print(
 					"Reading data file \"" + dataFileName + "\"...");
 
 			File inputFile = new File(dataFileNameComplete);
@@ -724,10 +725,10 @@ public class FrameMain extends JModelTestFrame {
 					menuAnalysisCalculateLikelihoods.setEnabled(true);
 					enableMenuShowModelTable(false);
 					enableMenuHtmlOutput(false);
-					ModelTest.getMainConsole().println(" OK.");
-					ModelTest.getMainConsole().println(
+					modelTest.getMainConsole().println(" OK.");
+					modelTest.getMainConsole().println(
 							"  number of sequences: " + options.numTaxa);
-					ModelTest.getMainConsole().println(
+					modelTest.getMainConsole().println(
 							"  number of sites: " + options.numSites);
 					options.sampleSize = options.numSites;
 				} catch (Exception e1) {
@@ -735,13 +736,13 @@ public class FrameMain extends JModelTestFrame {
 							+ dataFileName
 							+ "\" cannot be read as an alignment",
 							"jModelTest error", JOptionPane.ERROR_MESSAGE);
-					ModelTest.getMainConsole().println(" failed.\n");
+					modelTest.getMainConsole().println(" failed.\n");
 				}
 			} else {
 				JOptionPane.showMessageDialog(this, "The specified file \""
 						+ dataFileName + "\" cannot be found",
 						"jModelTest error", JOptionPane.ERROR_MESSAGE);
-				ModelTest.getMainConsole().println(" failed.\n");
+				modelTest.getMainConsole().println(" failed.\n");
 			}
 		}
 	}
@@ -765,7 +766,7 @@ public class FrameMain extends JModelTestFrame {
 
 	private void menuEditPreferencesActionPerformed(java.awt.event.ActionEvent e) {
 		try {
-			XManager.getInstance().loadFramePreferences();
+			XManager.getInstance(modelTest).loadFramePreferences();
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
@@ -798,8 +799,8 @@ public class FrameMain extends JModelTestFrame {
 	public void menuEditClearActionPerformed(java.awt.event.ActionEvent e) {
 		try {
 			mainEditorPane.setText("");
-			ModelTest.printHeader(ModelTest.getMainConsole());
-			ModelTest.printCitation(ModelTest.getMainConsole());
+			ModelTest.printHeader(modelTest.getMainConsole());
+			ModelTest.printCitation(modelTest.getMainConsole());
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
@@ -869,7 +870,7 @@ public class FrameMain extends JModelTestFrame {
 				Utilities
 						.printRed("\nWarning: If you save the log files out from the log directory, make sure to copy the \"log"
 								+ File.separator
-								+ "resources\" folder with the log file\n");
+								+ "resources\" folder with the log file\n", modelTest);
 			}
 
 			if (dialog.getFile() != null
@@ -878,8 +879,8 @@ public class FrameMain extends JModelTestFrame {
 																 * selected
 																 */
 			{
-				HtmlReporter.buildReport(options,
-						ModelTest.getCandidateModels(),
+				HtmlReporter.buildReport(modelTest,
+						modelTest.getCandidateModels(),
 						new File(dialog.getDirectory() + dialog.getFile()));
 			}
 		} catch (Exception f) {
@@ -890,7 +891,7 @@ public class FrameMain extends JModelTestFrame {
 	private void menuResultsShowModelTableActionPerformed(
 			java.awt.event.ActionEvent e) {
 		try {
-			XManager.getInstance().resultsFrame.setVisible(true);
+			XManager.getInstance(modelTest).resultsFrame.setVisible(true);
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
@@ -899,7 +900,7 @@ public class FrameMain extends JModelTestFrame {
 	private void menuAnalysisCalculateLikelihoodsActionPerformed(
 			java.awt.event.ActionEvent e) {
 		try {
-			Frame_CalcLike Likeframe = new Frame_CalcLike();
+			Frame_CalcLike Likeframe = new Frame_CalcLike(modelTest);
 			Likeframe.initComponents();
 			InitialFocusSetter.setInitialFocus(Likeframe,
 					Likeframe.RunButtonCalcLike);
@@ -911,7 +912,7 @@ public class FrameMain extends JModelTestFrame {
 
 	private void menuAnalysisAICActionPerformed(java.awt.event.ActionEvent e) {
 		try {
-			Frame_AIC AICframe = new Frame_AIC();
+			Frame_AIC AICframe = new Frame_AIC(modelTest);
 			AICframe.initComponents();
 			AICframe.setVisible(true);
 		} catch (Exception f) {
@@ -921,7 +922,7 @@ public class FrameMain extends JModelTestFrame {
 
 	private void menuAnalysisBICActionPerformed(java.awt.event.ActionEvent e) {
 		try {
-			Frame_BIC BICframe = new Frame_BIC();
+			Frame_BIC BICframe = new Frame_BIC(modelTest);
 			BICframe.initComponents();
 			BICframe.setVisible(true);
 		} catch (Exception f) {
@@ -931,7 +932,7 @@ public class FrameMain extends JModelTestFrame {
 
 	private void menuAnalysisDTActionPerformed(java.awt.event.ActionEvent e) {
 		try {
-			Frame_DT DTframe = new Frame_DT();
+			Frame_DT DTframe = new Frame_DT(modelTest);
 			DTframe.initComponents();
 			DTframe.setVisible(true);
 		} catch (Exception f) {
@@ -941,7 +942,7 @@ public class FrameMain extends JModelTestFrame {
 
 	private void menuAnalysishLRTActionPerformed(java.awt.event.ActionEvent e) {
 		try {
-			Frame_hLRT hLRTframe = new Frame_hLRT();
+			Frame_hLRT hLRTframe = new Frame_hLRT(modelTest);
 			hLRTframe.initComponents();
 			hLRTframe.setVisible(true);
 		} catch (Exception f) {
@@ -952,7 +953,7 @@ public class FrameMain extends JModelTestFrame {
 	private void menuAnalysisAveragingActionPerformed(
 			java.awt.event.ActionEvent e) {
 		try {
-			Frame_Consense consenseFrame = new Frame_Consense();
+			Frame_Consense consenseFrame = new Frame_Consense(modelTest);
 			consenseFrame.initComponents();
 			consenseFrame.setVisible(true);
 		} catch (Exception f) {
@@ -962,7 +963,7 @@ public class FrameMain extends JModelTestFrame {
 
 	private void menuToolsLRTActionPerformed(java.awt.event.ActionEvent e) {
 		try {
-			Frame_LRTcalculator LRTframe = new Frame_LRTcalculator();
+			Frame_LRTcalculator LRTframe = new Frame_LRTcalculator(modelTest);
 			LRTframe.initComponents();
 			LRTframe.setVisible(true);
 		} catch (Exception f) {

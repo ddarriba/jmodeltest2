@@ -36,12 +36,15 @@ public class MyTableCellRenderer extends DefaultTableCellRenderer {
 	private JTable whichTable;
 	private Object whichValue, val;
 	private String whichTableName;
+
+	private ModelTest modelTest;
 	
-	public MyTableCellRenderer (JTable mTable, String mTableName)
-		{
+	public MyTableCellRenderer (JTable mTable, String mTableName, ModelTest modelTest)
+	{
 		whichTable = mTable;
 		whichTableName = mTableName;
-		}
+		this.modelTest = modelTest;
+	}
 	
 	public Component getTableCellRendererComponent (JTable table, Object value,
 		boolean isSelected, boolean hasFocus, int row, int column)
@@ -52,13 +55,13 @@ public class MyTableCellRenderer extends DefaultTableCellRenderer {
 		setForeground(table.getForeground()); 
 
 		if (whichTableName.equals("AIC"))
-			whichValue = new Integer(ModelTest.getMinAIC().getId());
+			whichValue = new Integer(modelTest.getMinAIC().getId());
 		else if (whichTableName.equals("AICc"))
-			whichValue = new Integer(ModelTest.getMinAICc().getId());
+			whichValue = new Integer(modelTest.getMinAICc().getId());
 		else if (whichTableName.equals("BIC"))
-			whichValue = new Integer(ModelTest.getMinBIC().getId());
+			whichValue = new Integer(modelTest.getMinBIC().getId());
 		else if (whichTableName.equals("DT"))
-			whichValue = new Integer(ModelTest.getMinDT().getId());
+			whichValue = new Integer(modelTest.getMinDT().getId());
 		else
 			whichValue = new Integer(0);	
 						

@@ -131,24 +131,24 @@ public class ModelTestService {
     }
     
 	public InformationCriterion doIC(int ic, boolean writePAUPblock, boolean doImportances,
-			boolean doModelAveraging, double confidenceInterval) {
+			boolean doModelAveraging, double confidenceInterval, ModelTest modelTest) {
 		InformationCriterion criterion;
 		switch (ic) {
 		case InformationCriterion.AIC:
 			criterion = new AIC(writePAUPblock, doImportances,
-					doModelAveraging, confidenceInterval);
+					doModelAveraging, confidenceInterval, modelTest);
 			break;
 		case InformationCriterion.AICc:
 			criterion = new AICc(writePAUPblock, doImportances,
-					doModelAveraging, confidenceInterval);
+					doModelAveraging, confidenceInterval, modelTest);
 			break;
 		case InformationCriterion.BIC:
 			criterion = new BIC(writePAUPblock, doImportances,
-					doModelAveraging, confidenceInterval);
+					doModelAveraging, confidenceInterval, modelTest);
 			break;
 		case InformationCriterion.DT:
 			criterion = new DT(writePAUPblock, doImportances, doModelAveraging,
-					confidenceInterval);
+					confidenceInterval, modelTest);
 			break;
 		default:
 			throw new InvalidArgumentException.UnexistentCriterionException(ic);

@@ -20,15 +20,18 @@ package es.uvigo.darwin.jmodeltest.gui;
 import javax.swing.JFrame;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
+import es.uvigo.darwin.jmodeltest.ModelTest;
 
 public class JModelTestFrame extends JFrame {
 	
 	private static final long serialVersionUID = -8636558779921904218L;
 	
 	protected ApplicationOptions options;
+	protected ModelTest modelTest;
 	
-	public JModelTestFrame() {
-		options = ApplicationOptions.getInstance();
+	public JModelTestFrame(ModelTest modelTest) {
+		options = modelTest.getApplicationOptions();
+		this.modelTest = modelTest;
 	}
 
 }

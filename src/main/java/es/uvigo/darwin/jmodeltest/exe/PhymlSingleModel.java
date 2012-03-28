@@ -33,26 +33,26 @@ import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
 public class PhymlSingleModel extends Observable implements Runnable {
 
-	private int verbose = 0;
+	protected int verbose = 0;
 	private static final String CURRENT_DIRECTORY = System
 			.getProperty("user.dir");
 
 	public String PHYML_PATH = CURRENT_DIRECTORY + "/exe/phyml/";
 
-	private String phymlStatFileName;
-	private String phymlTreeFileName;
+	protected String phymlStatFileName;
+	protected String phymlTreeFileName;
 
-	private boolean PHYML_GLOBAL = false;
+	protected boolean PHYML_GLOBAL = false;
 
-	private Model model;
-	private long startTime;
-	private long endTime;
-	private String commandLine;
-	private int index;
-	private boolean justGetJCTree;
-	private boolean interrupted = false;
-	private ApplicationOptions options;
-	private int numberOfThreads = -1;
+	protected Model model;
+	protected long startTime;
+	protected long endTime;
+	protected String commandLine;
+	protected int index;
+	protected boolean justGetJCTree;
+	protected boolean interrupted = false;
+	protected ApplicationOptions options;
+	protected int numberOfThreads = -1;
 
 	public Model getModel() {
 		return model;
@@ -128,7 +128,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	 * line for Phyml3 * * *
 	 ***********************************************************************/
 
-	private void writePhyml3CommandLine(Model currentModel,
+	protected void writePhyml3CommandLine(Model currentModel,
 			boolean justGetJCtree) {
 
 		// input file
@@ -229,7 +229,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	 * line in the system * * *
 	 ***********************************************************************/
 
-	private void executeCommandLine() {
+	protected void executeCommandLine() {
 		String[] executable = new String[1];
 		try {
 			File dir = new File(PHYML_PATH);
@@ -297,7 +297,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	 * output files and loads * models parameter estimates * * *
 	 ***********************************************************************/
 
-	private void parsePhyml3Files(Model currentModel) {
+	protected void parsePhyml3Files(Model currentModel) {
 		String line;
 
 		boolean showParsing = false;
@@ -468,7 +468,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 	}
 
-	private void notifyObservers(int type, int value, Model model,
+	protected void notifyObservers(int type, int value, Model model,
 			String message) {
 		setChanged();
 		notifyObservers(new ProgressInfo(type, value, model, message));

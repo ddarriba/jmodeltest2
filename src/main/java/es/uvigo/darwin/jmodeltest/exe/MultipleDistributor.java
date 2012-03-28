@@ -107,7 +107,7 @@ public class MultipleDistributor extends Observable implements Runnable {
 	}
 
 	public MultipleDistributor(List<Model> models, RunPhymlHybrid caller,
-			int mpjMe, int mpjSize) {
+			int mpjMe, int mpjSize, ModelTest modelTest) {
 		this.mpjMe = mpjMe;
 		this.mpjSize = mpjSize;
 		this.modelsToSend = new ArrayList<Model>(models);
@@ -115,9 +115,9 @@ public class MultipleDistributor extends Observable implements Runnable {
 		this.itemsPerProc = new int[mpjSize];
 		this.displs = new int[mpjSize];
 
-		if (ModelTest.HOSTS_TABLE != null) {
-			numberOfHosts = ModelTest.HOSTS_TABLE.size();
-			Enumeration<Integer> procsPerHost = ModelTest.HOSTS_TABLE
+		if (modelTest.HOSTS_TABLE != null) {
+			numberOfHosts = modelTest.HOSTS_TABLE.size();
+			Enumeration<Integer> procsPerHost = modelTest.HOSTS_TABLE
 					.elements();
 			while (procsPerHost.hasMoreElements()) {
 				int procs = procsPerHost.nextElement();

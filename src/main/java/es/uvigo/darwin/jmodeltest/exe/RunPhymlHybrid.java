@@ -51,17 +51,17 @@ public class RunPhymlHybrid extends RunPhyml {
 	int[] itemsPerProc;
 	int[] displs;
 
-	public RunPhymlHybrid(Observer progress, ApplicationOptions options,
+	public RunPhymlHybrid(Observer progress, ModelTest modelTest,
 			Model[] models) {
-		super(progress, options, models);
+		super(progress, modelTest, models);
 		// this.deleteObserver(progress);
 		myModels = new ArrayList<Model>();
 
 	}
 
 	public RunPhymlHybrid(int mpjMe, int mpjSize, Observer progress,
-			ApplicationOptions options, Model[] models, int numberOfThreads) {
-		super(progress, options, models);
+			ModelTest modelTest, Model[] models, int numberOfThreads) {
+		super(progress, modelTest, models);
 		// this.deleteObserver(progress);
 		myModels = new ArrayList<Model>();
 
@@ -82,7 +82,7 @@ public class RunPhymlHybrid extends RunPhyml {
 
 		List<Model> modelList = Arrays.asList(models);
 		distributor = new MultipleDistributor(modelList, this,
-				ModelTest.MPJ_ME, ModelTest.MPJ_SIZE);
+				ModelTest.MPJ_ME, ModelTest.MPJ_SIZE, modelTest);
 		distributor.addObserver(progress);
 		
 		notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0,
@@ -235,7 +235,7 @@ public class RunPhymlHybrid extends RunPhyml {
 	public void execute() {
 
 		if (ModelTest.MPJ_ME == 0) {
-			printSettings(ModelTest.getMainConsole());
+			printSettings(modelTest.getMainConsole());
 
 			// TODO: Send topology to each processor
 			// estimate a NJ-JC tree if needed
@@ -269,7 +269,6 @@ public class RunPhymlHybrid extends RunPhyml {
 		optionsBCast[0] = options;
 		MPI.COMM_WORLD.Bcast(optionsBCast, 0, 1, MPI.OBJECT, 0);
 		this.options = optionsBCast[0];
-		ApplicationOptions.setInstance(this.options);
 
 		if (ModelTest.MPJ_ME == 0) {
 			distribute();

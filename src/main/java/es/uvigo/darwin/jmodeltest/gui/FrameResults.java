@@ -28,6 +28,7 @@ import java.util.Date;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
+import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.utilities.MyTableCellRenderer;
 import es.uvigo.darwin.jmodeltest.utilities.MyTableModel;
 import es.uvigo.darwin.jmodeltest.utilities.TableSorter;
@@ -66,32 +67,62 @@ public class FrameResults extends JModelTestFrame {
 	private javax.swing.JTable tableBIC = new javax.swing.JTable();
 	private javax.swing.JPanel panelDT = new javax.swing.JPanel();
 	private javax.swing.JScrollPane scrollPaneDT = new javax.swing.JScrollPane();
-	private  javax.swing.JTable tableDT = new javax.swing.JTable();
+	private javax.swing.JTable tableDT = new javax.swing.JTable();
 
-	private  MyTableModel modelModels = new MyTableModel("Model", options.numModels);
-	TableSorter sorterModels = new TableSorter(modelModels);
-	JTable tempTableModels = new JTable(sorterModels);
+	private  MyTableModel modelModels;
+	TableSorter sorterModels;
+	JTable tempTableModels;
 
-	private MyTableModel modelAIC = new MyTableModel("AIC", options.numModels);
-	TableSorter sorterAIC = new TableSorter(modelAIC);
-	JTable tempTableAIC = new JTable(sorterAIC);
-	MyTableCellRenderer AICRenderer = new MyTableCellRenderer(tempTableAIC,"AIC"); 
+	private MyTableModel modelAIC;
+	TableSorter sorterAIC;
+	JTable tempTableAIC;
+	MyTableCellRenderer AICRenderer; 
 
-	private MyTableModel modelAICc = new MyTableModel("AICc", options.numModels);
-	TableSorter sorterAICc = new TableSorter(modelAICc);
-	JTable tempTableAICc = new JTable(sorterAICc);
-	MyTableCellRenderer AICcRenderer = new MyTableCellRenderer(tempTableAICc,"AICc"); 
+	private MyTableModel modelAICc;
+	TableSorter sorterAICc;
+	JTable tempTableAICc;
+	MyTableCellRenderer AICcRenderer; 
 
-	private MyTableModel modelBIC = new MyTableModel("BIC", options.numModels);
-	TableSorter sorterBIC = new TableSorter(modelBIC);
-	JTable tempTableBIC = new JTable(sorterBIC);
-	MyTableCellRenderer BICRenderer = new MyTableCellRenderer(tempTableBIC,"BIC"); 
+	private MyTableModel modelBIC;
+	TableSorter sorterBIC;
+	JTable tempTableBIC;
+	MyTableCellRenderer BICRenderer; 
 	
-	private MyTableModel modelDT = new MyTableModel("DT", options.numModels);
-	TableSorter sorterDT = new TableSorter(modelDT);
-	JTable tempTableDT = new JTable(sorterDT);
-	MyTableCellRenderer DTRenderer = new MyTableCellRenderer(tempTableDT,"DT"); 
+	private MyTableModel modelDT;
+	TableSorter sorterDT;
+	JTable tempTableDT;
+	MyTableCellRenderer DTRenderer; 
 
+	public FrameResults(ModelTest modelTest)
+	{
+		super(modelTest);
+		modelModels = new MyTableModel("Model", options.numModels, modelTest);
+		sorterModels = new TableSorter(modelModels);
+		tempTableModels = new JTable(sorterModels);
+
+		modelAIC = new MyTableModel("AIC", options.numModels, modelTest);
+		sorterAIC = new TableSorter(modelAIC);
+		tempTableAIC = new JTable(sorterAIC);
+		AICRenderer = new MyTableCellRenderer(tempTableAIC,"AIC", modelTest); 
+
+		modelAICc = new MyTableModel("AICc", options.numModels, modelTest);
+		sorterAICc = new TableSorter(modelAICc);
+		tempTableAICc = new JTable(sorterAICc);
+		AICcRenderer = new MyTableCellRenderer(tempTableAICc,"AICc", modelTest); 
+
+		modelBIC = new MyTableModel("BIC", options.numModels, modelTest);
+		sorterBIC = new TableSorter(modelBIC);
+		tempTableBIC = new JTable(sorterBIC);
+		BICRenderer = new MyTableCellRenderer(tempTableBIC,"BIC", modelTest); 
+		
+		modelDT = new MyTableModel("DT", options.numModels, modelTest);
+		sorterDT = new TableSorter(modelDT);
+		tempTableDT = new JTable(sorterDT);
+		DTRenderer = new MyTableCellRenderer(tempTableDT,"DT", modelTest); 
+	
+	
+	}
+	
 	public void initComponents() throws Exception {
 
 	   	tableModels = tempTableModels;

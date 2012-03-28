@@ -56,7 +56,8 @@ public class Frame_DT extends JModelTestFrame {
 
 	private DT myDT;
 
-	public Frame_DT() {
+	public Frame_DT(ModelTest modelTest) {
+		super(modelTest);
 	}
 
 	public void initComponents() throws Exception {
@@ -259,8 +260,8 @@ public class Frame_DT extends JModelTestFrame {
 		{
 		TextFieldSizeDT.setEnabled(false);
 		TextFieldSizeDT.setText("" + options.sampleSize);
-		ApplicationOptions.getInstance().countBLasParameters = true;
-		XManager.getInstance().selectedMenuResultsBLasParameters(true);
+		modelTest.getApplicationOptions().countBLasParameters = true;
+		XManager.getInstance(modelTest).selectedMenuResultsBLasParameters(true);
 		jCheckBoxPAUPblock.setSelected(false);
 		jCheckBoxAveraging.setSelected(true);
 		jCheckBoxImportance.setSelected(true);
@@ -296,14 +297,14 @@ public class Frame_DT extends JModelTestFrame {
 			credibleInterval = JSliderInterval.getValue()/100.0;
 			options.sampleSize = Integer.parseInt(TextFieldSizeDT.getText());
 			
-			myDT = new DT(writePAUPblock, doImportances, doModelAveraging, credibleInterval);
+			myDT = new DT(writePAUPblock, doImportances, doModelAveraging, credibleInterval, modelTest);
 			myDT.compute();
-			myDT.print(ModelTest.getCurrentOutStream());
-			ModelTest.setMyDT(myDT);
+			myDT.print(modelTest.getCurrentOutStream());
+			modelTest.setMyDT(myDT);
 			options.doDT = myDT != null;
-			XManager.getInstance().resultsFrame.enablePane(FrameResults.TAB_DT);
-			XManager.getInstance().resultsFrame.populate(FrameResults.TAB_DT);
-			XManager.getInstance().enableMenuAveraging(!options.fixedTopology);
+			XManager.getInstance(modelTest).resultsFrame.enablePane(FrameResults.TAB_DT);
+			XManager.getInstance(modelTest).resultsFrame.populate(FrameResults.TAB_DT);
+			XManager.getInstance(modelTest).enableMenuAveraging(!options.fixedTopology);
 			}
 		catch (Exception f) 
 			{

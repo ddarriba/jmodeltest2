@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
+import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 
@@ -35,9 +36,9 @@ public class RunPhymlThread extends RunPhyml {
 
 	private ExecutorService threadPool;
 
-	public RunPhymlThread(Observer progress, ApplicationOptions options,
+	public RunPhymlThread(Observer progress, ModelTest modelTest,
 			Model[] models) {
-		super(progress, options, models);
+		super(progress, modelTest, models);
 
 		this.threadPool = Executors.newFixedThreadPool(options
 				.getNumberOfThreads());

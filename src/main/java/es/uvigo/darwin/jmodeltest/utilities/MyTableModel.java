@@ -51,8 +51,11 @@ public class MyTableModel extends AbstractTableModel {
 	private Object[][] data;
 	private int size;
 
-	public MyTableModel(String whichTable, int size) {
+	private ModelTest modelTest;
+
+	public MyTableModel(String whichTable, int size, ModelTest modelTest) {
 		this.size = size;
+		this.modelTest = modelTest;
 		int precision = ModelTest.PRECISION;
 
 		if (whichTable.equals("Model")) {
@@ -60,26 +63,26 @@ public class MyTableModel extends AbstractTableModel {
 			data = new Object[size][18];
 			for (i = 0; i < size; i++) {
 				data[i][0] = new Integer(
-						ModelTest.getCandidateModels()[i].getId());
-				data[i][1] = ModelTest.getCandidateModels()[i].getName();
-				data[i][2] = ModelTest.getCandidateModels()[i].getPartition();
+						modelTest.getCandidateModels()[i].getId());
+				data[i][1] = modelTest.getCandidateModels()[i].getName();
+				data[i][2] = modelTest.getCandidateModels()[i].getPartition();
 				data[i][3] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getLnL(), precision));
+						modelTest.getCandidateModels()[i].getLnL(), precision));
 				data[i][4] = new Integer(
-						ModelTest.getCandidateModels()[i].getK());
+						modelTest.getCandidateModels()[i].getK());
 
-				if (ModelTest.getCandidateModels()[i].ispF()) {
+				if (modelTest.getCandidateModels()[i].ispF()) {
 					data[i][5] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getfA(),
+							modelTest.getCandidateModels()[i].getfA(),
 							precision));
 					data[i][6] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getfC(),
+							modelTest.getCandidateModels()[i].getfC(),
 							precision));
 					data[i][7] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getfG(),
+							modelTest.getCandidateModels()[i].getfG(),
 							precision));
 					data[i][8] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getfT(),
+							modelTest.getCandidateModels()[i].getfT(),
 							precision));
 				} else {
 					data[i][5] = "-";
@@ -88,24 +91,24 @@ public class MyTableModel extends AbstractTableModel {
 					data[i][8] = "-";
 				}
 
-				if (ModelTest.getCandidateModels()[i].ispT())
+				if (modelTest.getCandidateModels()[i].ispT())
 					data[i][9] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getTitv(),
+							modelTest.getCandidateModels()[i].getTitv(),
 							precision));
 				else
 					data[i][9] = "-";
 
-				if (ModelTest.getCandidateModels()[i].ispR()) {
+				if (modelTest.getCandidateModels()[i].ispR()) {
 					data[i][10] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getRa(), 6));
+							modelTest.getCandidateModels()[i].getRa(), 6));
 					data[i][11] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getRb(), 6));
+							modelTest.getCandidateModels()[i].getRb(), 6));
 					data[i][12] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getRc(), 6));
+							modelTest.getCandidateModels()[i].getRc(), 6));
 					data[i][13] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getRd(), 6));
+							modelTest.getCandidateModels()[i].getRd(), 6));
 					data[i][14] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getRe(), 6));
+							modelTest.getCandidateModels()[i].getRe(), 6));
 					data[i][15] = new Double(1);
 				} else {
 					data[i][10] = "-";
@@ -116,18 +119,18 @@ public class MyTableModel extends AbstractTableModel {
 					data[i][15] = "-";
 				}
 
-				if (ModelTest.getCandidateModels()[i].ispI()) {
+				if (modelTest.getCandidateModels()[i].ispI()) {
 					data[i][16] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getPinv(),
+							modelTest.getCandidateModels()[i].getPinv(),
 							precision));
 				} else {
 					data[i][16] = "-";
 				}
 
-				if (ModelTest.getCandidateModels()[i].ispI()) {
-					if (ModelTest.getCandidateModels()[i].getShape() != ModelTest.INFINITY) {
+				if (modelTest.getCandidateModels()[i].ispI()) {
+					if (modelTest.getCandidateModels()[i].getShape() != ModelTest.INFINITY) {
 						data[i][17] = new Double(Round(
-								ModelTest.getCandidateModels()[i].getShape(),
+								modelTest.getCandidateModels()[i].getShape(),
 								precision));
 					} else {
 						data[i][17] = "inf";
@@ -188,83 +191,83 @@ public class MyTableModel extends AbstractTableModel {
 		if (whichTable.equals("AIC")) {
 			for (i = 0; i < size; i++) {
 				data[i][0] = new Integer(
-						ModelTest.getCandidateModels()[i].getId());
-				data[i][1] = ModelTest.getCandidateModels()[i].getName();
-				data[i][2] = ModelTest.getCandidateModels()[i].getPartition();
+						modelTest.getCandidateModels()[i].getId());
+				data[i][1] = modelTest.getCandidateModels()[i].getName();
+				data[i][2] = modelTest.getCandidateModels()[i].getPartition();
 				data[i][3] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getLnL(), precision));
+						modelTest.getCandidateModels()[i].getLnL(), precision));
 				data[i][4] = new Integer(
-						ModelTest.getCandidateModels()[i].getK());
+						modelTest.getCandidateModels()[i].getK());
 				data[i][5] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getAIC(), precision));
+						modelTest.getCandidateModels()[i].getAIC(), precision));
 				data[i][6] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getAICd(), precision));
+						modelTest.getCandidateModels()[i].getAICd(), precision));
 				data[i][7] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getAICw(), precision));
+						modelTest.getCandidateModels()[i].getAICw(), precision));
 				data[i][8] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getCumAICw(),
+						modelTest.getCandidateModels()[i].getCumAICw(),
 						precision));
 			}
 		} else if (whichTable.equals("AICc")) {
 			for (i = 0; i < size; i++) {
 				data[i][0] = new Integer(
-						ModelTest.getCandidateModels()[i].getId());
-				data[i][1] = ModelTest.getCandidateModels()[i].getName();
-				data[i][2] = ModelTest.getCandidateModels()[i].getPartition();
+						modelTest.getCandidateModels()[i].getId());
+				data[i][1] = modelTest.getCandidateModels()[i].getName();
+				data[i][2] = modelTest.getCandidateModels()[i].getPartition();
 				data[i][3] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getLnL(), precision));
+						modelTest.getCandidateModels()[i].getLnL(), precision));
 				data[i][4] = new Integer(
-						ModelTest.getCandidateModels()[i].getK());
+						modelTest.getCandidateModels()[i].getK());
 				data[i][5] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getAICc(), precision));
+						modelTest.getCandidateModels()[i].getAICc(), precision));
 				data[i][6] = new Double(
-						Round(ModelTest.getCandidateModels()[i].getAICcd(),
+						Round(modelTest.getCandidateModels()[i].getAICcd(),
 								precision));
 				data[i][7] = new Double(
-						Round(ModelTest.getCandidateModels()[i].getAICcw(),
+						Round(modelTest.getCandidateModels()[i].getAICcw(),
 								precision));
 				data[i][8] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getCumAICcw(),
+						modelTest.getCandidateModels()[i].getCumAICcw(),
 						precision));
 			}
 		} else if (whichTable.equals("BIC")) {
 			for (i = 0; i < size; i++) {
 				data[i][0] = new Integer(
-						ModelTest.getCandidateModels()[i].getId());
-				data[i][1] = ModelTest.getCandidateModels()[i].getName();
-				data[i][2] = ModelTest.getCandidateModels()[i].getPartition();
+						modelTest.getCandidateModels()[i].getId());
+				data[i][1] = modelTest.getCandidateModels()[i].getName();
+				data[i][2] = modelTest.getCandidateModels()[i].getPartition();
 				data[i][3] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getLnL(), precision));
+						modelTest.getCandidateModels()[i].getLnL(), precision));
 				data[i][4] = new Integer(
-						ModelTest.getCandidateModels()[i].getK());
+						modelTest.getCandidateModels()[i].getK());
 				data[i][5] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getBIC(), precision));
+						modelTest.getCandidateModels()[i].getBIC(), precision));
 				data[i][6] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getBICd(), precision));
+						modelTest.getCandidateModels()[i].getBICd(), precision));
 				data[i][7] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getBICw(), 4));
+						modelTest.getCandidateModels()[i].getBICw(), 4));
 				data[i][8] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getCumBICw(),
+						modelTest.getCandidateModels()[i].getCumBICw(),
 						precision));
 			}
 		} else if (whichTable.equals("DT")) {
 			for (i = 0; i < size; i++) {
 				data[i][0] = new Integer(
-						ModelTest.getCandidateModels()[i].getId());
-				data[i][1] = ModelTest.getCandidateModels()[i].getName();
-				data[i][2] = ModelTest.getCandidateModels()[i].getPartition();
+						modelTest.getCandidateModels()[i].getId());
+				data[i][1] = modelTest.getCandidateModels()[i].getName();
+				data[i][2] = modelTest.getCandidateModels()[i].getPartition();
 				data[i][3] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getLnL(), precision));
+						modelTest.getCandidateModels()[i].getLnL(), precision));
 				data[i][4] = new Integer(
-						ModelTest.getCandidateModels()[i].getK());
+						modelTest.getCandidateModels()[i].getK());
 				data[i][5] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getDT(), precision));
+						modelTest.getCandidateModels()[i].getDT(), precision));
 				data[i][6] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getDTd(), precision));
+						modelTest.getCandidateModels()[i].getDTd(), precision));
 				data[i][7] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getDTw(), 4));
+						modelTest.getCandidateModels()[i].getDTw(), 4));
 				data[i][8] = new Double(Round(
-						ModelTest.getCandidateModels()[i].getCumDTw(),
+						modelTest.getCandidateModels()[i].getCumDTw(),
 						precision));
 			}
 		}

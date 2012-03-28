@@ -27,7 +27,7 @@
 	<target name="compile" description="Compile code">
 		<mkdir dir="${bin}" />
 		<mkdir dir="${lib}" />
-		<javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no" target="1.6" classpathref="lib.path" debug="${compile.debug}">
+		<javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no" target="1.7" classpathref="lib.path" debug="${compile.debug}">
 		</javac>
 		<copy todir="${bin}/es">
 			<fileset dir="${src.resources.dir}/es" includes="**/*.xml,**/*.properties,**/*.gif,**/*.ico" />

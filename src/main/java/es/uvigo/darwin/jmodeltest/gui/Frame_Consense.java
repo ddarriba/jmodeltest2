@@ -54,7 +54,8 @@ public class Frame_Consense extends JModelTestFrame {
 
 	public RunConsense runConsense;
 
-	public Frame_Consense() {
+	public Frame_Consense(ModelTest modelTest) {
+		super(modelTest);
 	}
 
 	public void initComponents() throws Exception {
@@ -114,10 +115,10 @@ public class Frame_Consense extends JModelTestFrame {
 		ButtonStrict.setText("Strict");
 		ButtonStrict.setLocation(new java.awt.Point(140, 20));
 
-		ButtonAIC.setEnabled(ModelTest.testAIC());
-		ButtonAICc.setEnabled(ModelTest.testAICc());
-		ButtonBIC.setEnabled(ModelTest.testBIC());
-		ButtonDT.setEnabled(ModelTest.testDT());
+		ButtonAIC.setEnabled(modelTest.testAIC());
+		ButtonAICc.setEnabled(modelTest.testAICc());
+		ButtonBIC.setEnabled(modelTest.testBIC());
+		ButtonDT.setEnabled(modelTest.testDT());
 		if (ButtonAIC.isEnabled())
 			ButtonAIC.setSelected(true);
 		else if (ButtonAICc.isEnabled())
@@ -260,16 +261,16 @@ public class Frame_Consense extends JModelTestFrame {
 			{
 			// get criterion
 			if (ButtonAIC.isSelected()) {
-				criterion = ModelTest.getMyAIC();
+				criterion = modelTest.getMyAIC();
 			}
 			else if (ButtonAICc.isSelected()) {
-				criterion = ModelTest.getMyAICc();
+				criterion = modelTest.getMyAICc();
 			}
 			else if (ButtonBIC.isSelected()) {
-				criterion = ModelTest.getMyBIC();
+				criterion = modelTest.getMyBIC();
 			}
 			else {
-				criterion = ModelTest.getMyDT();
+				criterion = modelTest.getMyDT();
 			}
 
 			// get consensus type
@@ -284,19 +285,19 @@ public class Frame_Consense extends JModelTestFrame {
 			dispose();
 
 			// run consense
-			runConsense = new RunConsense(criterion, consensusType, credibleInterval);
+			runConsense = new RunConsense(criterion, consensusType, credibleInterval, modelTest);
 
 			if (ButtonAIC.isSelected()) {
-				ModelTest.setConsensusAIC(runConsense);
+				modelTest.setConsensusAIC(runConsense);
 			}
 			else if (ButtonAICc.isSelected()) {
-				ModelTest.setConsensusAICc(runConsense);
+				modelTest.setConsensusAICc(runConsense);
 			}
 			else if (ButtonBIC.isSelected()) {
-				ModelTest.setConsensusBIC(runConsense);
+				modelTest.setConsensusBIC(runConsense);
 			}
 			else {
-				ModelTest.setConsensusDT(runConsense);
+				modelTest.setConsensusDT(runConsense);
 			}
 			}
 		catch (Exception f) 
@@ -309,13 +310,13 @@ public class Frame_Consense extends JModelTestFrame {
 		{
 		try
 			{
-			if (ModelTest.testAIC())
+			if (modelTest.testAIC())
 				ButtonAIC.setSelected(true);
-			else if (ModelTest.testAICc())
+			else if (modelTest.testAICc())
 				ButtonAICc.setSelected(true);
-			else if (ModelTest.testBIC())
+			else if (modelTest.testBIC())
 				ButtonBIC.setSelected(true);
-			else if (ModelTest.testDT())
+			else if (modelTest.testDT())
 				ButtonDT.setEnabled(true);
 
 			ButtonMajority.setSelected(true);

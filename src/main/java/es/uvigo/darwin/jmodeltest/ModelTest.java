@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.Observer;
 import java.util.Vector;
 
 import mpi.MPI;
@@ -37,6 +38,7 @@ import es.uvigo.darwin.jmodeltest.exe.RunConsense;
 import es.uvigo.darwin.jmodeltest.exe.RunPhyml;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlHybrid;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlMPJ;
+import es.uvigo.darwin.jmodeltest.exe.RunPhymlQueue;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlThread;
 import es.uvigo.darwin.jmodeltest.gui.XManager;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
@@ -66,7 +68,7 @@ import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
  */
 public class ModelTest {
 
-	private ApplicationOptions options = ApplicationOptions.getInstance();
+	protected ApplicationOptions options;
 
 	/** The MPJ rank of the process. It is only useful if MPJ is running. */
 	public static int MPJ_ME;
@@ -88,40 +90,46 @@ public class ModelTest {
 	public static final String CONFIG_FILE = "conf/jmodeltest.conf";
 	public static final String UNKNOWN_HOSTNAME = "UNKNOWN";
 
-	private static TextOutputStream MAIN_CONSOLE;
-	private static TextOutputStream CURRENT_OUT_STREAM;
+	private TextOutputStream MAIN_CONSOLE;
+	private TextOutputStream CURRENT_OUT_STREAM;
 
-	public static String[] arguments;
+	public String[] arguments;
 
-	private static boolean AICwasCalculated = false;
-	private static boolean AICcwasCalculated = false;
-	private static boolean BICwasCalculated = false;
-	private static boolean DTwasCalculated = false;
+	private boolean AICwasCalculated = false;
+	private boolean AICcwasCalculated = false;
+	private boolean BICwasCalculated = false;
+	private boolean DTwasCalculated = false;
 
-	public static Vector<String> testingOrder; // order of the hLRTs
-	public static String averagedTreeString; // model-averaged phylogeny in
+	public Vector<String> testingOrder; // order of the hLRTs
+	public String averagedTreeString; // model-averaged phylogeny in
 												// Newick format
 
-	private static AIC myAIC;
-	private static AICc myAICc;
-	private static BIC myBIC;
-	private static DT myDT;
-	private static HLRT myHLRT;
+	private AIC myAIC;
+	private AICc myAICc;
+	private BIC myBIC;
+	private DT myDT;
+	private HLRT myHLRT;
 
-	private static RunConsense consensusAIC;
-	private static RunConsense consensusAICc;
-	private static RunConsense consensusBIC;
-	private static RunConsense consensusDT;
+	private RunConsense consensusAIC;
+	private RunConsense consensusAICc;
+	private RunConsense consensusBIC;
+	private RunConsense consensusDT;
 
-	private static Model[] candidateModels;
-	private static Model minAIC, minAICc, minBIC, minDT, minHLRT, minDLRT;
+	private Model[] candidateModels;
+	private Model minAIC, minAICc, minBIC, minDT, minHLRT, minDLRT;
 
 	private static String hostname;
-	public static Hashtable<String, Integer> HOSTS_TABLE;
+	public Hashtable<String, Integer> HOSTS_TABLE;
 
 	// We can work under a GUI or in the command line
-	public static boolean buildGUI = true;
+	public boolean buildGUI = true;
 
+	protected RunPhyml runPhyml;
+
+	protected boolean runInQueue = false;
+	protected File outputFile = null;
+	protected Observer progressObserver = null;
+	
 	static {
 		InetAddress addr;
 		try {
@@ -135,24 +143,50 @@ public class ModelTest {
 		}
 	}
 
-	// constructor with GUI
-	public ModelTest() {
-		XManager.getInstance();
+	public ModelTest(boolean buildGUI, Observer progressObserver) 
+	{
+		this.buildGUI = buildGUI;
+		options = new ApplicationOptions(this);
+		if (progressObserver == null)
+		{
+			this.progressObserver = new ConsoleProgressObserver(this);
+		}
+		else
+		{
+			this.progressObserver = progressObserver;
+		}
 	}
 
-	// constructor without GUI
-	public ModelTest(String[] arg) {
-		try {
-			ParseArguments();
-			if (options.doingSimulations) {
-				Simulation sim = new Simulation(options);
-				sim.run();
-			} else
-				runCommandLine();
-		} catch (Exception e) {
-			e.printStackTrace();
+	public ModelTest(String[] args, boolean buildGUI) 
+	{
+		this(buildGUI, null);
+		
+		if (buildGUI)
+		{
+			XManager.getInstance(this);	
 		}
-		finalize(0);
+		else
+		{
+			try 
+			{
+				arguments = args;
+				ParseArguments();
+				if (options.doingSimulations) 
+				{
+					Simulation sim = new Simulation(this);
+					sim.run();
+				} 
+				else
+				{
+					runCommandLine();	
+					endCommandLine();
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			finalize(0);
+		}
 	}
 
 	/****************************
@@ -163,7 +197,7 @@ public class ModelTest {
 		// initializing MPJ environment (if available)
 		System.err.println("[MPI] Testing MPI environment... (" + hostname + ")");
 		try {
-			arguments = MPI.Init(args);
+			args = MPI.Init(args);
 			System.err.println("[MPI] ... OK! ["+hostname+" ("+MPJ_ME+")]");
 			MPJ_ME = MPI.COMM_WORLD.Rank();
 			MPJ_SIZE = MPI.COMM_WORLD.Size();
@@ -173,13 +207,11 @@ public class ModelTest {
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
-			arguments = args;
 		} catch (Exception e) {
 			System.err.println("[MPI] Proceed without MPI");
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
-			arguments = args;
 		} catch (ExceptionInInitializerError e) {
 			System.err.println("[MPI] Initializer error!");
 			System.err.println(e.getMessage());
@@ -187,26 +219,23 @@ public class ModelTest {
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
-			arguments = args;
 		} catch (NoClassDefFoundError e) {
 			System.err.println("[MPI] Proceed without MPI");
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
-			arguments = args;
 		}
 
-		if (arguments.length < 1) {
-			buildGUI = true;
-			new ModelTest();
-		} else {
-			buildGUI = false;
-			new ModelTest(arguments);
-		}
-
-		ApplicationOptions.getInstance().getLogFile().delete();
+		ModelTest modelTest = new ModelTest(args, (args.length < 1));
+		
+		modelTest.getApplicationOptions().getLogFile().delete();
 	}
 
+	public ApplicationOptions getApplicationOptions()
+	{
+		return options;
+	}
+	
 	/****************************
 	 * runCommandLine ************************** * Organizes all the tasks that
 	 * the program needs to carry out * * *
@@ -260,36 +289,44 @@ public class ModelTest {
 		// build set of models
 
 		// calculate likelihoods with phyml in the command line
-		RunPhyml runPhyml;
-		if (MPJ_RUN) {
+		
+		if (runInQueue)
+		{
+			runPhyml = new RunPhymlQueue(progressObserver, this, getCandidateModels());
+		}
+		else if (MPJ_RUN) {
 			if (options.threadScheduling && options.getNumberOfThreads() > 0) {
 				runPhyml = new RunPhymlHybrid(MPJ_ME, MPJ_SIZE,
-						new ConsoleProgressObserver(options), options,
+						progressObserver, this,
 						getCandidateModels(), options.getNumberOfThreads());
 			} else {
 				runPhyml = new RunPhymlMPJ(
-						new ConsoleProgressObserver(options), options,
+						progressObserver, this,
 						getCandidateModels());
 			}
 		} else {
-			runPhyml = new RunPhymlThread(new ConsoleProgressObserver(options),
-					options, getCandidateModels());
+			runPhyml = new RunPhymlThread(progressObserver,
+					this, getCandidateModels());
 		}
+		
 		runPhyml.execute();
-
+	}
+	
+	public void endCommandLine() 
+	{
 		if (MPJ_ME == 0) {
 
 			// do AIC if selected
 			if (options.doAIC) {
 				myAIC = new AIC(options.writePAUPblock, options.doImportances,
-						options.doModelAveraging, options.confidenceInterval);
+						options.doModelAveraging, options.confidenceInterval, this);
 				myAIC.compute();
 				minAIC = myAIC.getMinModel();
 				AICwasCalculated = true;
 				myAIC.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
 					consensusAIC = new RunConsense(myAIC,
-							options.consensusType, options.confidenceInterval);
+							options.consensusType, options.confidenceInterval, this);
 				}
 			}
 
@@ -297,62 +334,62 @@ public class ModelTest {
 			if (options.doAICc) {
 				myAICc = new AICc(options.writePAUPblock,
 						options.doImportances, options.doModelAveraging,
-						options.confidenceInterval);
+						options.confidenceInterval, this);
 				myAICc.compute();
 				minAICc = myAICc.getMinModel();
 				AICcwasCalculated = true;
 				myAICc.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
 					consensusAICc = new RunConsense(myAICc,
-							options.consensusType, options.confidenceInterval);
+							options.consensusType, options.confidenceInterval, this);
 				}
 			}
 
 			// do BIC if selected
 			if (options.doBIC) {
 				myBIC = new BIC(options.writePAUPblock, options.doImportances,
-						options.doModelAveraging, options.confidenceInterval);
+						options.doModelAveraging, options.confidenceInterval, this);
 				myBIC.compute();
 				minBIC = myBIC.getMinModel();
 				BICwasCalculated = true;
 				myBIC.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
 					consensusBIC = new RunConsense(myBIC,
-							options.consensusType, options.confidenceInterval);
+							options.consensusType, options.confidenceInterval, this);
 				}
 			}
 
 			// do DT if selected
 			if (options.doDT) {
 				myDT = new DT(options.writePAUPblock, options.doImportances,
-						options.doModelAveraging, options.confidenceInterval);
+						options.doModelAveraging, options.confidenceInterval, this);
 				myDT.compute();
 				minDT = myDT.getMinModel();
 				DTwasCalculated = true;
 				myDT.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
 					consensusDT = new RunConsense(myDT, options.consensusType,
-							options.confidenceInterval);
+							options.confidenceInterval, this);
 				}
 			}
 
 			// do hLRT if selected
 			if (options.doHLRT) {
-				myHLRT = new HLRT();
+				myHLRT = new HLRT(this);
 				myHLRT.compute(!options.backwardHLRTSelection,
 						options.confidenceLevelHLRT, options.writePAUPblock);
 			}
 
 			// do dLRT if selected
 			if (options.doDLRT) {
-				myHLRT = new HLRT();
+				myHLRT = new HLRT(this);
 				myHLRT.computeDynamical(!options.backwardHLRTSelection,
 						options.confidenceLevelHLRT, options.writePAUPblock);
 			}
 
 			if (ModelTestConfiguration.isAutoLogEnabled()) {
-				HtmlReporter.buildReport(options,
-						ModelTest.getCandidateModels(), null);
+				HtmlReporter.buildReport(this,
+						getCandidateModels(), outputFile);
 			}
 
 			MAIN_CONSOLE.println(" ");
@@ -964,7 +1001,23 @@ public class ModelTest {
 							PrintUsage();
 						}
 					}
-				} else {
+				} 
+				else if (arg.equals("-output"))
+				{
+					if (i < arguments.length) 
+					{
+						String output = arguments[i++];
+						outputFile = new File(output);
+					}
+					else
+					{
+						System.err
+							.println(error
+								+ "-output option requires output filename.");
+						PrintUsage();
+					}
+				} 
+				else {
 					System.err.println(error + "the argument \" " + arg
 							+ "\" is unknown. Check its syntax.");
 					PrintUsage();
@@ -1015,6 +1068,7 @@ public class ModelTest {
 					+ "\n -tr: number of threads to execute (default is "
 					+ Runtime.getRuntime().availableProcessors()
 					+ ")"
+					+ "\n -output: output data file (html) (e.g., -output output.html)"
 					+ "\n -machinesfile: gets the processors per host from a machines file"
 					+ "\n\n Command line: java -jar jModeltest.jar [arguments]";
 			System.err.println(usage);
@@ -1248,116 +1302,116 @@ public class ModelTest {
 		}
 	}
 
-	public static TextOutputStream setMainConsole(TextOutputStream mainConsole) {
-		ModelTest.MAIN_CONSOLE = mainConsole;
+	public TextOutputStream setMainConsole(TextOutputStream mainConsole) {
+		this.MAIN_CONSOLE = mainConsole;
 		return mainConsole;
 	}
 
-	public static TextOutputStream getMainConsole() {
+	public TextOutputStream getMainConsole() {
 		return MAIN_CONSOLE;
 	}
 
-	public static TextOutputStream getCurrentOutStream() {
+	public TextOutputStream getCurrentOutStream() {
 		return CURRENT_OUT_STREAM;
 	}
 
-	public static void setCurrentOutStream(TextOutputStream currentOutStream) {
+	public void setCurrentOutStream(TextOutputStream currentOutStream) {
 		CURRENT_OUT_STREAM = currentOutStream;
 	}
 
-	public static AIC getMyAIC() {
+	public AIC getMyAIC() {
 		if (!AICwasCalculated)
 			throw new WeakStateException.UninitializedCriterionException("AIC");
 		return myAIC;
 	}
 
-	public static void setMyAIC(AIC myAIC) {
-		ModelTest.myAIC = myAIC;
-		ModelTest.minAIC = myAIC != null ? myAIC.getMinModel() : null;
+	public void setMyAIC(AIC myAIC) {
+		this.myAIC = myAIC;
+		this.minAIC = myAIC != null ? myAIC.getMinModel() : null;
 		AICwasCalculated = (myAIC != null);
 	}
 
-	public static boolean testAIC() {
+	public boolean testAIC() {
 		return AICwasCalculated;
 	}
 
-	public static AICc getMyAICc() {
+	public AICc getMyAICc() {
 		if (!AICcwasCalculated)
 			throw new WeakStateException.UninitializedCriterionException("AICc");
 		return myAICc;
 	}
 
-	public static void setMyAICc(AICc myAICc) {
-		ModelTest.myAICc = myAICc;
-		ModelTest.minAICc = myAICc != null ? myAICc.getMinModel() : null;
+	public void setMyAICc(AICc myAICc) {
+		this.myAICc = myAICc;
+		this.minAICc = myAICc != null ? myAICc.getMinModel() : null;
 		AICcwasCalculated = (myAICc != null);
 	}
 
-	public static boolean testAICc() {
+	public boolean testAICc() {
 		return AICcwasCalculated;
 	}
 
-	public static BIC getMyBIC() {
+	public BIC getMyBIC() {
 		if (!BICwasCalculated)
 			throw new WeakStateException.UninitializedCriterionException("BIC");
 		return myBIC;
 	}
 
-	public static void setMyBIC(BIC myBIC) {
-		ModelTest.myBIC = myBIC;
-		ModelTest.minBIC = myBIC != null ? myBIC.getMinModel() : null;
+	public void setMyBIC(BIC myBIC) {
+		this.myBIC = myBIC;
+		this.minBIC = myBIC != null ? myBIC.getMinModel() : null;
 		BICwasCalculated = (myBIC != null);
 	}
 
-	public static boolean testBIC() {
+	public boolean testBIC() {
 		return BICwasCalculated;
 	}
 
-	public static DT getMyDT() {
+	public DT getMyDT() {
 		if (!DTwasCalculated)
 			throw new WeakStateException.UninitializedCriterionException("DT");
 		return myDT;
 	}
 
-	public static void setMyDT(DT myDT) {
-		ModelTest.myDT = myDT;
-		ModelTest.minDT = myDT != null ? myDT.getMinModel() : null;
+	public void setMyDT(DT myDT) {
+		this.myDT = myDT;
+		this.minDT = myDT != null ? myDT.getMinModel() : null;
 		DTwasCalculated = (myDT != null);
 	}
 
-	public static boolean testDT() {
+	public boolean testDT() {
 		return DTwasCalculated;
 	}
 
-	public static RunConsense getConsensusAIC() {
+	public RunConsense getConsensusAIC() {
 		return consensusAIC;
 	}
 
-	public static RunConsense getConsensusAICc() {
+	public RunConsense getConsensusAICc() {
 		return consensusAICc;
 	}
 
-	public static RunConsense getConsensusBIC() {
+	public RunConsense getConsensusBIC() {
 		return consensusBIC;
 	}
 
-	public static RunConsense getConsensusDT() {
+	public RunConsense getConsensusDT() {
 		return consensusDT;
 	}
 
-	public static void setConsensusAIC(RunConsense pConsensusAIC) {
+	public void setConsensusAIC(RunConsense pConsensusAIC) {
 		consensusAIC = pConsensusAIC;
 	}
 
-	public static void setConsensusAICc(RunConsense pConsensusAICc) {
+	public void setConsensusAICc(RunConsense pConsensusAICc) {
 		consensusAICc = pConsensusAICc;
 	}
 
-	public static void setConsensusBIC(RunConsense pConsensusBIC) {
+	public void setConsensusBIC(RunConsense pConsensusBIC) {
 		consensusBIC = pConsensusBIC;
 	}
 
-	public static void setConsensusDT(RunConsense pConsensusDT) {
+	public void setConsensusDT(RunConsense pConsensusDT) {
 		consensusDT = pConsensusDT;
 	}
 
@@ -1388,14 +1442,14 @@ public class ModelTest {
 	 * @param minDLRT
 	 *            the minDLRT to set
 	 */
-	public static void setMinDLRT(Model minDLRT) {
-		ModelTest.minDLRT = minDLRT;
+	public void setMinDLRT(Model minDLRT) {
+		this.minDLRT = minDLRT;
 	}
 
 	/**
 	 * @return the minDLRT
 	 */
-	public static Model getMinDLRT() {
+	public Model getMinDLRT() {
 		return minDLRT;
 	}
 
@@ -1403,42 +1457,42 @@ public class ModelTest {
 	 * @param minHLRT
 	 *            the minHLRT to set
 	 */
-	public static void setMinHLRT(Model minHLRT) {
-		ModelTest.minHLRT = minHLRT;
+	public void setMinHLRT(Model minHLRT) {
+		this.minHLRT = minHLRT;
 	}
 
 	/**
 	 * @return the minHLRT
 	 */
-	public static Model getMinHLRT() {
+	public Model getMinHLRT() {
 		return minHLRT;
 	}
 
 	/**
 	 * @return the minDT
 	 */
-	public static Model getMinDT() {
+	public Model getMinDT() {
 		return minDT;
 	}
 
 	/**
 	 * @return the minBIC
 	 */
-	public static Model getMinBIC() {
+	public Model getMinBIC() {
 		return minBIC;
 	}
 
 	/**
 	 * @return the minAICc
 	 */
-	public static Model getMinAICc() {
+	public Model getMinAICc() {
 		return minAICc;
 	}
 
 	/**
 	 * @return the minAIC
 	 */
-	public static Model getMinAIC() {
+	public Model getMinAIC() {
 		return minAIC;
 	}
 
@@ -1446,21 +1500,21 @@ public class ModelTest {
 	 * @param candidateModels
 	 *            the candidateModels to set
 	 */
-	public static void setCandidateModels(Model[] candidateModels) {
-		ModelTest.candidateModels = candidateModels;
+	public void setCandidateModels(Model[] candidateModels) {
+		this.candidateModels = candidateModels;
 	}
 
 	/**
 	 * @return the candidateModels
 	 */
-	public static Model[] getCandidateModels() {
+	public Model[] getCandidateModels() {
 		return candidateModels;
 	}
 
 	/**
 	 * @return a single candidate model
 	 */
-	public static Model getCandidateModel(int index) {
+	public Model getCandidateModel(int index) {
 		return candidateModels[index];
 	}
 

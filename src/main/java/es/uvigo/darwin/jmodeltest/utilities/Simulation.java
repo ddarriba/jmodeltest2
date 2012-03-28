@@ -46,6 +46,7 @@ import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 public class Simulation {
 	private ApplicationOptions options;
+	private ModelTest modelTest;
 	
 	private static final double nil = -99999;
 
@@ -55,8 +56,9 @@ public class Simulation {
 	private static final String DT = "DT";
 	private static final String[] IC_TYPES = { AIC, AICc, BIC, DT };
 
-	public Simulation(ApplicationOptions options) {
-		this.options = options;
+	public Simulation(ModelTest modelTest) {
+		this.modelTest = modelTest;
+		this.options = modelTest.getApplicationOptions();
 	}
 
 	/*************************
@@ -102,7 +104,7 @@ public class Simulation {
 			append = true;
 
 		// outfiles
-		TextOutputStream outConsole = ModelTest.setMainConsole(new TextOutputStream(
+		TextOutputStream outConsole = modelTest.setMainConsole(new TextOutputStream(
 				outdir + simsName + ".out", append));
 		TextOutputStream treeConsole = new TextOutputStream(treedir + simsName
 				+ ".trees", append);
@@ -120,8 +122,8 @@ public class Simulation {
 
 		// print the command line
 		outConsole.print("\nArguments =");
-		for (i = 0; i < ModelTest.arguments.length; i++)
-			outConsole.print(" " + ModelTest.arguments[i]);
+		for (i = 0; i < modelTest.arguments.length; i++)
+			outConsole.print(" " + modelTest.arguments[i]);
 
 		// open data file
 		File file = options.getInputFile();
@@ -223,7 +225,7 @@ public class Simulation {
 		options.setCandidateModels();
 
 		// calculate likelihoods with phyml in the command line
-		RunPhyml phymlrun = new RunPhymlThread(new ConsoleProgressObserver(options), options, ModelTest.getCandidateModels());
+		RunPhyml phymlrun = new RunPhymlThread(new ConsoleProgressObserver(modelTest), modelTest, modelTest.getCandidateModels());
 		phymlrun.execute();
 
 		// print all model trees to tree file and parameters to parms file
@@ -232,13 +234,13 @@ public class Simulation {
 					.println("data\tname\tln\tK\tfA\tfC\tfG\tfT\tkappa\ttitv\trAC\tAG\trAT\trCG\trCT\trGT\tpinvI\tshapeG\tpinvIG\tshapeIG");
 		for (i = 0; i < options.numModels; i++) {
 			treeConsole.println(options.getInputFile().getName() + "\t"
-					+ ModelTest.getCandidateModels()[i].getName() + "\t"
-					+ ModelTest.getCandidateModels()[i].getTreeString());
+					+ modelTest.getCandidateModels()[i].getName() + "\t"
+					+ modelTest.getCandidateModels()[i].getTreeString());
 			printModelLine(
-					ModelTest.getCandidateModels()[i],
+					modelTest.getCandidateModels()[i],
 					parameterConsole,
 					options.getInputFile().getName() + "\t"
-							+ ModelTest.getCandidateModels()[i].getName(), nil, nil);
+							+ modelTest.getCandidateModels()[i].getName(), nil, nil);
 		}
 
 		// do AIC if selected
@@ -267,15 +269,15 @@ public class Simulation {
 
 		// do hLRT if selected
 		if (options.doHLRT) {
-			HLRT myHLRT = new HLRT();
+			HLRT myHLRT = new HLRT(modelTest);
 			myHLRT.compute(!options.backwardHLRTSelection,
 					options.confidenceLevelHLRT, options.writePAUPblock);
-			treeConsole.println(ModelTest.averagedTreeString);
+			treeConsole.println(modelTest.averagedTreeString);
 		}
 
 		// do dLRT if selected
 		if (options.doDLRT) {
-			HLRT myHLRT = new HLRT();
+			HLRT myHLRT = new HLRT(modelTest);
 			myHLRT.computeDynamical(!options.backwardHLRTSelection,
 					options.confidenceLevelHLRT, options.writePAUPblock);
 		}
@@ -387,16 +389,16 @@ public class Simulation {
 		InformationCriterion ic;
 		if (icType.equals(AIC)) {
 			ic = new AIC(options.writePAUPblock, options.doImportances,
-					options.doModelAveraging, options.confidenceInterval);
+					options.doModelAveraging, options.confidenceInterval, modelTest);
 		} else if (icType.equals("AICc")) {
 			ic = new AICc(options.writePAUPblock, options.doImportances,
-					options.doModelAveraging, options.confidenceInterval);
+					options.doModelAveraging, options.confidenceInterval, modelTest);
 		} else if (icType.equals("BIC")) {
 			ic = new BIC(options.writePAUPblock, options.doImportances,
-					options.doModelAveraging, options.confidenceInterval);
+					options.doModelAveraging, options.confidenceInterval, modelTest);
 		} else if (icType.equals("DT")) {
 			ic = new DT(options.writePAUPblock, options.doImportances,
-					options.doModelAveraging, options.confidenceInterval);
+					options.doModelAveraging, options.confidenceInterval, modelTest);
 		} else {
 			ic = null;
 			// TODO: EXCEPTION!!!
@@ -405,13 +407,13 @@ public class Simulation {
 		ic.compute();
 		ic.print(outConsole);
 		if (icType.equals(AIC)) {
-			ModelTest.setMyAIC((AIC) ic);
+			modelTest.setMyAIC((AIC) ic);
 		} else if (icType.equals("AICc")) {
-			ModelTest.setMyAICc((AICc) ic);
+			modelTest.setMyAICc((AICc) ic);
 		} else if (icType.equals("BIC")) {
-			ModelTest.setMyBIC((BIC) ic);
+			modelTest.setMyBIC((BIC) ic);
 		} else if (icType.equals("DT")) {
-			ModelTest.setMyDT((DT) ic);
+			modelTest.setMyDT((DT) ic);
 		}
 
 		ICtre.println(ic.getMinModel().getTreeString());
@@ -423,11 +425,11 @@ public class Simulation {
 
 		if (options.doAveragedPhylogeny) {
 			new RunConsense(ic,	"50% majority rule", 
-					options.confidenceInterval);
-			IC_mmi_mtre.println(ModelTest.averagedTreeString);
+					options.confidenceInterval, modelTest);
+			IC_mmi_mtre.println(modelTest.averagedTreeString);
 			new RunConsense(ic, "strict",
-					options.confidenceInterval);
-			IC_mmi_atre.println(ModelTest.averagedTreeString);
+					options.confidenceInterval, modelTest);
+			IC_mmi_atre.println(modelTest.averagedTreeString);
 		}
 		if (options.doImportances) {
 			if (!append) {

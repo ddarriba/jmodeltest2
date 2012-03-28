@@ -67,7 +67,8 @@ public class Frame_hLRT extends JModelTestFrame {
 
 	private String currentDirectory = System.getProperty("user.dir");
 
-	public Frame_hLRT() {
+	public Frame_hLRT(ModelTest modelTest) {
+		super(modelTest);
 	}
 
 	public void initComponents() throws Exception {
@@ -92,7 +93,7 @@ public class Frame_hLRT extends JModelTestFrame {
 		HypothesisList.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "Hypotheses order", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
 		HypothesisList.setVisible(true);
 		HypothesisList.setSize(new java.awt.Dimension(130, 130));
-		HypothesisList.setVisibleRowCount(ModelTest.testingOrder.size());
+		HypothesisList.setVisibleRowCount(modelTest.testingOrder.size());
 		HypothesisList.setFont(XManager.FONT_LABEL_BIG);
 		HypothesisList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		HypothesisList.setLocation(new java.awt.Point(20, 80));
@@ -492,23 +493,23 @@ public class Frame_hLRT extends JModelTestFrame {
 			forward = false;
 	
 		for (i=0; i< listModel.getSize(); i++)
-			ModelTest.testingOrder.setElementAt((String)listModel.getElementAt(i),i);
+			modelTest.testingOrder.setElementAt((String)listModel.getElementAt(i),i);
 	
 		/* check whether 2tv goes before 4tv */
-		if (forward && ModelTest.testingOrder.indexOf("2tv") > ModelTest.testingOrder.indexOf("4tv"))
+		if (forward && modelTest.testingOrder.indexOf("2tv") > modelTest.testingOrder.indexOf("4tv"))
 			{
 			JOptionPane.showMessageDialog(this, "for forward hLRTs the hypothesis 2tv needs\nto be tested before the hypothesis 4tv", 
 						"jModelTest error", JOptionPane.ERROR_MESSAGE);
-			ModelTest.getMainConsole().println ("\nError: for forward hLRTs the hypothesis 2tv needs\nto be tested before the hypothesis 4tv");
+			modelTest.getMainConsole().println ("\nError: for forward hLRTs the hypothesis 2tv needs\nto be tested before the hypothesis 4tv");
 			}
-		else	if (!forward && ModelTest.testingOrder.indexOf("2tv") < ModelTest.testingOrder.indexOf("4tv"))
+		else	if (!forward && modelTest.testingOrder.indexOf("2tv") < modelTest.testingOrder.indexOf("4tv"))
 			{
 			JOptionPane.showMessageDialog(this, "for backward hLRTs the hypothesis 2tv needs\nto be tested after the hypothesis 4tv", 
 						"jModelTest error", JOptionPane.ERROR_MESSAGE);
-			ModelTest.getMainConsole().println ("\nError: for backward hLRTs the hypothesis 2tv needs\nto be tested after the hypothesis 4tv");
+			modelTest.getMainConsole().println ("\nError: for backward hLRTs the hypothesis 2tv needs\nto be tested after the hypothesis 4tv");
 			}
 	
-		HLRT myHLRT = new HLRT();
+		HLRT myHLRT = new HLRT(modelTest);
 		if (jCheckBoxDynamical.isSelected())
 			myHLRT.computeDynamical(forward, alpha, writePAUPblock);
 		else

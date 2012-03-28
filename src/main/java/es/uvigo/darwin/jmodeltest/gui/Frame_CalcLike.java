@@ -62,8 +62,6 @@ public class Frame_CalcLike extends JModelTestFrame {
 	private static final int TOTAL_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 	private static final int DEFAULT_NUMBER_OF_THREADS = TOTAL_NUMBER_OF_THREADS; 
 	
-	private ApplicationOptions options = ApplicationOptions.getInstance();
-	
 	private JPanel PanelProcessors = new JPanel();
 	private JSlider SliderProcessors = new JSlider(1,TOTAL_NUMBER_OF_THREADS,DEFAULT_NUMBER_OF_THREADS);
 	private JLabel jLabelNumProcessors = new JLabel();
@@ -117,7 +115,8 @@ public class Frame_CalcLike extends JModelTestFrame {
 		return runPhyml;
 	}
 	
-	public Frame_CalcLike() {
+	public Frame_CalcLike(ModelTest modelTest) {
+		super(modelTest);
 	}
 
 	public void initComponents() throws Exception {
@@ -638,15 +637,15 @@ public class Frame_CalcLike extends JModelTestFrame {
 			options.setCandidateModels();
 
 			// build progress frame
-			progressFrame = new Frame_Progress(options.numModels, this, options);
+			progressFrame = new Frame_Progress(options.numModels, this, modelTest);
 
 			setVisible(false);
 
 			// scroll to the bottom
-			XManager.getInstance()
+			XManager.getInstance(modelTest)
 					.getPane()
 					.setCaretPosition(
-							XManager.getInstance().getPane().getDocument()
+							XManager.getInstance(modelTest).getPane().getDocument()
 									.getLength());
 			// run phyml
 			this.task = new ComputeLikelihoodTask();
@@ -736,7 +735,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		if (treefilename != null) // menu not canceled
 		{
 			String treefilenameComplete = fc.getDirectory() + treefilename;
-			ModelTest.getMainConsole().print(
+			modelTest.getMainConsole().print(
 					"Reading tree file \"" + treefilename + "\"...");
 			System.err.print("\nreading tree file \"" + treefilename + "\"...");
 
@@ -750,11 +749,11 @@ public class Frame_CalcLike extends JModelTestFrame {
 				JOptionPane.showMessageDialog(this, "The specified file \""
 						+ treefilename + "\" cannot be found",
 						"jModelTest error", JOptionPane.ERROR_MESSAGE);
-				ModelTest.getMainConsole().println(" failed.\n");
+				modelTest.getMainConsole().println(" failed.\n");
 				ButtonMLCalcLike.setSelected(true);
 				;
 			} catch (TreeParseException e1) {
-				ModelTest.getMainConsole().println(" failed.\n");
+				modelTest.getMainConsole().println(" failed.\n");
 				System.err.println(" failed.\n");
 				ButtonMLCalcLike.setSelected(true);
 				;
@@ -771,7 +770,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 				out.print(options.getUserTree());
 				out.close();
 				jLabelUserTopology.setText(treefilename);
-				ModelTest.getMainConsole().println(" OK.");
+				modelTest.getMainConsole().println(" OK.");
 				System.err.println("OK.");
 			}
 		} else // file does not exists
@@ -787,7 +786,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		private RunPhyml runPhyml;
 		
 		public ComputeLikelihoodTask() {
-			this.runPhyml = new RunPhymlThread(progressFrame, options, ModelTest.getCandidateModels());
+			this.runPhyml = new RunPhymlThread(progressFrame, modelTest, modelTest.getCandidateModels());
 		}
 		
 		public Object construct() {

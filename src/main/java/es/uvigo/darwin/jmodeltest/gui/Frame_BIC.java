@@ -55,7 +55,8 @@ public class Frame_BIC extends JModelTestFrame {
 
 	private BIC myBIC;
 
-	public Frame_BIC() {
+	public Frame_BIC(ModelTest modelTest) {
+		super(modelTest);
 	}
 
 	public void initComponents() throws Exception {
@@ -275,8 +276,8 @@ public class Frame_BIC extends JModelTestFrame {
 	public void JButtonDefaultBICActionPerformed(java.awt.event.ActionEvent e) {
 		TextFieldSizeBIC.setEnabled(false);
 		TextFieldSizeBIC.setText("" + options.sampleSize);
-		ApplicationOptions.getInstance().countBLasParameters = true;
-		XManager.getInstance().selectedMenuResultsBLasParameters(true);
+		modelTest.getApplicationOptions().countBLasParameters = true;
+		XManager.getInstance(modelTest).selectedMenuResultsBLasParameters(true);
 		jCheckBoxPAUPblock.setSelected(false);
 		jCheckBoxAveraging.setSelected(true);
 		jCheckBoxImportance.setSelected(true);
@@ -308,14 +309,14 @@ public class Frame_BIC extends JModelTestFrame {
 
 			options.sampleSize = Integer.parseInt(TextFieldSizeBIC.getText());
 			myBIC = new BIC(writePAUPblock, doImportances, doModelAveraging,
-					credibleInterval);
+					credibleInterval, modelTest);
 			myBIC.compute();
-			myBIC.print(ModelTest.getCurrentOutStream());
-			ModelTest.setMyBIC(myBIC);
+			myBIC.print(modelTest.getCurrentOutStream());
+			modelTest.setMyBIC(myBIC);
 			options.doBIC = myBIC != null;
-			XManager.getInstance().resultsFrame.enablePane(FrameResults.TAB_BIC);
-			XManager.getInstance().resultsFrame.populate(FrameResults.TAB_BIC);
-			XManager.getInstance().enableMenuAveraging(!options.fixedTopology);
+			XManager.getInstance(modelTest).resultsFrame.enablePane(FrameResults.TAB_BIC);
+			XManager.getInstance(modelTest).resultsFrame.populate(FrameResults.TAB_BIC);
+			XManager.getInstance(modelTest).enableMenuAveraging(!options.fixedTopology);
 		} catch (Exception f) {
 			f.printStackTrace();
 		}

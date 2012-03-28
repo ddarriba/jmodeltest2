@@ -21,7 +21,6 @@ import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
 
-import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
@@ -35,12 +34,14 @@ public class ConsoleProgressObserver implements Observer {
 	private int totalModels;
 	private int completedModels = 0;
 	private boolean threadScheduling;
+	private ModelTest modelTest;
 
-	public ConsoleProgressObserver(ApplicationOptions options) {
+	public ConsoleProgressObserver(ModelTest modelTest) {
+		this.modelTest = modelTest;
 		this.startTime = System.currentTimeMillis();
-		this.stream = ModelTest.getMainConsole();
-		this.totalModels = options.numModels;
-		this.threadScheduling = options.threadScheduling;
+		this.stream = modelTest.getMainConsole();
+		this.totalModels = modelTest.getApplicationOptions().numModels;
+		this.threadScheduling = modelTest.getApplicationOptions().threadScheduling;
 	}
 
 	@Override
@@ -102,9 +103,9 @@ public class ConsoleProgressObserver implements Observer {
 			case ProgressInfo.OPTIMIZATION_COMPLETED_OK:
 
 				stream.println(" ");
-				for (Model model : ModelTest.getCandidateModels()) {
-					model.print(ModelTest.getMainConsole());
-					ModelTest.getMainConsole().println(" ");
+				for (Model model : modelTest.getCandidateModels()) {
+					model.print(modelTest.getMainConsole());
+					modelTest.getMainConsole().println(" ");
 				}
 
 				stream.println(" ");

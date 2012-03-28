@@ -59,17 +59,20 @@ public class RunConsense {
 	private double[] w;
 	private double[] cumw;
 	private boolean[] isInInterval;
+	private ModelTest modelTest;
 
 	public static es.uvigo.darwin.jmodeltest.threads.SwingWorker workerConsense;
 
 	// constructor
 	public RunConsense(InformationCriterion tcriterion, String tconsensusType,
-			double minterval) {
+			double minterval, ModelTest modelTest) {
 
+		this.modelTest = modelTest;
+		
 		criterion = tcriterion;
 		consensusType = tconsensusType;
 		numModels = tcriterion.getNumModels();
-		model = ModelTest.getCandidateModels();
+		model = modelTest.getCandidateModels();
 		order = new int[numModels];
 		confidenceInterval = minterval;
 		confidenceModels = new Vector<Model>();
@@ -78,7 +81,7 @@ public class RunConsense {
 		cumw = new double[numModels];
 		isInInterval = new boolean[numModels];
 
-		stream = ModelTest.getMainConsole();
+		stream = modelTest.getMainConsole();
 
 		/**
 		 * This action listener, called by the "Start" button, effectively forks
@@ -89,16 +92,16 @@ public class RunConsense {
 		 * that finished() is called even if the worker is interrupconsense
 		 * because we catch the InterrupconsenseException in doConsense().
 		 */
-		if (ModelTest.buildGUI)
+		if (modelTest.buildGUI)
 			System.out.println("\nComputing model averaged phylogeny ...");
 
 		buildConfidenceInterval();
 		consensus = doConsense();
 		printConsensus();
 
-		if (ModelTest.buildGUI) {
-			XManager.getInstance().getPane().setCaretPosition(
-					XManager.getInstance().getPane().getDocument()
+		if (modelTest.buildGUI) {
+			XManager.getInstance(modelTest).getPane().setCaretPosition(
+					XManager.getInstance(modelTest).getPane().getDocument()
 					.getLength());
 			System.out.println("OK");
 		}
@@ -260,7 +263,7 @@ public class RunConsense {
 		if (criterion.getType() == InformationCriterion.DT)
 			Utilities
 					.printRed("\nWarning: The DT weights used for this model averaged phylogeny are very gross"
-							+ " and should be used with caution. See the program documentation.\n");
+							+ " and should be used with caution. See the program documentation.\n", modelTest);
         stream.println(" ");		
         stream.println("Selection criterion: . . . . " + criterion);
         stream.print("Confidence interval: . . . . "); 

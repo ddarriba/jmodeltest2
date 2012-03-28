@@ -47,8 +47,7 @@ public class ApplicationOptions implements Serializable {
 		NNI, SPR, BEST
 	};
 
-	private static ApplicationOptions instance;
-	private static Vector<String> testOrder;
+	private Vector<String> testOrder;
 
 	private File inputDataFile, inputTreeFile;
 	private File alignmentFile, treeFile;
@@ -115,9 +114,12 @@ public class ApplicationOptions implements Serializable {
 	// lengths as parameters
 
 	private int substTypeCode = 0; // number of substitution types to
+
+	private ModelTest modelTest;
 									// consider
 
-	private ApplicationOptions() {
+	public ApplicationOptions(ModelTest modelTest) {
+		this.modelTest = modelTest;
 		try {
 			logFile = File.createTempFile("jmodeltest-phyml", ".log");
 			logFile.deleteOnExit();
@@ -160,16 +162,11 @@ public class ApplicationOptions implements Serializable {
 		}
 	}
 
-	public static ApplicationOptions getInstance() {
-		if (instance == null) {
-			instance = new ApplicationOptions();
-		}
-		return instance;
-	}
 
 	/****************************
 	 * setCandidateModels *********************** * Build the set of candidate
-	 * models * *
+	 * models * 
+	 * @param modelTest *
 	 ************************************************************************/
 
 	public void setCandidateModels() {
@@ -177,7 +174,7 @@ public class ApplicationOptions implements Serializable {
 		boolean includeModel;
 
 		// fill in list of models
-		ModelTest.setCandidateModels(new Model[numModels]);
+		modelTest.setCandidateModels(new Model[numModels]);
 
 		for (i = j = 0; i < ModelTest.MAX_NUM_MODELS; i++) {
 			includeModel = true;
@@ -195,12 +192,12 @@ public class ApplicationOptions implements Serializable {
 			if (includeModel) {
 				// System.out.println("Including model" + Model.modelName[i] +
 				// " out of " + ModelTest.numModels + " models");
-				loadModelConstraints(ModelTest.getCandidateModel(j), j, i);
+				loadModelConstraints(modelTest.getCandidateModel(j), j, i);
 				j++;
 			}
 		}
 
-		if (ModelTest.buildGUI || ModelTest.testingOrder == null) {
+		if (modelTest.buildGUI || modelTest.testingOrder == null) {
 			// set set of hypotheses for hLRTs in default order
 			testOrder = new Vector<String>();
 			// we need to reinitialize the hypotheses list in case it existed
@@ -236,7 +233,7 @@ public class ApplicationOptions implements Serializable {
 
 			// ModelTest.testingOrder.removeAllElements();
 
-			ModelTest.testingOrder = testOrder;
+			modelTest.testingOrder = testOrder;
 		}
 	}
 
@@ -297,7 +294,7 @@ public class ApplicationOptions implements Serializable {
 		else
 			modelParameters = ModelConstants.freeParameters[modelNo] + BL;
 
-		ModelTest.getCandidateModels()[order] = new Model(order + 1,
+		modelTest.getCandidateModels()[order] = new Model(order + 1,
 				ModelConstants.modelName[modelNo],
 				ModelConstants.modelCode[modelNo], lk, modelParameters, pF, pT,
 				pV, pR, pI, pG, ModelConstants.numTransitions[modelNo],
@@ -374,14 +371,6 @@ public class ApplicationOptions implements Serializable {
 		return substTypeCode;
 	}
 
-	public static void setInstance(ApplicationOptions newInstance) {
-		File alignmentFile = instance.alignmentFile;
-		File treeFile = instance.treeFile;
-		instance = newInstance;
-		instance.alignmentFile = alignmentFile;
-		instance.treeFile = treeFile;
-	}
-
 	public int getNumberOfThreads() {
 		return numberOfThreads;
 	}
@@ -391,9 +380,9 @@ public class ApplicationOptions implements Serializable {
 	}
 
 	public void setMachinesFile(File machinesFile) throws FileNotFoundException {
-		if (ModelTest.HOSTS_TABLE.containsKey(ModelTest.getHostname())) {
+		if (modelTest.HOSTS_TABLE.containsKey(ModelTest.getHostname())) {
 
-			setNumberOfThreads((Integer) ModelTest.HOSTS_TABLE.get(ModelTest
+			setNumberOfThreads((Integer) modelTest.HOSTS_TABLE.get(ModelTest
 					.getHostname()));
 
 		} else {

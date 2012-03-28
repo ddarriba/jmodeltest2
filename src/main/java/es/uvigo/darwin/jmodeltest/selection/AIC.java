@@ -19,6 +19,7 @@ package es.uvigo.darwin.jmodeltest.selection;
 
 import java.util.Random;
 
+import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 
@@ -26,8 +27,8 @@ public class AIC extends InformationCriterion {
 
 	// constructor
 	public AIC(boolean mwritePAUPblock, boolean mdoImportances,
-			boolean mdoModelAveraging, double minterval) {
-		super(mwritePAUPblock, mdoImportances, mdoModelAveraging, minterval);
+			boolean mdoModelAveraging, double minterval, ModelTest modelTest) {
+		super(mwritePAUPblock, mdoImportances, mdoModelAveraging, minterval, modelTest);
 	}
 
 	/****************************

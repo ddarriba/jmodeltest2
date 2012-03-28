@@ -30,11 +30,16 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
+import es.uvigo.darwin.jmodeltest.ModelTest;
 
 public abstract class AlignmentReader {
-	private static ApplicationOptions options = ApplicationOptions
-			.getInstance();;
+	private static ApplicationOptions options;
 
+	public AlignmentReader(ModelTest modelTest)
+	{
+		options = modelTest.getApplicationOptions();
+	}
+	
 	/****************************
 	 * readDataFile **************************** * Reads the input file and gets
 	 * the number of taxa and alignment * length * *

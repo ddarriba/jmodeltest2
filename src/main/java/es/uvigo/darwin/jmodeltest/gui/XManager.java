@@ -68,6 +68,8 @@ public class XManager {
 	public static boolean resultsFrameBuilt = false;
 	private JTextPane PANE;
 
+	private ModelTest modelTest;
+
 	static {
 
 		if (Utilities.isWindows() == false) {
@@ -89,8 +91,8 @@ public class XManager {
 		StyleConstants.setForeground(blackText, Color.black);
 	}
 
-	private XManager() {
-
+	private XManager(ModelTest modelTest) {
+		this.modelTest = modelTest;
 		try {
 			try {
 				UIManager.setLookAndFeel(UIManager
@@ -99,18 +101,18 @@ public class XManager {
 				e.printStackTrace();
 			}
 
-			frame = new FrameMain();
+			frame = new FrameMain(modelTest);
 			frame.initComponents();
 			frame.setVisible(true);
 			PANE = frame.getMainEditorPane();
 
-			ModelTest.setMainConsole(new TextOutputStream(new PrintStream(
+			modelTest.setMainConsole(new TextOutputStream(new PrintStream(
 					new DocumentOutputStream(PANE.getDocument()))));
 
-			ModelTest.setCurrentOutStream(ModelTest.getMainConsole());
-			ModelTest.printHeader(ModelTest.getMainConsole());
-			ModelTest.printNotice(ModelTest.getMainConsole());
-			ModelTest.printCitation(ModelTest.getMainConsole());
+			modelTest.setCurrentOutStream(modelTest.getMainConsole());
+			ModelTest.printHeader(modelTest.getMainConsole());
+			ModelTest.printNotice(modelTest.getMainConsole());
+			ModelTest.printCitation(modelTest.getMainConsole());
 
 			// check expiration date
 			// CheckExpiration (frame);
@@ -155,7 +157,7 @@ public class XManager {
 			if (resultsFrameBuilt) {
 				resultsFrame.dispose();
 			}
-			resultsFrame = new FrameResults();
+			resultsFrame = new FrameResults(modelTest);
 			resultsFrame.initComponents();
 			resultsFrame.setVisible(false);
 			resultsFrameBuilt = true;
@@ -164,16 +166,16 @@ public class XManager {
 		}
 	}
 
-	public static XManager getInstance() {
+	public static XManager getInstance(ModelTest modelTest) {
 		if (instance == null) {
-			instance = new XManager();
+			instance = new XManager(modelTest);
 		}
 		return instance;
 	}
 	
 	public void loadFramePreferences() {
 		if (preferencesFrame == null) {
-			preferencesFrame = new FramePreferences();			
+			preferencesFrame = new FramePreferences(modelTest);			
 		}
 		preferencesFrame.setVisible(true);
 	}

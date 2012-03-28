@@ -72,7 +72,8 @@ public class FramePreferences extends JModelTestFrame {
 	private JButton btnCancel = new JButton();
 	private JButton btnOpen;
 
-	public FramePreferences() {
+	public FramePreferences(ModelTest modelTest) {
+		super(modelTest);
 		initComponents();
 	}
 

@@ -32,17 +32,20 @@ public class HLRT
 	public final double	MAX_PROB = 0.999999;   
 	public final double	MIN_PROB = 0.000001;
 	public double		alphaLRT;
-	public TextOutputStream stream = ModelTest.getMainConsole();
+	public TextOutputStream stream;
 	
 	public int TPMnumber;
 	public int TIMnumber;
+	private ModelTest modelTest;
 	
 	// constructor
-	public HLRT() 
-		{
+	public HLRT(ModelTest modelTest) 
+	{
 		TPMnumber = 0;
 		TIMnumber = 0;
-		}
+		this.modelTest = modelTest;
+		this.stream = modelTest.getMainConsole();
+	}
 
 
  /**************************** compute *********************************
@@ -61,18 +64,18 @@ public class HLRT
 		String[]	hypotheses;
 		
 		alphaLRT = alpha;
-		hypotheses = new String[ModelTest.testingOrder.size()];
+		hypotheses = new String[modelTest.testingOrder.size()];
 		i=0;
-		for (Enumeration<String> e = ModelTest.testingOrder.elements(); e.hasMoreElements();) 
+		for (Enumeration<String> e = modelTest.testingOrder.elements(); e.hasMoreElements();) 
 			hypotheses[i++] = e.nextElement();
 	
-		if (ModelTest.buildGUI)
+		if (modelTest.buildGUI)
 			System.out.print("computing hLRT ... ");
 
 		if (forward)
-			currentModel = ModelTest.getCandidateModels()[0];	
+			currentModel = modelTest.getCandidateModels()[0];	
 		else
-			currentModel = ModelTest.getCandidateModels()[options.numModels-1];
+			currentModel = modelTest.getCandidateModels()[options.numModels-1];
 			
 		stream.println("\n\n\n---------------------------------------------------------------");
 		stream.println("*                                                             *");
@@ -120,7 +123,7 @@ public class HLRT
 	
 	//System.err.println("hypothesis = " +   hypotheses[i] + " -- found best competing model = " + competingModel.name);
 
-			if (ApplicationOptions.getInstance().getSubstTypeCode() == 3)
+			if (modelTest.getApplicationOptions().getSubstTypeCode() == 3)
 				if (competingModel.getName().startsWith("TIM") || competingModel.getName().startsWith("TPM"))
 					competingModel = BestTIMTPM(competingModel);
 			
@@ -147,8 +150,8 @@ public class HLRT
 				else
 					{
 					stream.println("\nThe current model could not be rejected");
-					if (ModelTest.buildGUI)
-						Utilities.toConsoleEnd();
+					if (modelTest.buildGUI)
+						Utilities.toConsoleEnd(modelTest);
 					break;
 					}
 				}
@@ -159,32 +162,32 @@ public class HLRT
 				else
 					{
 					stream.println("\nThe current model rejected the null model");
-					if (ModelTest.buildGUI)
-						Utilities.toConsoleEnd();
+					if (modelTest.buildGUI)
+						Utilities.toConsoleEnd(modelTest);
 					break;
 					}
 				}
 	
-			if (ModelTest.buildGUI)
-				Utilities.toConsoleEnd();
+			if (modelTest.buildGUI)
+				Utilities.toConsoleEnd(modelTest);
 			}
 		
-		ModelTest.setMinHLRT(currentModel);
+		modelTest.setMinHLRT(currentModel);
 	
 		stream.println("\n Model selected: ");	
-		ModelTest.getMinHLRT().print(stream);
+		modelTest.getMinHLRT().print(stream);
 	
 		// print ML tree for best-fit model
-		if (ApplicationOptions.getInstance().optimizeMLTopology)
-			stream.println ("\nML tree (NNI) for the best hLRT model = " + ModelTest.getMinHLRT().getTreeString());
+		if (modelTest.getApplicationOptions().optimizeMLTopology)
+			stream.println ("\nML tree (NNI) for the best hLRT model = " + modelTest.getMinHLRT().getTreeString());
 					
 		// print PAUP* block
 		if (writePAUPblock)
-			ModelTest.WritePaupBlock(stream, "hLRT", ModelTest.getMinHLRT());
+			ModelTest.WritePaupBlock(stream, "hLRT", modelTest.getMinHLRT());
 
-		if (ModelTest.buildGUI)
+		if (modelTest.buildGUI)
 			{
-			Utilities.toConsoleEnd();
+			Utilities.toConsoleEnd(modelTest);
 			System.out.println("OK");
 			}
 		}
@@ -209,18 +212,18 @@ public class HLRT
 		double		lnDifference, bestLnDifference;
 		
 		alphaLRT = alpha;
-		hypotheses = new String[ModelTest.testingOrder.size()];
+		hypotheses = new String[modelTest.testingOrder.size()];
 		i=0;
-		for (String s : ModelTest.testingOrder)
+		for (String s : modelTest.testingOrder)
 			hypotheses[i++] = s;
 	
-		if (ModelTest.buildGUI)
+		if (modelTest.buildGUI)
 			System.out.print("computing dynamical LRTs ... ");
 
 		if (forward)
-			currentModel = ModelTest.getCandidateModels()[0];	
+			currentModel = modelTest.getCandidateModels()[0];	
 		else
-			currentModel = ModelTest.getCandidateModels()[options.numModels-1];
+			currentModel = modelTest.getCandidateModels()[options.numModels-1];
 			
 		stream.println("\n\n\n---------------------------------------------------------------");
 		stream.println("*                                                             *");
@@ -272,7 +275,7 @@ public class HLRT
 				competingModel = findCompetingModel (currentModel, hypotheses[i], forward);
 				if (competingModel != null)
 					{
-					if (ApplicationOptions.getInstance().getSubstTypeCode() == 3)
+					if (modelTest.getApplicationOptions().getSubstTypeCode() == 3)
 						if (competingModel.getName().startsWith("TIM") || competingModel.getName().startsWith("TPM"))
 							competingModel = BestTIMTPM(competingModel);
 					lnDifference = Math.abs(currentModel.getLnL() - competingModel.getLnL());
@@ -334,8 +337,8 @@ public class HLRT
 				else
 					{
 					stream.println("\nThe current model could not be rejected");
-					if (ModelTest.buildGUI)
-						Utilities.toConsoleEnd();
+					if (modelTest.buildGUI)
+						Utilities.toConsoleEnd(modelTest);
 					break;
 					}
 				}
@@ -346,8 +349,8 @@ public class HLRT
 				else
 					{
 					stream.println("\nThe current model rejected the null model");
-					if (ModelTest.buildGUI)
-						Utilities.toConsoleEnd();
+					if (modelTest.buildGUI)
+						Utilities.toConsoleEnd(modelTest);
 					break;
 					}
 				}
@@ -366,22 +369,22 @@ public class HLRT
 			if (hypotheses.length <= 0)
 				thereAreValidHypotheses = false;
 			
-			if (ModelTest.buildGUI)
-				Utilities.toConsoleEnd();
+			if (modelTest.buildGUI)
+				Utilities.toConsoleEnd(modelTest);
 			}
 		
-		ModelTest.setMinDLRT(currentModel);
+		modelTest.setMinDLRT(currentModel);
 	
 		stream.println("\n Model selected: ");	
-		ModelTest.getMinDLRT().print(stream);
+		modelTest.getMinDLRT().print(stream);
 		
 		// print PAUP* block
 		if (writePAUPblock)
-			ModelTest.WritePaupBlock(stream, "dLRT", ModelTest.getMinDLRT());
+			ModelTest.WritePaupBlock(stream, "dLRT", modelTest.getMinDLRT());
 
-		if (ModelTest.buildGUI)
+		if (modelTest.buildGUI)
 			{
-			Utilities.toConsoleEnd();
+			Utilities.toConsoleEnd(modelTest);
 			System.out.println("OK");
 			}
 		}
@@ -404,7 +407,7 @@ public class HLRT
 		Model competing, found;
 		
 		found = null;
-		for (Model model : ModelTest.getCandidateModels())
+		for (Model model : modelTest.getCandidateModels())
 			{
 			competing = model;
 			isTest = false;
@@ -447,7 +450,7 @@ public class HLRT
 			if (current.ispT() == competing.ispT() && current.ispR() != competing.ispR())
 				isTest = false;
 
-			if (ApplicationOptions.getInstance().getSubstTypeCode() == 0)
+			if (modelTest.getApplicationOptions().getSubstTypeCode() == 0)
 				{
 				if ((Math.abs(competing.getNumTi() - current.getNumTi()) == 1) && (Math.abs(competing.getNumTv() - current.getNumTv()) == 3))
 					{
@@ -537,7 +540,7 @@ public class HLRT
 		
 		m1 = m2 = m3 = null;
 		
-		for (Model model : ModelTest.getCandidateModels())
+		for (Model model : modelTest.getCandidateModels())
 			{
 			if (modelName1.equals(model.getName()))
 				m1 = model;

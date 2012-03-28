@@ -109,13 +109,13 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	private int maximum;
 
 	public Frame_Progress(int numModels, Frame_CalcLike frameCalcLike,
-			ApplicationOptions options) {
+			ModelTest modelTest) {
+		super(modelTest);
 		this.numberOfThreads = options.getNumberOfThreads();
-		this.totalModels = ModelTest.getCandidateModels().length;
+		this.totalModels = modelTest.getCandidateModels().length;
 		this.interrupted = false;
-		this.options = options;
 		this.startTime = System.currentTimeMillis();
-		this.stream = ModelTest.getMainConsole();
+		this.stream = modelTest.getMainConsole();
 		this.threadProgressBar = new JProgressBar[numberOfThreads];
 		this.threadProgressLabel = new JLabel[numberOfThreads];
 		this.threadProgressModelLabel = new JLabel[numberOfThreads];
@@ -363,10 +363,10 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 				stream.println("Model \t\t Exec. Time \t Total Time \t -lnL");
 				stream.println("-------------------------------------------------------------------------");
 
-				ModelTest.setMyAIC(null);
-				ModelTest.setMyAICc(null);
-				ModelTest.setMyBIC(null);
-				ModelTest.setMyDT(null);
+				modelTest.setMyAIC(null);
+				modelTest.setMyAICc(null);
+				modelTest.setMyBIC(null);
+				modelTest.setMyDT(null);
 
 				break;
 
@@ -402,10 +402,10 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 						+ String.format(Locale.ENGLISH, "%5.4f", info.getModel().getLnL()));
 
 				// scroll to the bottom
-				XManager.getInstance()
+				XManager.getInstance(modelTest)
 						.getPane()
 						.setCaretPosition(
-								XManager.getInstance().getPane().getDocument()
+								XManager.getInstance(modelTest).getPane().getDocument()
 										.getLength());
 				break;
 
@@ -414,7 +414,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 					interrupted = true;
 					stream.println(" ");
 
-					XManager.getInstance().setLikeLabelColor(
+					XManager.getInstance(modelTest).setLikeLabelColor(
 							XManager.LABEL_FAIL_COLOR);
 
 					System.err
@@ -422,13 +422,13 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 					Utilities
 							.printRed("\nComputation of likelihood scores interrupted. It took "
 									+ Utilities.calculateRuntime(startTime,
-											System.currentTimeMillis()) + ".\n");
+											System.currentTimeMillis()) + ".\n", modelTest);
 
 					stream.println(" ");
-					XManager.getInstance()
+					XManager.getInstance(modelTest)
 							.getPane()
 							.setCaretPosition(
-									XManager.getInstance().getPane()
+									XManager.getInstance(modelTest).getPane()
 											.getDocument().getLength());
 					ProcessManager.getInstance().killAll();
 				}
@@ -436,7 +436,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 
 			case ProgressInfo.ERROR:
 				progressBarCancel(null);
-				Utilities.printRed(info.getMessage());
+				Utilities.printRed(info.getMessage(), modelTest);
 				JOptionPane.showMessageDialog(new JFrame(), info.getMessage(),
 						"jModeltest error", JOptionPane.ERROR_MESSAGE);
 				break;
@@ -449,11 +449,11 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 					stream.println("::Results::");
 					stream.println(" ");
 					int numComputedModels = 0;
-					for (Model model : ModelTest.getCandidateModels()) {
+					for (Model model : modelTest.getCandidateModels()) {
 						if (model.getLnL() > 0.0) {
 							numComputedModels++;
-							model.print(ModelTest.getMainConsole());
-							ModelTest.getMainConsole().println(" ");
+							model.print(modelTest.getMainConsole());
+							modelTest.getMainConsole().println(" ");
 						}
 					}
 
@@ -465,14 +465,14 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 					else
 						baseTree = "(fixed tree)";
 
-					XManager.getInstance()
+					XManager.getInstance(modelTest)
 							.setLikeLabelText(
 									"  Likelihood scores loaded for "
 											+ numComputedModels + " models "
 											+ baseTree);
 
 					if (numComputedModels == options.numModels) {
-						XManager.getInstance().setLikeLabelColor(
+						XManager.getInstance(modelTest).setLikeLabelColor(
 								XManager.LABEL_BLUE_COLOR);
 
 						stream.println("\nComputation of likelihood scores completed. It took "
@@ -481,23 +481,23 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 
 						// calculations
 						if (options.fixedTopology) {
-							XManager.getInstance().enableMenuhLRT(true);
-							XManager.getInstance().enableMenuAveraging(false);
+							XManager.getInstance(modelTest).enableMenuhLRT(true);
+							XManager.getInstance(modelTest).enableMenuAveraging(false);
 						}
 
-						XManager.getInstance().enableMenuAIC(true);
-						XManager.getInstance().enableMenuBIC(true);
-						XManager.getInstance().enableMenuDT(true);
+						XManager.getInstance(modelTest).enableMenuAIC(true);
+						XManager.getInstance(modelTest).enableMenuBIC(true);
+						XManager.getInstance(modelTest).enableMenuDT(true);
 
 						// build results table
-						XManager.getInstance().buildFrameResults();
-						XManager.getInstance().enableMenuShowModelTable(true);
-						XManager.getInstance().enableMenuHtmlOutput(true);
+						XManager.getInstance(modelTest).buildFrameResults();
+						XManager.getInstance(modelTest).enableMenuShowModelTable(true);
+						XManager.getInstance(modelTest).enableMenuHtmlOutput(true);
 
 						System.out.println(" ... OK");
 
 					} else {
-						XManager.getInstance().setLikeLabelColor(
+						XManager.getInstance(modelTest).setLikeLabelColor(
 								XManager.LABEL_FAIL_COLOR);
 
 						stream.println("\nComputation of likelihood scores interrupted. It took "
@@ -507,10 +507,10 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 
 				}
 
-				XManager.getInstance()
+				XManager.getInstance(modelTest)
 						.getPane()
 						.setCaretPosition(
-								XManager.getInstance().getPane().getDocument()
+								XManager.getInstance(modelTest).getPane().getDocument()
 										.getLength());
 				// continue
 

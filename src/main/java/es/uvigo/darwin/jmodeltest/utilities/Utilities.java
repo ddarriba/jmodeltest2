@@ -263,12 +263,12 @@ public final class Utilities {
 		return isNumber;
 	}
 
-	public static void toConsoleEnd() {
-		if (ModelTest.buildGUI)
-			XManager.getInstance()
+	public static void toConsoleEnd(ModelTest modelTest) {
+		if (modelTest.buildGUI)
+			XManager.getInstance(modelTest)
 					.getPane()
 					.setCaretPosition(
-							XManager.getInstance().getPane().getDocument()
+							XManager.getInstance(modelTest).getPane().getDocument()
 									.getLength());
 	}
 
@@ -359,10 +359,10 @@ public final class Utilities {
 	 * Prints to the main console text in red
 	 */
 
-	public static void printRed(String text) {
-		if (ModelTest.buildGUI) {
+	public static void printRed(String text, ModelTest modelTest) {
+		if (modelTest.buildGUI) {
 			try {
-				Document doc = XManager.getInstance().getPane().getDocument();
+				Document doc = XManager.getInstance(modelTest).getPane().getDocument();
 				doc.insertString(doc.getLength(), text, XManager.redText);
 			} catch (javax.swing.text.BadLocationException e) {
 			}

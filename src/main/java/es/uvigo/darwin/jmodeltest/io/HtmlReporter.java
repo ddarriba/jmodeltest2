@@ -54,26 +54,28 @@ public abstract class HtmlReporter {
 	private static TreeFacade treeFacade = new TreeFacadeImpl();
 	private static Map<String, Object> datamodel;
 
-	public static void buildReport(ApplicationOptions options, Model models[],
+	public static void buildReport(ModelTest modelTest, Model models[],
 			File outputFile) {
 
 		// Add the values in the datamodel
 		datamodel = new HashMap<String, Object>();
 
-		fillInWithOptions(options);
+		ApplicationOptions options = modelTest.getApplicationOptions();
+		
+		fillInWithOptions(modelTest);
 		fillInWithSortedModels(models);
 
 		if (options.doAIC) {
 			Collection<Map<String, String>> aicModels = new ArrayList<Map<String, String>>();
 			Map<String, String> bestAicModel = new HashMap<String, String>();
-			fillInWIthInformationCriterion(ModelTest.getMyAIC(), aicModels,
+			fillInWIthInformationCriterion(modelTest.getMyAIC(), aicModels,
 					bestAicModel);
 			datamodel.put("aicModels", aicModels);
 			datamodel.put("bestAicModel", bestAicModel);
-			datamodel.put("aicConfidenceCount", ModelTest.getMyAIC()
+			datamodel.put("aicConfidenceCount", modelTest.getMyAIC()
 					.getConfidenceModels().size());
 			StringBuffer aicConfModels = new StringBuffer();
-			for (Model model : ModelTest.getMyAIC().getConfidenceModels())
+			for (Model model : modelTest.getMyAIC().getConfidenceModels())
 				aicConfModels.append(model.getName() + " ");
 			datamodel.put("aicConfidenceList", aicConfModels.toString());
 		}
@@ -81,14 +83,14 @@ public abstract class HtmlReporter {
 		if (options.doAICc) {
 			Collection<Map<String, String>> aiccModels = new ArrayList<Map<String, String>>();
 			Map<String, String> bestAiccModel = new HashMap<String, String>();
-			fillInWIthInformationCriterion(ModelTest.getMyAICc(), aiccModels,
+			fillInWIthInformationCriterion(modelTest.getMyAICc(), aiccModels,
 					bestAiccModel);
 			datamodel.put("aiccModels", aiccModels);
 			datamodel.put("bestAiccModel", bestAiccModel);
-			datamodel.put("aiccConfidenceCount", ModelTest.getMyAICc()
+			datamodel.put("aiccConfidenceCount", modelTest.getMyAICc()
 					.getConfidenceModels().size());
 			StringBuffer aiccConfModels = new StringBuffer();
-			for (Model model : ModelTest.getMyAICc().getConfidenceModels())
+			for (Model model : modelTest.getMyAICc().getConfidenceModels())
 				aiccConfModels.append(model.getName() + " ");
 			datamodel.put("aiccConfidenceList", aiccConfModels.toString());
 		}
@@ -96,14 +98,14 @@ public abstract class HtmlReporter {
 		if (options.doBIC) {
 			Collection<Map<String, String>> bicModels = new ArrayList<Map<String, String>>();
 			Map<String, String> bestBicModel = new HashMap<String, String>();
-			fillInWIthInformationCriterion(ModelTest.getMyBIC(), bicModels,
+			fillInWIthInformationCriterion(modelTest.getMyBIC(), bicModels,
 					bestBicModel);
 			datamodel.put("bicModels", bicModels);
 			datamodel.put("bestBicModel", bestBicModel);
-			datamodel.put("bicConfidenceCount", ModelTest.getMyBIC()
+			datamodel.put("bicConfidenceCount", modelTest.getMyBIC()
 					.getConfidenceModels().size());
 			StringBuffer bicConfModels = new StringBuffer();
-			for (Model model : ModelTest.getMyBIC().getConfidenceModels())
+			for (Model model : modelTest.getMyBIC().getConfidenceModels())
 				bicConfModels.append(model.getName() + " ");
 			datamodel.put("bicConfidenceList", bicConfModels.toString());
 		}
@@ -111,58 +113,58 @@ public abstract class HtmlReporter {
 		if (options.doDT) {
 			Collection<Map<String, String>> dtModels = new ArrayList<Map<String, String>>();
 			Map<String, String> bestDtModel = new HashMap<String, String>();
-			fillInWIthInformationCriterion(ModelTest.getMyDT(), dtModels,
+			fillInWIthInformationCriterion(modelTest.getMyDT(), dtModels,
 					bestDtModel);
 			datamodel.put("dtModels", dtModels);
 			datamodel.put("bestDtModel", bestDtModel);
-			datamodel.put("dtConfidenceCount", ModelTest.getMyDT()
+			datamodel.put("dtConfidenceCount", modelTest.getMyDT()
 					.getConfidenceModels().size());
 			StringBuffer dtConfModels = new StringBuffer();
-			for (Model model : ModelTest.getMyDT().getConfidenceModels())
+			for (Model model : modelTest.getMyDT().getConfidenceModels())
 				dtConfModels.append(model.getName() + " ");
 			datamodel.put("dtConfidenceList", dtConfModels.toString());
 		}
 
 		datamodel.put("doAICAveragedPhylogeny",
-				ModelTest.getConsensusAIC() != null ? new Integer(1)
+				modelTest.getConsensusAIC() != null ? new Integer(1)
 						: new Integer(0));
-		if (ModelTest.getConsensusAIC() != null) {
-			datamodel.put("aicConsensusTree", treeFacade.toNewick(ModelTest
+		if (modelTest.getConsensusAIC() != null) {
+			datamodel.put("aicConsensusTree", treeFacade.toNewick(modelTest
 					.getConsensusAIC().getConsensus(), true, true, true));
-			datamodel.put("consensusType", ModelTest.getConsensusAIC()
+			datamodel.put("consensusType", modelTest.getConsensusAIC()
 					.getConsensusType());
 		}
 		datamodel.put("doAICcAveragedPhylogeny",
-				ModelTest.getConsensusAICc() != null ? new Integer(1)
+				modelTest.getConsensusAICc() != null ? new Integer(1)
 						: new Integer(0));
-		if (ModelTest.getConsensusAICc() != null) {
-			datamodel.put("aiccConsensusTree", treeFacade.toNewick(ModelTest
+		if (modelTest.getConsensusAICc() != null) {
+			datamodel.put("aiccConsensusTree", treeFacade.toNewick(modelTest
 					.getConsensusAICc().getConsensus(), true, true, true));
-			datamodel.put("consensusType", ModelTest.getConsensusAICc()
+			datamodel.put("consensusType", modelTest.getConsensusAICc()
 					.getConsensusType());
 		}
 		datamodel.put("doBICAveragedPhylogeny",
-				ModelTest.getConsensusBIC() != null ? new Integer(1)
+				modelTest.getConsensusBIC() != null ? new Integer(1)
 						: new Integer(0));
-		if (ModelTest.getConsensusBIC() != null) {
-			datamodel.put("bicConsensusTree", treeFacade.toNewick(ModelTest
+		if (modelTest.getConsensusBIC() != null) {
+			datamodel.put("bicConsensusTree", treeFacade.toNewick(modelTest
 					.getConsensusBIC().getConsensus(), true, true, true));
-			datamodel.put("consensusType", ModelTest.getConsensusBIC()
+			datamodel.put("consensusType", modelTest.getConsensusBIC()
 					.getConsensusType());
 		}
 		datamodel.put("doDTAveragedPhylogeny",
-				ModelTest.getConsensusDT() != null ? new Integer(1)
+				modelTest.getConsensusDT() != null ? new Integer(1)
 						: new Integer(0));
-		if (ModelTest.getConsensusDT() != null) {
-			datamodel.put("dtConsensusTree", treeFacade.toNewick(ModelTest
+		if (modelTest.getConsensusDT() != null) {
+			datamodel.put("dtConsensusTree", treeFacade.toNewick(modelTest
 					.getConsensusDT().getConsensus(), true, true, true));
-			datamodel.put("consensusType", ModelTest.getConsensusDT()
+			datamodel.put("consensusType", modelTest.getConsensusDT()
 					.getConsensusType());
 		}
 
 		// Process the template using FreeMarker
 		try {
-			freemarkerDo(datamodel, "index.html", outputFile);
+			freemarkerDo(datamodel, "index.html", outputFile, modelTest);
 		} catch (Exception e) {
 			System.out
 					.println("There was a problem building the html log files: "
@@ -172,7 +174,7 @@ public abstract class HtmlReporter {
 
 	// Process a template using FreeMarker and print the results
 	static void freemarkerDo(Map<String, Object> datamodel, String template,
-			File mOutputFile) throws Exception {
+			File mOutputFile, ModelTest modelTest) throws Exception {
 		File resourcesDir = new File("resources" + File.separator + "template");
 		File logDir = new File(
 				ModelTestConfiguration
@@ -208,7 +210,7 @@ public abstract class HtmlReporter {
 			}
 		} else {
 			outputFile = new File(logDir.getPath() + File.separator
-					+ ApplicationOptions.getInstance().getInputFile().getName() 
+					+ modelTest.getApplicationOptions().getInputFile().getName() 
 					+ ".jmodeltest."
 					+ Calendar.getInstance().getTimeInMillis() + ".html");
 		}
@@ -222,10 +224,11 @@ public abstract class HtmlReporter {
 		tpl.process(datamodel, output);
 	}
 
-	private static void fillInWithOptions(ApplicationOptions options) {
+	private static void fillInWithOptions(ModelTest modelTest) {
+		ApplicationOptions options = modelTest.getApplicationOptions();
 
 		StringBuffer arguments = new StringBuffer();
-		for (String argument : ModelTest.arguments)
+		for (String argument : modelTest.arguments)
 			arguments.append(argument + " ");
 		datamodel.put("arguments", arguments);
 		datamodel.put("alignName", options.getInputFile());
@@ -233,7 +236,7 @@ public abstract class HtmlReporter {
 		datamodel.put("seqLength", options.numSites);
 		datamodel.put("phymlVersion", RunPhyml.PHYML_VERSION);
 		datamodel.put("phymlBinary", Utilities.getBinaryVersion());
-		datamodel.put("candidateModels", ModelTest.getCandidateModels().length);
+		datamodel.put("candidateModels", modelTest.getCandidateModels().length);
 		if (options.getSubstTypeCode() == 0)
 			datamodel.put("substSchemes", "3");
 		else if (options.getSubstTypeCode() == 1)

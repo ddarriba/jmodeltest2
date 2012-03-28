@@ -28,7 +28,7 @@ import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
 public abstract class InformationCriterion {
 
-	protected ApplicationOptions options = ApplicationOptions.getInstance();
+	protected ApplicationOptions options;
 	
 	public static final int AIC  = 1;
 	public static final int AICc = 2;
@@ -57,14 +57,18 @@ public abstract class InformationCriterion {
 	protected double atitv, akappa, apinvI, ashapeG, apinvIG, ashapeIG;
 	protected double aRa, aRb, aRc, aRd, aRe, aRf;
 
+	protected ModelTest modelTest;
+
 	public List<Model> getConfidenceModels() {
 		return confidenceModels;
 	}
 	
 	public InformationCriterion(boolean mwritePAUPblock, boolean mdoImportances,
-			boolean mdoModelAveraging, double minterval) {
+			boolean mdoModelAveraging, double minterval, ModelTest modelTest) {
+		this.modelTest = modelTest;
+		this.options = modelTest.getApplicationOptions();
 		numModels = options.numModels;
-		models = ModelTest.getCandidateModels();
+		models = modelTest.getCandidateModels();
 		order = new int[numModels];
 		writePAUPblock = mwritePAUPblock;
 		doImportances = mdoImportances;
@@ -455,12 +459,12 @@ public abstract class InformationCriterion {
 
 		printFooter(stream);
 		
-		Utilities.toConsoleEnd();
+		Utilities.toConsoleEnd(modelTest);
 
 		// indicate table availability
-		if (ModelTest.buildGUI) {
+		if (modelTest.buildGUI) {
 			stream.println("\nModel selection results also available at the \"Model > Show model table\" menu");
-			Utilities.toConsoleEnd();
+			Utilities.toConsoleEnd(modelTest);
 		}
 
 		// print confidence set
