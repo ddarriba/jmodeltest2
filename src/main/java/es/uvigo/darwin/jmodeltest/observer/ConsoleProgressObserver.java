@@ -36,7 +36,8 @@ public class ConsoleProgressObserver implements Observer {
 	private boolean threadScheduling;
 	private ModelTest modelTest;
 
-	public ConsoleProgressObserver(ModelTest modelTest) {
+	public ConsoleProgressObserver(ModelTest modelTest) 
+	{
 		this.modelTest = modelTest;
 		this.startTime = System.currentTimeMillis();
 		this.stream = modelTest.getMainConsole();

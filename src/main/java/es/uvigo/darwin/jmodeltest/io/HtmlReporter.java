@@ -176,9 +176,19 @@ public abstract class HtmlReporter {
 	static void freemarkerDo(Map<String, Object> datamodel, String template,
 			File mOutputFile, ModelTest modelTest) throws Exception {
 		File resourcesDir = new File("resources" + File.separator + "template");
-		File logDir = new File(
+		File logDir;
+		
+		if (mOutputFile != null)
+		{
+			logDir = new File(mOutputFile.getParentFile().getPath());
+		}
+		else
+		{
+			logDir = new File(
 				ModelTestConfiguration
 						.getLogDir());
+		}
+		
 		if (!logDir.exists() || !logDir.isDirectory()) {
 			logDir.delete();
 			logDir.mkdir();

@@ -59,15 +59,20 @@ public class PhymlQueueModel {
 	public List<Integer> pendingJobs() 
 	{
 		List<Integer> jobIds = new ArrayList<Integer>();
-		System.out.println("jobIds[0]: "+jobIds);
 		for (PhymlSingleQueueModel psqm : psqms)
 		{
-			System.out.println("add: " + psqm.getJobId());
 			jobIds.add(psqm.getJobId());
 		}
 
-		System.out.println("jobIds[1]: "+jobIds);
 		return jobIds;
+	}
+
+	public void cancelExecute() 
+	{
+		for (PhymlSingleQueueModel psqm : psqms)
+		{
+			psqm.cancelCompute();
+		}
 	}
 
 }

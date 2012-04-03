@@ -65,6 +65,18 @@ public class ModelTestQueue extends ModelTest
    		return false;
     }
 
+	public void cancelAnalysis()
+    {
+   		try 
+   		{
+   			((RunPhymlQueue) runPhyml).cancelExecute();
+		}
+   		catch (NotAvailableResourceException e) 
+   		{
+			e.printStackTrace();
+		}
+    }
+	
 	public List<Integer> pendingJobs() 
 	{
 		return ((RunPhymlQueue) runPhyml).pendingJobs();

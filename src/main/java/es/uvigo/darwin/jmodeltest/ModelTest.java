@@ -147,14 +147,8 @@ public class ModelTest {
 	{
 		this.buildGUI = buildGUI;
 		options = new ApplicationOptions(this);
-		if (progressObserver == null)
-		{
-			this.progressObserver = new ConsoleProgressObserver(this);
-		}
-		else
-		{
-			this.progressObserver = progressObserver;
-		}
+
+		this.progressObserver = progressObserver;
 	}
 
 	public ModelTest(String[] args, boolean buildGUI) 
@@ -294,21 +288,26 @@ public class ModelTest {
 		{
 			runPhyml = new RunPhymlQueue(progressObserver, this, getCandidateModels());
 		}
-		else if (MPJ_RUN) {
-			if (options.threadScheduling && options.getNumberOfThreads() > 0) {
-				runPhyml = new RunPhymlHybrid(MPJ_ME, MPJ_SIZE,
-						progressObserver, this,
-						getCandidateModels(), options.getNumberOfThreads());
+		else
+		{
+			progressObserver = new ConsoleProgressObserver(this);
+			
+			if (MPJ_RUN) 
+			{		
+				if (options.threadScheduling && options.getNumberOfThreads() > 0) {
+					runPhyml = new RunPhymlHybrid(MPJ_ME, MPJ_SIZE,
+							progressObserver, this,
+							getCandidateModels(), options.getNumberOfThreads());
+				} else {
+					runPhyml = new RunPhymlMPJ(
+							progressObserver, this,
+							getCandidateModels());
+				}
 			} else {
-				runPhyml = new RunPhymlMPJ(
-						progressObserver, this,
-						getCandidateModels());
+				runPhyml = new RunPhymlThread(progressObserver,
+						this, getCandidateModels());
 			}
-		} else {
-			runPhyml = new RunPhymlThread(progressObserver,
-					this, getCandidateModels());
 		}
-		
 		runPhyml.execute();
 	}
 	

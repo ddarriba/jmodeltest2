@@ -219,5 +219,17 @@ public class PhymlSingleQueueModel extends PhymlSingleModel
     {
     	return filePath.substring(filePath.lastIndexOf("/") + 1);
     }
+
+	public void cancelCompute() 
+	{
+		try
+		{
+			ModelTestQueue.getRunWorkerManager().getResource(this).cancelJob(jobId);
+		}
+		catch (NotAvailableResourceException e)
+		{
+			e.printStackTrace();
+		}
+	}
     
 }

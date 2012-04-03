@@ -122,7 +122,12 @@ public class RunPhymlQueue extends RunPhyml
 		
 		return end;
 	}
-
+	
+	public void cancelExecute() throws NotAvailableResourceException
+	{
+		 pqm.cancelExecute();
+	}
+	
 	public List<Integer> pendingJobs() 
 	{
 		List<Integer> jobIds;
