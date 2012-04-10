@@ -42,6 +42,11 @@ import es.uvigo.darwin.jmodeltest.utilities.Utilities;
  */
 public abstract class RunPhyml extends Observable implements Observer {
 
+	// Set of variables for tuning the guided search algorithm
+	private static final boolean filterFrequencies = true;
+	private static final boolean filterRateMatrix = true;
+	private static final boolean filterRateVariation = true;
+
 	protected ApplicationOptions options;
 	protected Model[] models;
 
@@ -98,6 +103,31 @@ public abstract class RunPhyml extends Observable implements Observer {
 						null);
 			}
 
+		}
+
+		if (options.getGuidedSearchThreshold() > 0.0) {
+
+			// compute GTR model
+			Model gtrModel = null;
+			for (int i = (models.length - 1); i >= 0; i--) {
+				if (models[i].getName().startsWith("GTR+I+G")) {
+					gtrModel = models[i];
+					PhymlSingleModel gtrPhymlModel = new PhymlSingleModel(
+							gtrModel, 0, false, options);
+					gtrPhymlModel.run();
+					break;
+				}
+			}
+			if (gtrModel != null) {
+				GuidedSearchManager gsm = new GuidedSearchManager(
+						options.getGuidedSearchThreshold(), gtrModel,
+						filterFrequencies, filterRateMatrix,
+						filterRateVariation);
+
+				models = gsm.filterModels(models);
+				ModelTest.setCandidateModels(models);
+				System.out.println("Tenemors " + models.length + " modelos");
+			}
 		}
 
 		// compute likelihood scores for all models

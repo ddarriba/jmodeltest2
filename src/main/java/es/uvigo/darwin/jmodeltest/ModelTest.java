@@ -1447,6 +1447,7 @@ public class ModelTest {
 	 *            the candidateModels to set
 	 */
 	public static void setCandidateModels(Model[] candidateModels) {
+		ApplicationOptions.getInstance().numModels = candidateModels.length;
 		ModelTest.candidateModels = candidateModels;
 	}
 

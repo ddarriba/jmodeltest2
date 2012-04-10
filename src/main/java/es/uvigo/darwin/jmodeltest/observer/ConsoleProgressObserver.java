@@ -35,12 +35,13 @@ public class ConsoleProgressObserver implements Observer {
 	private int totalModels;
 	private int completedModels = 0;
 	private boolean threadScheduling;
+	private ApplicationOptions options;
 
 	public ConsoleProgressObserver(ApplicationOptions options) {
 		this.startTime = System.currentTimeMillis();
 		this.stream = ModelTest.getMainConsole();
-		this.totalModels = options.numModels;
 		this.threadScheduling = options.threadScheduling;
+		this.options=options;
 	}
 
 	@Override
@@ -63,6 +64,7 @@ public class ConsoleProgressObserver implements Observer {
 				break;
 
 			case ProgressInfo.OPTIMIZATION_INIT:
+				this.totalModels = options.numModels;
 				stream.println(" ");stream.println(" ");
 				stream.println("::Progress::");
 				stream.println(" ");

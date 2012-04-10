@@ -101,6 +101,11 @@ public class ApplicationOptions implements Serializable {
 
 	public TreeSearch treeSearchOperations = TreeSearch.BEST;
 
+	// Threshold for the guided search mode. A QST == 0.0 means no model 
+	// but the GTR one is optimized. A high QST means the whole set of
+	// set of models will be optimized.
+	private double guidedSearchThreshold = 0;
+	
 	public int numSites;
 	public int numTaxa;
 	public int numBranches;
@@ -390,6 +395,14 @@ public class ApplicationOptions implements Serializable {
 		this.numberOfThreads = numberOfThreads;
 	}
 
+	public double getGuidedSearchThreshold() {
+		return guidedSearchThreshold;
+	}
+	
+	public void setGuidedSearchThreshold(double guidedSearchThreshold) {
+		this.guidedSearchThreshold = guidedSearchThreshold;
+	}
+	
 	public void setMachinesFile(File machinesFile) throws FileNotFoundException {
 		if (ModelTest.HOSTS_TABLE.containsKey(ModelTest.getHostname())) {
 
