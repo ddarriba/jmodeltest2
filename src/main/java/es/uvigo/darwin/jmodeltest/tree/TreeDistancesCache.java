@@ -19,8 +19,6 @@ package es.uvigo.darwin.jmodeltest.tree;
 
 import java.util.Hashtable;
 
-import es.uvigo.darwin.prottest.tree.TreeUtils;
-
 import pal.tree.Tree;
 
 /**
@@ -85,10 +83,10 @@ public class TreeDistancesCache {
         } else {
             switch (distanceType) {
                 case EUCLIDEAN:
-                    distance = TreeUtils.euclideanTreeDistance(t1, t2); 
+                	distance = TreeUtilities.getEuclideanTreeDistance(t1, t2);
                     break;
                 case ROBINSON_FOULDS:
-                    distance = TreeUtils.robinsonFouldsTreeDistance(t1, t2); 
+                    distance = TreeUtilities.getRobinsonFouldsTreeDistance(t1, t2); 
                     break;
             }
             distances.put(tp, distance);
@@ -118,7 +116,6 @@ public class TreeDistancesCache {
             return result;
         }
 
-        //TODO: Make this method become conmutative
         @Override
         public boolean equals(Object obj) {
             if (this == obj) {
@@ -134,21 +131,12 @@ public class TreeDistancesCache {
             if (!getOuterType().equals(other.getOuterType())) {
                 return false;
             }
-            if (t1 == null) {
-                if (other.t1 != null) {
-                    return false;
-                }
-            } else if (!t1.equals(other.t1)) {
-                return false;
-            }
-            if (t2 == null) {
-                if (other.t2 != null) {
-                    return false;
-                }
-            } else if (!t2.equals(other.t2)) {
-                return false;
-            }
-            return true;
+            // assume not null members
+            boolean checkB, checkA;
+            checkA = (t1.equals(other.t1) && t2.equals(other.t2));
+            checkB = (t1.equals(other.t2) && t2.equals(other.t1));
+
+            return checkA || checkB;
         }
 
         private TreeDistancesCache getOuterType() {

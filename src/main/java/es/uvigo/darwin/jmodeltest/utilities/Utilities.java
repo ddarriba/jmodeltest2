@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest.utilities;
 
 import java.io.File;
@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
@@ -36,6 +35,9 @@ import es.uvigo.darwin.jmodeltest.gui.XManager;
 public final class Utilities {
 
 	public static final int NA = Integer.MIN_VALUE;
+	public static final int OS_LINUX = 1;
+	public static final int OS_OSX = 2;
+	public static final int OS_WINDOWS = 3;
 
 	public Utilities() {
 	}
@@ -49,57 +51,52 @@ public final class Utilities {
 		return token;
 	}
 
-	public static String secondToLastToken(String str) {
-		StringTokenizer st = new StringTokenizer(str);
-		int numTokens = st.countTokens();
-		int tokenNumber = 0;
-		String token = "";
-
-		while (st.hasMoreTokens()) {
-			token = st.nextToken();
-			tokenNumber++;
-			if (tokenNumber == numTokens - 1) {
-				break;
-			}
-		}
-		return token;
-	}
-
 	public static boolean isWindows() {
 		if (System.getProperty("os.name").startsWith("Window"))
 			return true;
 		return false;
 	}
 
-	public static String findCurrentOS() {
+	public static int findCurrentOS() {
 		String os = System.getProperty("os.name");
 		if (os.startsWith("Mac"))
-			return "macintosh";
+			return OS_OSX;
 		else if (os.startsWith("Windows"))
-			return "windows";
+			return OS_WINDOWS;
 		else
-			return "linux";
+			return OS_LINUX;
 	}
 
 	public static String getBinaryVersion() {
-		String os = System.getProperty("os.name");
 		String arch = System.getProperty("os.arch");
 		String bit = System.getProperty("sun.arch.data.model");
 
-		if (os.startsWith("Mac") && arch.startsWith("ppc")) {
-			System.err.println("Sorry, PowerPC architecture is no longer supported");
-			System.exit(0);
-		} else if (os.startsWith("Mac")) {
-			return "PhyML_3.0_macOS_i386";
-		} else if (os.startsWith("Linux")) {
+		String binaryName = null;
+		switch (findCurrentOS()) {
+
+		case OS_OSX:
+			if (arch.startsWith("ppc")) {
+				System.err
+						.println("Sorry, PowerPC architecture is no longer supported");
+				System.exit(0);
+			} else {
+				binaryName = "PhyML_3.0_macOS_i386";
+			}
+			break;
+		case OS_LINUX:
 			if (bit.startsWith("64"))
-				return "PhyML_3.0_linux64";
+				binaryName = "PhyML_3.0_linux64";
 			else
-				return "PhyML_3.0_linux32";
-		} else if (os.startsWith("Windows")) {
-			return "PhyML_3.0_win32.exe";
+				binaryName = "PhyML_3.0_linux32";
+			break;
+		case OS_WINDOWS:
+			binaryName = "PhyML_3.0_win32.exe";
+			break;
+		default:
+			binaryName = null;
 		}
-		return null;
+
+		return binaryName;
 	}
 
 	public static String calculateRuntimeMinutes(long startTime, long endTime) {
@@ -138,115 +135,9 @@ public final class Utilities {
 			s = "0" + s;
 		return h + "h:" + m + ":" + s + ":" + d + "";
 	}
-	
+
 	public static String calculateRuntime(long startTime, long endTime) {
 		return displayRuntime(endTime - startTime);
-	}
-
-	public static String getPath() {
-		return (new Utilities()).internalGetPath(false);
-	}
-
-	public static String getURLPath() {
-		return (new Utilities()).internalGetPath(true);
-	}
-
-	private String internalGetPath(boolean withFile) {
-		// ClassLoader loader = this.getClass().getClassLoader();
-		// URL tmp = loader.getResource("./");
-		String j = null;
-		URL tmp = null;
-		try {
-			// tmp = XProtTest.class.getResource("");
-			tmp = getClass().getResource("");
-		} catch (Exception e) {
-			System.err.println(e);
-			e.printStackTrace();
-			return null;
-		}
-		if (tmp == null) {
-			System.err
-					.println("***************************************************************");
-			System.err
-					.println("** ERROR: Cannot find ModelTest's path, unable to run phyml!! **");
-			System.err
-					.println("***************************************************************");
-			// prottest.setValue(-1);
-			return null;
-		} else {
-			j = tmp.getPath();
-			j = replace(j, "%20", " ");
-			// j = tmp.getPath().replaceAll("%20", " ");
-			// System.err.println("j: " + j);
-			if (!withFile) {
-				if (isWindows())
-					j = replace(j, "file:/", "");
-				else
-					j = replace(j, "file:", "");
-			}
-			// j = Pattern.compile("file:").matcher(j).replaceFirst("");
-			// j = j.replaceFirst("file:", "");
-			// System.err.println("after replaceFirst:  " + j);
-			// j = Pattern.compile("!.*$").matcher(j).replaceFirst("");
-			int last2 = j.lastIndexOf("!");
-			j = j.substring(0, last2);
-			// j = j.replaceFirst("!.*$", "");
-			// System.err.println("after replaceFirst2: " + j);
-			int last = j.lastIndexOf("/");
-			// j = j.replaceFirst("/.*?.jar$", "");
-			j = j.substring(0, last);
-			// System.err.println("after replaceFirst3: " + j);
-		}
-		return j;
-	}
-
-	public static String quoteIt(String orig) {
-		// quote spaces (or other characters) of filenames:
-		orig = replace(orig, " ", "\\ ");
-		return orig;
-	}
-
-	/**
-	 * I took this method from SkeetUtil (
-	 * http://www.yoda.arachsys.com/java/skeetutil/ )
-	 */
-	public static String replace(String orig, String from, String to) {
-		int fromLength = from.length();
-
-		if (fromLength == 0)
-			throw new IllegalArgumentException(
-					"String to be replaced must not be empty");
-
-		int start = orig.indexOf(from);
-		if (start == -1)
-			return orig;
-
-		boolean greaterLength = (to.length() >= fromLength);
-
-		StringBuffer buffer;
-		// If the "to" parameter is longer than (or
-		// as long as) "from", the final length will
-		// be at least as large
-		if (greaterLength) {
-			if (from.equals(to))
-				return orig;
-			buffer = new StringBuffer(orig.length());
-		} else {
-			buffer = new StringBuffer();
-		}
-
-		char[] origChars = orig.toCharArray();
-
-		int copyFrom = 0;
-		while (start != -1) {
-			buffer.append(origChars, copyFrom, start - copyFrom);
-			buffer.append(to);
-			copyFrom = start + fromLength;
-			start = orig.indexOf(from, copyFrom);
-		}
-		buffer.append(origChars, copyFrom, origChars.length - copyFrom);
-
-		return buffer.toString();
 	}
 
 	public static boolean isNumber(String s) {
@@ -256,9 +147,9 @@ public final class Utilities {
 		for (int i = 0; i < s.length() && isNumber; i++) {
 			char c = s.charAt(i);
 			if (validChars.indexOf(c) == -1)
-				isNumber = false;
+				isNumber &= false;
 			else
-				isNumber = true;
+				isNumber &= true;
 		}
 		return isNumber;
 	}
@@ -303,7 +194,7 @@ public final class Utilities {
 	 * 
 	 * If value is NA it prints "-"
 	 */
-	public static String CheckNA(double value) {
+	public static String checkNA(double value) {
 		if (value == NA)
 			return "  -  ";
 		else {
@@ -375,12 +266,36 @@ public final class Utilities {
 	 * Rounds a double to a number of significant digits
 	 *********************************************************/
 
-	public static double RoundDoubleTo(double decimal, int dplaces) {
+	public static double roundDoubleTo(double decimal, int dplaces) {
 		BigDecimal bd = new BigDecimal(decimal);
 		bd = bd.setScale(dplaces, BigDecimal.ROUND_UP);
 		return bd.doubleValue();
 	}
 
+	public static String asPercent(double decimal) {
+		if (decimal > 100.0d) {
+			decimal = 100.0d;
+		}
+		return format(decimal, 6, 2, false) + "%";
+	}
+
+	public static String format(double number, int totalLength, int decimalPlaces, boolean exp) {
+		StringBuffer sb;
+		String format;
+		if (exp) {
+			format = "%"+totalLength+"."+decimalPlaces+"e";
+		} else {
+			format = "%"+totalLength+"."+decimalPlaces+"f";
+		}
+		sb = new StringBuffer(String.format(Locale.ENGLISH, format, number));
+		// normalize string to size 6
+		for (int i = sb.length(); i < totalLength; i++) {
+			sb.insert(0, " ");
+		}
+
+		return sb.toString();
+	}
+	
 	/******************
 	 * putSlashBeforeSpaces **************************
 	 * 

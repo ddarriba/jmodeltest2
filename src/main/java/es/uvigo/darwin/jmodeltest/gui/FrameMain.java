@@ -123,9 +123,7 @@ public class FrameMain extends JModelTestFrame {
 	private JMenuItem menuAveraging;
 
 	static {
-		String os = System.getProperty("os.name");
-
-		if (os.startsWith("Mac")) {
+		if (Utilities.findCurrentOS() == Utilities.OS_OSX) {
 			HOTKEY_MODIFIER = ActionEvent.META_MASK;
 		} else {
 			HOTKEY_MODIFIER = ActionEvent.CTRL_MASK;

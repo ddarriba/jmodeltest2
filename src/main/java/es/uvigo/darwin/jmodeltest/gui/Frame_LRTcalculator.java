@@ -315,8 +315,8 @@ public class Frame_LRTcalculator extends JModelTestFrame {
 					else
 						pvalue = LRT(delta, df);
 	
-					jLabelLRT.setText("LRT = " + Utilities.RoundDoubleTo(delta,6));
-					jLabelLRTpvalue.setText("P-value = " + Utilities.RoundDoubleTo(pvalue,6));
+					jLabelLRT.setText("LRT = " + Utilities.roundDoubleTo(delta,6));
+					jLabelLRTpvalue.setText("P-value = " + Utilities.roundDoubleTo(pvalue,6));
 					}
 				}			
 			}

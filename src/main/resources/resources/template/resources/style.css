@@ -205,12 +205,22 @@ border-width: 1px;
 }
 
 #sorted-models {
-  	height: 400px;
+  	max-height: 400px;
   	overflow-y: auto;
   	border-width: 1px;
 	border-style: solid;
 	border-color: #000;
 	font-size: 0.8em;
+}
+
+#topologies {
+  	max-height: 400px;
+  	overflow-y: auto;
+  	border-width: 1px;
+	border-style: solid;
+	border-color: #000;
+	font-size: 0.8em;
+	margin-top: 20px;
 }
 
 .model-info {
@@ -235,19 +245,73 @@ border-width: 1px;
 	padding-left: 4px;
 }
 
+table.topologies-info {
+	margin-left: auto;
+	margin-right: auto;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #000;
+	border-collapse: collapse;
+	background-color: #FFE8C3;
+	font-size: 0.95em;
+}
+
+table.topologies-info th {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #000;
+	background-color: #015367;
+	color: #fff;
+}
+
+table.topologies-info td {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #000;
+	padding: 4px;
+}
+
+table.topologies-info td.col-id {
+}
+
+table.topologies-info td.col-models {
+	width: 200px;
+	font-size: 0.8em;
+	white-space: auto;
+}
+
+table.topologies-info td.col-topo {
+	width: 200px;
+	font-size: 0.8em;
+	white-space: auto;
+}
+
+table.topologies-info td.topo-rank {
+	text-align: center;
+}
+
+.topo-scroll {
+	max-height: 100px;
+	overflow-y: auto;
+	word-wrap: break-word;
+}
+
 #section {
 	clear: both;
 }
 
 #selection_best_model {
-	float: left;  	width: 230px;
+	float: left;
+  	width: 230px;
   	height: 230px;
   	padding: 10px;
   	padding-bottom: 10px;
-	font-size: 0.8em;}
+	font-size: 0.8em;
+}
 
 #selection_best_tree {
-	float: right;  	width: 500px;
+	float: right;
+  	width: 500px;
   	height: 230px;
   	padding:10px;
   	text-align: center;
@@ -306,6 +370,16 @@ border-width: 1px;
   	height: 300px;
   	width: 320px;
 	float: left;
+}
+
+img.distances-img {
+	width: 350px;
+}
+
+#selection-distances {
+	width: 700px;
+	margin: 0 auto;
+	padding-top: 10px;
 }
 
 #selection_results {

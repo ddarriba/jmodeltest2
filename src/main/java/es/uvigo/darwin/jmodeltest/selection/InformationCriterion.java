@@ -521,26 +521,26 @@ public abstract class InformationCriterion {
 			stream.println("Parameter       estimates");
 			stream.print("-------------------------");
 			if (options.doF) {
-				stream.printf("\nfA\t%13s", Utilities.CheckNA(afA));
-				stream.printf("\nfC\t%13s", Utilities.CheckNA(afC));
-				stream.printf("\nfG\t%13s", Utilities.CheckNA(afG));
-				stream.printf("\nfT\t%13s", Utilities.CheckNA(afT));
+				stream.printf("\nfA\t%13s", Utilities.checkNA(afA));
+				stream.printf("\nfC\t%13s", Utilities.checkNA(afC));
+				stream.printf("\nfG\t%13s", Utilities.checkNA(afG));
+				stream.printf("\nfT\t%13s", Utilities.checkNA(afT));
 			}
-			stream.printf("\nkappa\t%13s", Utilities.CheckNA(akappa));
-			stream.printf("\ntitv\t%13s", Utilities.CheckNA(atitv));
-			stream.printf("\nrAC\t%13s", Utilities.CheckNA(aRa));
-			stream.printf("\nrAG\t%13s", Utilities.CheckNA(aRb));
-			stream.printf("\nrAT\t%13s", Utilities.CheckNA(aRc));
-			stream.printf("\nrCG\t%13s", Utilities.CheckNA(aRd));
-			stream.printf("\nrCT\t%13s", Utilities.CheckNA(aRe));
-			stream.printf("\nrGT\t%13s", Utilities.CheckNA(aRf));
+			stream.printf("\nkappa\t%13s", Utilities.checkNA(akappa));
+			stream.printf("\ntitv\t%13s", Utilities.checkNA(atitv));
+			stream.printf("\nrAC\t%13s", Utilities.checkNA(aRa));
+			stream.printf("\nrAG\t%13s", Utilities.checkNA(aRb));
+			stream.printf("\nrAT\t%13s", Utilities.checkNA(aRc));
+			stream.printf("\nrCG\t%13s", Utilities.checkNA(aRd));
+			stream.printf("\nrCT\t%13s", Utilities.checkNA(aRe));
+			stream.printf("\nrGT\t%13s", Utilities.checkNA(aRf));
 			if (options.doI)
-				stream.printf("\npinv(I)\t%13s", Utilities.CheckNA(apinvI));
+				stream.printf("\npinv(I)\t%13s", Utilities.checkNA(apinvI));
 			if (options.doG)
-				stream.printf("\nalpha(G)\t%13s", Utilities.CheckNA(ashapeG));
+				stream.printf("\nalpha(G)\t%13s", Utilities.checkNA(ashapeG));
 			if (options.doI && options.doG) {
-				stream.printf("\npinv(IG)\t%13s", Utilities.CheckNA(apinvIG));
-				stream.printf("\nalpha(IG)\t%13s", Utilities.CheckNA(ashapeIG));
+				stream.printf("\npinv(IG)\t%13s", Utilities.checkNA(apinvIG));
+				stream.printf("\nalpha(IG)\t%13s", Utilities.checkNA(ashapeIG));
 			}
 			stream.println("\n-------------------------");
 			stream.println("Numbers have been rounded.");

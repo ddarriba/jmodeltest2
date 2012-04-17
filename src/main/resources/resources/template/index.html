@@ -138,7 +138,152 @@
 </#list>
 </table>
 </div><!--sorted-models-->
-
+<#if isTopologiesSummary == 1>
+  <div id="topologies">
+  <p>
+  There are ${numberOfTopologies} different topologies. The following table shows the models supporting each topology and the rank according to each Information Criterion, as well as Robinson-Foulds and Euclidean distances with the tree of the best-fit model.
+  </p>
+  <table class="topologies-info">
+  <tr><th class="col-id"> ID </th>
+      <th class="col-models"> Models </th>
+      <th class="col-topo"> Topology </th>
+      <th/>
+      <th> AIC </th>
+      <th> BIC </th>
+      <th> AICc </th>
+      <th> DT </th>
+  </tr>
+  <#list sortedTopologies as topology>
+  <tr>
+    <td rowspan="5" class="col-id"> ${topology.index}</td>
+    <td rowspan="5" class="col-models">
+    <div class="topo-scroll"> 
+      ${topology.models}
+    </div>
+    </td>
+    <td rowspan="5" class="col-topo">
+    <div class="topo-scroll">
+      <a href="http://www.phylowidget.org/full/?tree=${topology.tree}">${topology.tree}</a>
+    </div>
+    </td>
+    <th>RANK</th>
+    <#if isAIC == 1>
+      <td class="topo-rank">${topology.aicRank}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isBIC == 1>
+      <td class="topo-rank">${topology.bicRank}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isAICc == 1>
+      <td class="topo-rank">${topology.aiccRank}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isDT == 1>
+      <td class="topo-rank">${topology.dtRank}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    </tr>
+    <tr>
+    <th>Weight</th>
+    <#if isAIC == 1>
+      <td class="topo-rank">${topology.aicWeight}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isBIC == 1>
+      <td class="topo-rank">${topology.bicWeight}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isAICc == 1>
+      <td class="topo-rank">${topology.aiccWeight}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isDT == 1>
+      <td class="topo-rank">${topology.dtWeight}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    </tr>
+    <tr>
+    <th>RF</th>
+    <#if isAIC == 1>
+      <td class="topo-rank">${topology.aicRF}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isBIC == 1>
+      <td class="topo-rank">${topology.bicRF}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isAICc == 1>
+      <td class="topo-rank">${topology.aiccRF}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isDT == 1>
+      <td class="topo-rank">${topology.dtRF}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    </tr>
+    <tr>
+    <th>AVG Distance</th>
+    <#if isAIC == 1>
+      <td class="topo-rank">${topology.aicAvgDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isBIC == 1>
+      <td class="topo-rank">${topology.bicAvgDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isAICc == 1>
+      <td class="topo-rank">${topology.aiccAvgDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isDT == 1>
+      <td class="topo-rank">${topology.dtAvgDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    </tr>
+    <tr>
+    <th>Distance VAR</th>
+    <#if isAIC == 1>
+      <td class="topo-rank">${topology.aicVarDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isBIC == 1>
+      <td class="topo-rank">${topology.bicVarDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isAICc == 1>
+      <td class="topo-rank">${topology.aiccVarDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isDT == 1>
+      <td class="topo-rank">${topology.dtVarDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    </tr>
+  </#list>
+  </table>
+  </div><!--sorted-models-->
+</#if>
 <p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
 
 
@@ -212,8 +357,10 @@ ${aicConfidenceList}
  </div><!--selection-caption-->
   </div><!--selection-lower-->
   
-<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
-
+  <div id="selection-distances">
+    <img class="distances-img" src="${aicEuImagePath}"/><img class="distances-img" src="${aicRfImagePath}"/>
+  </div><!--selection-distances-->
+  
 <#if doAICAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
 
@@ -231,11 +378,11 @@ ${aicConsensusTree}
 </div><!--consensus-tree-->
 </#if>
 
+<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
+
 </div><!--selection-->
 
 </#if>
-
-
 
 <#if isAICc == 1>
 
@@ -304,7 +451,9 @@ ${aiccConfidenceList}
  </div><!--selection-caption-->
   </div><!--selection-lower-->
   
-<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
+  <div id="selection-distances">
+    <img class="distances-img" src="${aiccEuImagePath}"/><img class="distances-img" src="${aiccRfImagePath}"/>
+  </div><!--selection-distances-->
 
 <#if doAICcAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
@@ -324,6 +473,8 @@ ${aiccConsensusTree}
 </#if>
 
 </div><!--selection-->
+
+<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
 
 </#if>
 
@@ -394,10 +545,12 @@ ${aiccConsensusTree}
 There are ${bicConfidenceCount} models in the ${confidenceInterval}% confidence interval:<br/>
 ${bicConfidenceList}
 </p>
- </div><!--selection-caption-->
+  </div><!--selection-caption-->
   </div><!--selection-lower-->
-  
-<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
+
+  <div id="selection-distances">
+    <img class="distances-img" src="${bicEuImagePath}"/><img class="distances-img" src="${bicRfImagePath}"/>
+  </div><!--selection-distances-->
 
 <#if doBICAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
@@ -415,6 +568,8 @@ ${bicConsensusTree}
  <a href="http://www.phylowidget.org/full/?tree=${bicConsensusTree}&useBranchLengths=true">Display consensus tree in PhyloWidget</a>
 </div><!--consensus-tree-->
 </#if>
+
+<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
 
 </div><!--selection-->
 
@@ -488,8 +643,11 @@ ${dtConfidenceList}
 </p>
  </div><!--selection-caption-->
   </div><!--selection-lower-->
-<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
-
+  
+  <div id="selection-distances">
+    <img class="distances-img" src="${dtEuImagePath}"/><img class="distances-img" src="${dtRfImagePath}"/>
+  </div><!--selection-distances-->
+  
 <#if doDTAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
 
@@ -506,6 +664,8 @@ ${dtConsensusTree}
  <a href="http://www.phylowidget.org/full/?tree=${dtConsensusTree}&useBranchLengths=true">Display consensus tree in PhyloWidget</a>
 </div><!--consensus-tree-->
 </#if>
+
+<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
 
 </div><!--selection-->
 

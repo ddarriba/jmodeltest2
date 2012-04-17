@@ -21,8 +21,8 @@ import java.util.Random;
 
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
-import es.uvigo.darwin.prottest.tree.TreeDistancesCache;
-import es.uvigo.darwin.prottest.tree.TreeEuclideanDistancesCache;
+import es.uvigo.darwin.jmodeltest.tree.TreeDistancesCache;
+import es.uvigo.darwin.jmodeltest.tree.TreeEuclideanDistancesCache;
 
 //DP check: DT might keep running even with bad likelihoods ?
 public class DT extends InformationCriterion {
@@ -45,7 +45,7 @@ public class DT extends InformationCriterion {
 
 		boolean sorted;
 		int i, j, temp2, pass;
-		double min, sumExp, sum, sumReciprocal, cum, temp1;
+		double min, sum, sumReciprocal, cum, temp1;
 		double[] tempw = new double[numModels];
 		double[] BIC = new double[numModels];
 
@@ -101,10 +101,10 @@ public class DT extends InformationCriterion {
 		}
 
 		// Calculate DT differences
-		sumReciprocal = sumExp = sum = 0;
+		sumReciprocal = sum = 0;
 		for (i = 0; i < numModels; i++) {
 			models[i].setDTd(models[i].getDT() - minModel.getDT());
-			sumExp += Math.exp(-0.5 * models[i].getDTd());
+//			sumExp += Math.exp(-0.5 * models[i].getDTd());
 			sumReciprocal += 1.0 / models[i].getDT();
 		}
 

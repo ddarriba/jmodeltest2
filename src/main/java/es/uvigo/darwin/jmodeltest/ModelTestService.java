@@ -35,6 +35,7 @@ import es.uvigo.darwin.jmodeltest.selection.AICc;
 import es.uvigo.darwin.jmodeltest.selection.BIC;
 import es.uvigo.darwin.jmodeltest.selection.DT;
 import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
+import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
 
 public class ModelTestService {
@@ -78,15 +79,16 @@ public class ModelTestService {
         int limit = 0;
         String out = "";
         String outO = "Linux";
-        String os = System.getProperty("os.name");
-        if (os.startsWith("Mac")) {
-            outO = "Linux";
-        } else if (os.startsWith("Linux")) {
-            outO = "Linux";
-        } else if (os.startsWith("Win")) {
+        switch (Utilities.findCurrentOS()) {
+        case Utilities.OS_WINDOWS:
             outO = "Windows";
+	        break;
+        case Utilities.OS_OSX:
+        case Utilities.OS_LINUX:
+            outO = "Linux";
+            break;
         }
-        String outP = "JModelTest";
+        String outP = "PhyML";
         String outF = "PHYLIP";
         boolean lower = false;
         boolean numbers = false;

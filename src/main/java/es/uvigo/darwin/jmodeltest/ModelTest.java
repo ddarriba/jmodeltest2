@@ -49,8 +49,11 @@ import es.uvigo.darwin.jmodeltest.selection.AICc;
 import es.uvigo.darwin.jmodeltest.selection.BIC;
 import es.uvigo.darwin.jmodeltest.selection.DT;
 import es.uvigo.darwin.jmodeltest.selection.HLRT;
+import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
+import es.uvigo.darwin.jmodeltest.tree.TreeSummary;
 import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Simulation;
+import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 /**
@@ -245,8 +248,10 @@ public class ModelTest {
 				options.numModels = 5;
 			else if (options.getSubstTypeCode() == 2)
 				options.numModels = 7;
-			else
+			else if (options.getSubstTypeCode() == 3)
 				options.numModels = 11;
+			else
+				options.numModels = 203;
 
 			if (options.doF)
 				options.numModels *= 2;
@@ -335,7 +340,7 @@ public class ModelTest {
 							options.confidenceInterval);
 				}
 			}
-
+			
 			// do hLRT if selected
 			if (options.doHLRT) {
 				myHLRT = new HLRT();
@@ -350,176 +355,119 @@ public class ModelTest {
 						options.confidenceLevelHLRT, options.writePAUPblock);
 			}
 
-			if (ModelTestConfiguration.isAutoLogEnabled()) {
-				HtmlReporter.buildReport(options,
-						ModelTest.getCandidateModels(), null);
-			}
+			Tree bestAIC = myAIC != null? myAIC.getMinModel().getTree() : null;
+			Tree bestAICc = myAICc != null? myAICc.getMinModel().getTree() : null;
+			Tree bestBIC = myBIC != null? myBIC.getMinModel().getTree() : null;
+			Tree bestDT = myDT != null? myDT.getMinModel().getTree() : null;
 
+			MAIN_CONSOLE.println(" ");MAIN_CONSOLE.println(" ");MAIN_CONSOLE.println(" ");
+			MAIN_CONSOLE.println("---------------------------------------------------------------");
+			MAIN_CONSOLE.println("*                                                             *");
+			MAIN_CONSOLE.println("*                    SELECTION SUMMARY                        *");
+			MAIN_CONSOLE.println("*                                                             *");
+			MAIN_CONSOLE.println("---------------------------------------------------------------");
+			MAIN_CONSOLE.println("");
+			
+			TreeSummary treeSummary = new TreeSummary(bestAIC, bestAICc, bestBIC, bestDT, candidateModels);
+			
+			treeSummary.print(MAIN_CONSOLE);
+			
 			MAIN_CONSOLE.println(" ");
-			MAIN_CONSOLE.println("Program is done.");
 			MAIN_CONSOLE.println(" ");MAIN_CONSOLE.println(" ");
-			MAIN_CONSOLE.println("::Selection Summary::");
+			MAIN_CONSOLE.println("::Best Models::");
 			MAIN_CONSOLE.println(" ");
 			if (myAIC == null && myAICc == null && 
 					myBIC == null && myDT == null) {
 				MAIN_CONSOLE.println("No information criterion was selected.");
 			}
-			
 			MAIN_CONSOLE.println("\tModel \t\tf(a) \tf(c) \tf(g) \tf(t) \tkappa \ttitv " +
-			"\tRa \tRb \tRc \tRd \tRe \tRf \tpInv \tgamma");
+			"\tRa\tRb\tRc\tRd\tRe\tRf\tpInv \tgamma");
 			MAIN_CONSOLE.println("----------------------------------------------------------------------------------------------------------------------------------------");
 			if (myAIC != null) {
-//				MAIN_CONSOLE.println("BestAICmodelAVG "
-//						+ myAIC.getMinModel().getName() + " " + Utilities.RoundDoubleTo(myAIC.getAfA(),4)
-//						+ " " + myAIC.getAfC() + " " + myAIC.getAfG() + " "
-//						+ myAIC.getAfT() + " " + myAIC.getAkappa() + " "
-//						+ myAIC.getAtitv() + " " + myAIC.getaRa() + " "
-//						+ myAIC.getaRb() + " " + myAIC.getaRc() + " "
-//						+ myAIC.getaRd() + " " + myAIC.getaRe() + " "
-//						+ myAIC.getaRf() + " " + myAIC.getApinvI() + " "
-//						+ myAIC.getApinvIG() + " " + myAIC.getAshapeG() + " "
-//						+ myAIC.getAshapeIG() + " "
-//						+ myAIC.getMinModel().getPartition());
 				Model minModel = myAIC.getMinModel();
-				MAIN_CONSOLE.print("AIC \t" +
-						  minModel.getName() + "\t");
-				if (minModel.getName().length()<8)
-					System.err.print("\t");
-				MAIN_CONSOLE.print(minModel.getfA()
-						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
-						+ minModel.getfT() + "\t" + minModel.getKappa() + "\t"
-						+ minModel.getTitv() + "\t" + minModel.getRa() + "\t"
-						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
-						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
-						+ minModel.getRf() + "\t");
-				if (minModel.ispI()) {
-					MAIN_CONSOLE.print(minModel.getPinv());
-				} else {
-					MAIN_CONSOLE.print("N/A");
-				}
-				MAIN_CONSOLE.print("\t");
-				if (minModel.ispG()) {
-					MAIN_CONSOLE.print(minModel.getShape());
-				} else {
-					MAIN_CONSOLE.print("N/A");
-				}
-				MAIN_CONSOLE.print("\n");
+				MAIN_CONSOLE.println("AIC \t" + getModelRow(minModel));
+//				MAIN_CONSOLE.println("average \t" + getModelAverageRow(myAIC));
 			}
 			if (myBIC != null) {
-//				System.err.println("BestBICmodelAVG "
-//						+ myBIC.getMinModel().getName() + " " + myBIC.getAfA()
-//						+ " " + myBIC.getAfC() + " " + myBIC.getAfG() + " "
-//						+ myBIC.getAfT() + " " + myBIC.getAkappa() + " "
-//						+ myBIC.getAtitv() + " " + myBIC.getaRa() + " "
-//						+ myBIC.getaRb() + " " + myBIC.getaRc() + " "
-//						+ myBIC.getaRd() + " " + myBIC.getaRe() + " "
-//						+ myBIC.getaRf() + " " + myBIC.getApinvI() + " "
-//						+ myBIC.getApinvIG() + " " + myBIC.getAshapeG() + " "
-//						+ myBIC.getAshapeIG() + " "
-//						+ myBIC.getMinModel().getPartition());
 				Model minModel = myBIC.getMinModel();
-				MAIN_CONSOLE.print("BIC \t" +
-						  minModel.getName() + "\t");
-				if (minModel.getName().length()<8)
-					System.err.print("\t");
-				MAIN_CONSOLE.print(minModel.getfA()
-						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
-						+ minModel.getfT() + "\t" + minModel.getKappa() + "\t"
-						+ minModel.getTitv() + "\t" + minModel.getRa() + "\t"
-						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
-						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
-						+ minModel.getRf() + "\t");
-				if (minModel.ispI()) {
-					MAIN_CONSOLE.print(minModel.getPinv());
-				} else {
-					MAIN_CONSOLE.print("N/A");
-				}
-				MAIN_CONSOLE.print("\t");
-				if (minModel.ispG()) {
-					MAIN_CONSOLE.print(minModel.getShape());
-				} else {
-					MAIN_CONSOLE.print("N/A");
-				}
-				MAIN_CONSOLE.print("\n");
+				MAIN_CONSOLE.println("BIC \t" + getModelRow(minModel));
+//				MAIN_CONSOLE.println("average \t" + getModelAverageRow(myBIC));
 			}
 			if (myAICc != null) {
-//				System.err.println("BestAICcmodelAVG "
-//						+ myAICc.getMinModel().getName() + " "
-//						+ myAICc.getAfA() + " " + myAICc.getAfC() + " "
-//						+ myAICc.getAfG() + " " + myAICc.getAfT() + " "
-//						+ myAICc.getAkappa() + " " + myAICc.getAtitv() + " "
-//						+ myAICc.getaRa() + " " + myAICc.getaRb() + " "
-//						+ myAICc.getaRc() + " " + myAICc.getaRd() + " "
-//						+ myAICc.getaRe() + " " + myAICc.getaRf() + " "
-//						+ myAICc.getApinvI() + " " + myAICc.getApinvIG() + " "
-//						+ myAICc.getAshapeG() + " " + myAICc.getAshapeIG()
-//						+ " " + myAICc.getMinModel().getPartition());
 				Model minModel = myAICc.getMinModel();
-				MAIN_CONSOLE.print("AICc \t" +
-						  minModel.getName() + "\t");
-				if (minModel.getName().length()<8)
-					System.err.print("\t");
-				MAIN_CONSOLE.print(minModel.getfA()
-						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
-						+ minModel.getfT() + "\t" + minModel.getKappa() + "\t"
-						+ minModel.getTitv() + "\t" + minModel.getRa() + "\t"
-						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
-						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
-						+ minModel.getRf() + "\t");
-				if (minModel.ispI()) {
-					MAIN_CONSOLE.print(minModel.getPinv());
-				} else {
-					MAIN_CONSOLE.print("N/A");
-				}
-				MAIN_CONSOLE.print("\t");
-				if (minModel.ispG()) {
-					MAIN_CONSOLE.print(minModel.getShape());
-				} else {
-					MAIN_CONSOLE.print("N/A");
-				}
-				MAIN_CONSOLE.print("\n");
+				MAIN_CONSOLE.println("AICc \t" + getModelRow(minModel));
+//				MAIN_CONSOLE.println("average \t" + getModelAverageRow(myAICc));
 			}
 			if (myDT != null) {
-//				System.err.println("BestDTmodelAVG "
-//						+ myDT.getMinModel().getName() + " " + myDT.getAfA()
-//						+ " " + myDT.getAfC() + " " + myDT.getAfG() + " "
-//						+ myDT.getAfT() + " " + myDT.getAkappa() + " "
-//						+ myDT.getAtitv() + " " + myDT.getaRa() + " "
-//						+ myDT.getaRb() + " " + myDT.getaRc() + " "
-//						+ myDT.getaRd() + " " + myDT.getaRe() + " "
-//						+ myDT.getaRf() + " " + myDT.getApinvI() + " "
-//						+ myDT.getApinvIG() + " " + myDT.getAshapeG() + " "
-//						+ myDT.getAshapeIG() + " "
-//						+ myDT.getMinModel().getPartition());
 				Model minModel = myDT.getMinModel();
-				MAIN_CONSOLE.print("DT \t" +
-						  minModel.getName() + "\t");
-				if (minModel.getName().length()<8)
-					System.err.print("\t");
-				MAIN_CONSOLE.print(minModel.getfA()
-						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
-						+ minModel.getfT() + "\t" + minModel.getKappa() + "\t"
-						+ minModel.getTitv() + "\t" + minModel.getRa() + "\t"
-						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
-						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
-						+ minModel.getRf() + "\t");
-				if (minModel.ispI()) {
-					MAIN_CONSOLE.print(minModel.getPinv());
-				} else {
-					MAIN_CONSOLE.print("N/A");
-				}
-				MAIN_CONSOLE.print("\t");
-				if (minModel.ispG()) {
-					MAIN_CONSOLE.print(minModel.getShape());
-				} else {
-					MAIN_CONSOLE.print("N/A");
-				}
-				MAIN_CONSOLE.print("\n");
+				MAIN_CONSOLE.println("DT \t" + getModelRow(minModel));
+//				MAIN_CONSOLE.println("average \t" + getModelAverageRow(myDT));
+				
+				MAIN_CONSOLE.println(" ");
+				MAIN_CONSOLE.println("Program is done.");
+				
+			}
+			
+			if (ModelTestConfiguration.isAutoLogEnabled()) {
+				HtmlReporter.buildReport(options,
+						ModelTest.getCandidateModels(), null, treeSummary);
 			}
 		} // end root
 
 	} // end of runCommandLine
 
+	private String getModelRow(Model model) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(model.getName() + "\t");
+		if (model.getName().length()<8)
+			sb.append("\t");
+		sb.append(Utilities.format(model.getfA(),4,2,false)
+		+ "\t" + Utilities.format(model.getfC(),4,2,false) + "\t" 
+		+ Utilities.format(model.getfG(),4,2,false) + "\t"
+		+ Utilities.format(model.getfT(),4,2,false) + "\t" 
+		+ Utilities.format(model.getKappa(),4,2,false) + "\t"
+		+ Utilities.format(model.getTitv(),4,2,false) + "\t" 
+		+ Utilities.format(model.getRa(),7,3,false) + " "
+		+ Utilities.format(model.getRb(),7,3,false) + " " 
+		+ Utilities.format(model.getRc(),7,3,false) + " "
+		+ Utilities.format(model.getRd(),7,3,false) + " " 
+		+ Utilities.format(model.getRe(),7,3,false) + " "
+		+ Utilities.format(model.getRf(),7,3,false) + " ");
+		if (model.ispI()) {
+			sb.append(Utilities.format(model.getPinv(),7,2,false));
+		} else {
+			sb.append("N/A");
+		}
+		sb.append("\t");
+		if (model.ispG()) {
+			sb.append(Utilities.format(model.getShape(),7,2,false));
+		} else {
+			sb.append("N/A");
+		}
+		return sb.toString();
+	}
+	
+	@SuppressWarnings("unused")
+	private String getModelAverageRow(InformationCriterion ic) {
+		StringBuilder sb = new StringBuilder();
+				sb.append(Utilities.format(ic.getAfA(),4,2,false) + "\t");
+				sb.append(Utilities.format(ic.getAfC(),4,2,false) + "\t");
+				sb.append(Utilities.format(ic.getAfG(),4,2,false) + "\t");
+				sb.append(Utilities.format(ic.getAfT(),4,2,false) + "\t");
+				sb.append(Utilities.format(ic.getAkappa(),4,2,false) + "\t");
+				sb.append(Utilities.format(ic.getAtitv(),4,2,false) + "\t");
+				sb.append(Utilities.format(ic.getaRa(),7,3,false) + "\t");
+				sb.append(Utilities.format(ic.getaRb(),7,3,false) + "\t");
+				sb.append(Utilities.format(ic.getaRc(),7,3,false) + "\t");
+				sb.append(Utilities.format(ic.getaRd(),7,3,false) + "\t");
+				sb.append(Utilities.format(ic.getaRe(),7,3,false) + "\t");
+				sb.append(Utilities.format(ic.getaRf(),7,3,false) + "\t");
+				sb.append(Utilities.format(ic.getApinvI(),7,4,false) + "\t");
+				sb.append(Utilities.format(ic.getApinvIG(),7,4,false) + "\t");
+				sb.append(Utilities.format(ic.getAshapeG(),7,3,false) + "\t");
+				sb.append(Utilities.format(ic.getAshapeIG(),7,3,false) + "\t");
+				return sb.toString();
+	}
 	/****************************
 	 * ParseArguments **************************** * Parses the command line for
 	 * jModeltest * *
@@ -1478,5 +1426,6 @@ public class ModelTest {
 		}
 
 	}
+
 } // class ModelTest
 
