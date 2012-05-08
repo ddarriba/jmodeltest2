@@ -20,9 +20,12 @@ package es.uvigo.darwin.jmodeltest.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -36,6 +39,7 @@ import javax.swing.plaf.BorderUIResource;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.selection.BIC;
+import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
 public class Frame_BIC extends JModelTestFrame {
 
@@ -52,6 +56,7 @@ public class Frame_BIC extends JModelTestFrame {
 	private JCheckBox jCheckBoxAveraging = new JCheckBox();
 	private JCheckBox jCheckBoxImportance = new JCheckBox();
 	private JSlider JSliderInterval = new JSlider();
+	private JComboBox<ApplicationOptions.SampleSizeMode> comboSampleSizeMode = new JComboBox<ApplicationOptions.SampleSizeMode>(ApplicationOptions.SampleSizeMode.values());
 
 	private BIC myBIC;
 
@@ -59,34 +64,33 @@ public class Frame_BIC extends JModelTestFrame {
 	}
 
 	public void initComponents() throws Exception {
-		PanelBICSettings.setSize(new java.awt.Dimension(490, 240));
+		PanelBICSettings.setSize(490, 240);
 		PanelBICSettings
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(new java.awt.Color(
 								153, 153, 153), 1, false), "BIC Settings", 4,
 						2, new java.awt.Font("Application", 1, 10),
 						new java.awt.Color(102, 102, 153)));
-		PanelBICSettings.setLocation(new java.awt.Point(10, 10));
+		PanelBICSettings.setLocation(10, 10);
 		PanelBICSettings.setVisible(true);
 		PanelBICSettings.setLayout(null);
 
 		RunButtonBIC.setVisible(true);
-		RunButtonBIC.setSize(new java.awt.Dimension(190, 40));
+		RunButtonBIC.setSize(190, 40);
 		RunButtonBIC.setText("Do BIC calculations");
-		RunButtonBIC.setLocation(new java.awt.Point(280, 190));
+		RunButtonBIC.setLocation(280, 190);
 		getRootPane().setDefaultButton(RunButtonBIC);
 
 		JButtonDefaultBIC.setVisible(true);
-		JButtonDefaultBIC.setSize(new java.awt.Dimension(141, 40));
+		JButtonDefaultBIC.setSize(141, 40);
 		JButtonDefaultBIC.setText("Default Settings");
-		JButtonDefaultBIC.setLocation(new java.awt.Point(10, 190));
+		JButtonDefaultBIC.setLocation(10, 190);
 
 		CancelButtonBIC.setVisible(true);
-		CancelButtonBIC.setSize(new java.awt.Dimension(110, 40));
+		CancelButtonBIC.setSize(110, 40);
 		CancelButtonBIC.setText("Cancel");
-		CancelButtonBIC.setLocation(new java.awt.Point(160, 190));
+		CancelButtonBIC.setLocation(160, 190);
 
-		TextFieldSizeBIC.setEnabled(true);
 		TextFieldSizeBIC
 				.setToolTipText("Enter the sample size you want to use for the BIC and click RETURN. By default this is the number of sites in the alignment");
 		TextFieldSizeBIC
@@ -96,27 +100,42 @@ public class Frame_BIC extends JModelTestFrame {
 						new java.awt.Font("Application", 1, 10),
 						new java.awt.Color(102, 102, 153)));
 		TextFieldSizeBIC.setVisible(true);
-		TextFieldSizeBIC.setSize(new java.awt.Dimension(100, 40));
-		TextFieldSizeBIC.setText("" + options.sampleSize);
+		TextFieldSizeBIC.setSize(170, 40);
+		options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.ALIGNMENT);
+		TextFieldSizeBIC.setText(Utilities.format(options.getSampleSize(),10,4,false));
 		TextFieldSizeBIC.setHorizontalAlignment(JTextField.RIGHT);
-		TextFieldSizeBIC.setLocation(new java.awt.Point(30, 20));
+		TextFieldSizeBIC.setLocation(30, 20);
+		TextFieldSizeBIC.setEnabled(false);
 
+		comboSampleSizeMode.setVisible(true);
+		comboSampleSizeMode.setSize(170, 40);
+		comboSampleSizeMode.setLocation(220, 20);
+		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
+		comboSampleSizeMode
+			.setToolTipText("Select the mode the sample size is computed.");
+		comboSampleSizeMode
+		.setBorder(new BorderUIResource.TitledBorderUIResource(
+				new LineBorder(new java.awt.Color(
+						153, 153, 153), 1, false), "Sample size mode", 4, 2,
+				new java.awt.Font("Application", 1, 10),
+				new java.awt.Color(102, 102, 153)));
+		
 		jCheckBoxImportance.setVisible(true);
-		jCheckBoxImportance.setSize(new java.awt.Dimension(260, 20));
+		jCheckBoxImportance.setSize(260, 20);
 		jCheckBoxImportance.setText("Calculate parameter importances");
-		jCheckBoxImportance.setLocation(new java.awt.Point(30, 70));
+		jCheckBoxImportance.setLocation(30, 70);
 		jCheckBoxImportance.setSelected(true);
 
 		jCheckBoxAveraging.setVisible(true);
-		jCheckBoxAveraging.setSize(new java.awt.Dimension(260, 20));
+		jCheckBoxAveraging.setSize(260, 20);
 		jCheckBoxAveraging.setText("Do model averaging");
-		jCheckBoxAveraging.setLocation(new java.awt.Point(30, 110));
+		jCheckBoxAveraging.setLocation(30, 110);
 		jCheckBoxAveraging.setSelected(true);
 
 		jCheckBoxPAUPblock.setVisible(true);
-		jCheckBoxPAUPblock.setSize(new java.awt.Dimension(260, 20));
+		jCheckBoxPAUPblock.setSize(260, 20);
 		jCheckBoxPAUPblock.setText("Write PAUP* block");
-		jCheckBoxPAUPblock.setLocation(new java.awt.Point(30, 150));
+		jCheckBoxPAUPblock.setLocation(30, 150);
 		jCheckBoxPAUPblock.setSelected(false);
 		jCheckBoxPAUPblock
 				.setToolTipText("Writes a block of PAUP* commands implementing the selected model");
@@ -131,8 +150,8 @@ public class Frame_BIC extends JModelTestFrame {
 						"Confidence interval = 100%", 4, 2, new java.awt.Font(
 								"Application", 1, 10), new java.awt.Color(102,
 								102, 153)));
-		JSliderInterval.setSize(new java.awt.Dimension(170, 70));
-		JSliderInterval.setLocation(new java.awt.Point(300, 70));
+		JSliderInterval.setSize(170, 70);
+		JSliderInterval.setLocation(300, 70);
 		JSliderInterval.setMinimum(0);
 		JSliderInterval.setMaximum(100);
 		JSliderInterval.setValue(100);
@@ -143,12 +162,13 @@ public class Frame_BIC extends JModelTestFrame {
 		JSliderInterval.setEnabled(true);
 		JSliderInterval.setFont(XManager.FONT_SLIDER);
 
-		setLocation(new java.awt.Point(281, 80));
+		setLocation(281, 80);
 		getContentPane().setLayout(null);
 		setTitle("Bayesian Information Criterion (BIC) Settings");
 
 		PanelBICSettings.add(TextFieldTaxaBIC);
 		PanelBICSettings.add(TextFieldSizeBIC);
+		PanelBICSettings.add(comboSampleSizeMode);
 		PanelBICSettings.add(jCheckBoxAveraging);
 		PanelBICSettings.add(jCheckBoxImportance);
 		PanelBICSettings.add(jCheckBoxPAUPblock);
@@ -158,7 +178,7 @@ public class Frame_BIC extends JModelTestFrame {
 		PanelBICSettings.add(RunButtonBIC);
 		getContentPane().add(PanelBICSettings);
 
-		setSize(new java.awt.Dimension(510, 280));
+		setSize(510, 280);
 		setResizable(false);
 
 		// event handling
@@ -176,6 +196,21 @@ public class Frame_BIC extends JModelTestFrame {
 					}
 				});
 
+		comboSampleSizeMode
+		.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if ((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem() != ApplicationOptions.SampleSizeMode.USER) {
+					options.setSampleSizeMode((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem());
+					TextFieldSizeBIC.setText(Utilities.format(options.getSampleSize(),10,4,false));
+					TextFieldSizeBIC.setEnabled(false);
+				} else {
+					TextFieldSizeBIC.setEnabled(true);
+				}
+			}
+		});
+		
 		JSliderInterval
 				.addChangeListener(new ChangeListener() {
 					public void stateChanged(ChangeEvent e) {
@@ -274,7 +309,8 @@ public class Frame_BIC extends JModelTestFrame {
 
 	public void JButtonDefaultBICActionPerformed(java.awt.event.ActionEvent e) {
 		TextFieldSizeBIC.setEnabled(false);
-		TextFieldSizeBIC.setText("" + options.sampleSize);
+		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
+		TextFieldSizeBIC.setText(Utilities.format(options.getSampleSize(),10,4,false));
 		ApplicationOptions.getInstance().countBLasParameters = true;
 		XManager.getInstance().selectedMenuResultsBLasParameters(true);
 		jCheckBoxPAUPblock.setSelected(false);
@@ -306,7 +342,6 @@ public class Frame_BIC extends JModelTestFrame {
 
 			credibleInterval = JSliderInterval.getValue() / 100.0;
 
-			options.sampleSize = Integer.parseInt(TextFieldSizeBIC.getText());
 			myBIC = new BIC(writePAUPblock, doImportances, doModelAveraging,
 					credibleInterval);
 			myBIC.compute();

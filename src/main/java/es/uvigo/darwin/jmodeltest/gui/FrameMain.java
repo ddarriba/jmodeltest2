@@ -47,12 +47,14 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.plaf.BorderUIResource;
 
-import pal.alignment.Alignment;
+
+import pal.tree.Tree;
 import edu.stanford.ejalbert.BrowserLauncher;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.ModelTestService;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
+import es.uvigo.darwin.jmodeltest.tree.TreeSummary;
 import es.uvigo.darwin.jmodeltest.utilities.InitialFocusSetter;
 import es.uvigo.darwin.jmodeltest.utilities.PrintUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
@@ -709,12 +711,9 @@ public class FrameMain extends JModelTestFrame {
 					ModelTestService.readAlignment(inputFile,
 							options.getAlignmentFile());
 
-					Alignment alignment = AlignmentReader
+					options.setAlignment(AlignmentReader
 							.readAlignment(new PrintWriter(System.err), options
-									.getAlignmentFile().getAbsolutePath(), true);
-					options.numTaxa = alignment.getSequenceCount();
-					options.numSites = alignment.getSiteCount();
-					options.numBranches = 2 * options.numTaxa - 3;
+									.getAlignmentFile().getAbsolutePath(), true));
 
 					LabelStatusData.setText(dataFileName + "  ");
 					LabelStatusData.setForeground(new java.awt.Color(102, 102,
@@ -724,10 +723,10 @@ public class FrameMain extends JModelTestFrame {
 					enableMenuHtmlOutput(false);
 					ModelTest.getMainConsole().println(" OK.");
 					ModelTest.getMainConsole().println(
-							"  number of sequences: " + options.numTaxa);
+							"  number of sequences: " + options.getNumTaxa());
 					ModelTest.getMainConsole().println(
-							"  number of sites: " + options.numSites);
-					options.sampleSize = options.numSites;
+							"  number of sites: " + options.getNumSites());
+					options.checkSampleSize();
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(this, "The specified file \""
 							+ dataFileName
@@ -876,9 +875,16 @@ public class FrameMain extends JModelTestFrame {
 																 * selected
 																 */
 			{
+				Tree bestAIC = ModelTest.getMinAIC() != null? ModelTest.getMinAIC().getTree() : null;
+				Tree bestAICc = ModelTest.getMinAICc() != null? ModelTest.getMinAICc().getTree() : null;
+				Tree bestBIC = ModelTest.getMinBIC() != null? ModelTest.getMinBIC().getTree() : null;
+				Tree bestDT = ModelTest.getMinDT() != null? ModelTest.getMinDT().getTree() : null;
+
+				TreeSummary treeSummary = new TreeSummary(bestAIC, bestAICc, bestBIC, bestDT, ModelTest.getCandidateModels());
+				
 				HtmlReporter.buildReport(options,
 						ModelTest.getCandidateModels(),
-						new File(dialog.getDirectory() + dialog.getFile()));
+						new File(dialog.getDirectory() + dialog.getFile()), treeSummary);
 			}
 		} catch (Exception f) {
 			f.printStackTrace();

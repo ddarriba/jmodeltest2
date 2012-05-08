@@ -243,7 +243,7 @@ public class RunPhymlHybrid extends RunPhyml {
 				notifyObservers(ProgressInfo.BASE_TREE_INIT, 0, models[0], null);
 
 				PhymlSingleModel jcModel = new PhymlSingleModel(models[0], 0,
-						true, options);
+						true, false, options);
 				jcModel.run();
 
 				// create JCtree file

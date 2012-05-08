@@ -55,18 +55,22 @@ import es.uvigo.darwin.jmodeltest.exe.RunPhymlThread;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.threads.SwingWorker;
 import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
+import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
 public class Frame_CalcLike extends JModelTestFrame {
 
 	private static final long serialVersionUID = 201103091058L;
 	private static final int TOTAL_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 	private static final int DEFAULT_NUMBER_OF_THREADS = TOTAL_NUMBER_OF_THREADS; 
+	private static final int DEFAULT_THRESHOLD = 100; // DEFAULT_THRESHOLD/1000
 	
 	private ApplicationOptions options = ApplicationOptions.getInstance();
 	
 	private JPanel PanelProcessors = new JPanel();
 	private JSlider SliderProcessors = new JSlider(1,TOTAL_NUMBER_OF_THREADS,DEFAULT_NUMBER_OF_THREADS);
 	private JLabel jLabelNumProcessors = new JLabel();
+	
+	private JPanel PanelHeuristics = new JPanel();
 	
 	private JPanel PanelCalcLike = new JPanel();
 	JButton RunButtonCalcLike = new JButton();
@@ -77,7 +81,14 @@ public class Frame_CalcLike extends JModelTestFrame {
 	private JRadioButton Button5SubsTypeCalcLike = new JRadioButton();
 	private JRadioButton Button7SubsTypeCalcLike = new JRadioButton();
 	private JRadioButton Button11SubsTypeCalcLike = new JRadioButton();
+	private JRadioButton Button203SubsTypeCalcLike = new JRadioButton();
 
+	private JCheckBox jCheckBoxModelFiltering = new JCheckBox();
+	private JLabel jLabelThreshold = new JLabel();
+	private JLabel jLabelSliderCaption = new JLabel();
+	private JCheckBox jCheckBoxClustering = new JCheckBox();
+	private JSlider SliderThreshold = new JSlider(1,1000,100);
+	
 	private JPanel PanelFrequenciesCalcLike = new JPanel();
 	private JCheckBox jCheckBoxFrequencies = new JCheckBox();
 
@@ -134,7 +145,6 @@ public class Frame_CalcLike extends JModelTestFrame {
 		SliderProcessors.setValue(SliderProcessors.getMaximum());
 		SliderProcessors.setLocation(10, 20);
 		SliderProcessors.setSize(400, 45);
-		SliderProcessors.setPaintLabels(false);
 		
 		jLabelNumProcessors.setText(String.valueOf(SliderProcessors.getValue()));
 		jLabelNumProcessors.setLocation(420, 25);
@@ -143,7 +153,54 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelProcessors.add(SliderProcessors);
 		PanelProcessors.add(jLabelNumProcessors);
 		
-		PanelCalcLike.setLocation(10, 100);
+		PanelHeuristics.setLocation(10, 100);
+		PanelHeuristics.setSize(460, 120);
+		PanelHeuristics
+				.setBorder(new BorderUIResource.TitledBorderUIResource(
+						new LineBorder(XManager.PANEL_BORDER_COLOR, 1, false),
+						"Heuristics", 4, 2, XManager.FONT_LABEL,
+						XManager.LABEL_BLUE_COLOR));
+		PanelHeuristics.setVisible(true);
+		PanelHeuristics.setLayout(null);
+		
+		jCheckBoxClustering.setEnabled(false);
+		jCheckBoxClustering.setText("Clustering");
+		jCheckBoxClustering.setSelected(false);
+		jCheckBoxClustering.setLocation(10,30);
+		jCheckBoxClustering.setSize(150, 20);
+		jCheckBoxClustering.setVisible(true);
+		
+		jLabelSliderCaption.setText("Model filtering threshold:");
+		jLabelSliderCaption.setLocation(140, 20);
+		jLabelSliderCaption.setSize(250,40);
+		jLabelSliderCaption.setVisible(true);
+		
+		jCheckBoxModelFiltering.setEnabled(true);
+		jCheckBoxModelFiltering.setText("Model Filtering");
+		jCheckBoxModelFiltering.setSelected(false);
+		jCheckBoxModelFiltering.setLocation(10,70);
+		jCheckBoxModelFiltering.setSize(140, 20);
+		jCheckBoxModelFiltering.setVisible(true);
+		
+		jLabelThreshold.setText(Utilities.format(SliderThreshold.getValue()/1000.0,5,3,false));
+		jLabelThreshold.setLocation(400, 60);
+		jLabelThreshold.setSize(60,40);
+		jLabelThreshold.setEnabled(jCheckBoxModelFiltering.isSelected());
+		jLabelThreshold.setVisible(true);
+		
+		SliderThreshold.setEnabled(jCheckBoxModelFiltering.isSelected());
+		SliderThreshold.setLocation(150,55);
+		SliderThreshold.setSize(240, 45);
+		SliderThreshold.setValue(DEFAULT_THRESHOLD);
+		SliderThreshold.setVisible(true);
+		
+		PanelHeuristics.add(jCheckBoxClustering);
+		PanelHeuristics.add(jCheckBoxModelFiltering);
+		PanelHeuristics.add(SliderThreshold);
+		PanelHeuristics.add(jLabelThreshold);
+		PanelHeuristics.add(jLabelSliderCaption);
+		
+		PanelCalcLike.setLocation(10, 230);
 		PanelCalcLike.setSize(460, 360);
 		PanelCalcLike
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
@@ -196,12 +253,18 @@ public class Frame_CalcLike extends JModelTestFrame {
 		Button11SubsTypeCalcLike.setText("11");
 		Button11SubsTypeCalcLike.setLocation(170, 20);
 		Button11SubsTypeCalcLike.setSelected(true);
+		Button203SubsTypeCalcLike.setVisible(true);
+		Button203SubsTypeCalcLike.setSize(60, 20);
+		Button203SubsTypeCalcLike.setText("203");
+		Button203SubsTypeCalcLike.setLocation(220, 20);
+		Button203SubsTypeCalcLike.setSelected(true);
 		ButtonGroupNumberModelsCalcLike.add(Button3SubsTypeCalcLike);
 		ButtonGroupNumberModelsCalcLike.add(Button5SubsTypeCalcLike);
 		ButtonGroupNumberModelsCalcLike.add(Button7SubsTypeCalcLike);
 		ButtonGroupNumberModelsCalcLike.add(Button11SubsTypeCalcLike);
-		jLabelNumModels.setSize(160, 20);
-		jLabelNumModels.setLocation(240, 20);
+		ButtonGroupNumberModelsCalcLike.add(Button203SubsTypeCalcLike);
+		jLabelNumModels.setSize(150, 20);
+		jLabelNumModels.setLocation(290, 20);
 		jLabelNumModels.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		jLabelNumModels.setAlignmentY(JLabel.CENTER_ALIGNMENT);
 		jLabelNumModels.setVisible(true);
@@ -353,6 +416,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelNumberModelsCalcLike.add(Button5SubsTypeCalcLike);
 		PanelNumberModelsCalcLike.add(Button7SubsTypeCalcLike);
 		PanelNumberModelsCalcLike.add(Button11SubsTypeCalcLike);
+		PanelNumberModelsCalcLike.add(Button203SubsTypeCalcLike);
 		PanelNumberModelsCalcLike.add(jLabelNumModels);
 		PanelRateVariationCalcLike.add(jCheckBoxPinv);
 		PanelRateVariationCalcLike.add(jCheckBoxGamma);
@@ -371,8 +435,9 @@ public class Frame_CalcLike extends JModelTestFrame {
 
 		getContentPane().add(PanelProcessors);
 		getContentPane().add(PanelCalcLike);
+		getContentPane().add(PanelHeuristics);
 
-		setSize(480, 500);
+		setSize(480, 630);
 		setResizable(false);
 
 		// Update number of models
@@ -405,35 +470,44 @@ public class Frame_CalcLike extends JModelTestFrame {
 			
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				SliderChangeListener(e);
+				processorsSliderChangeListener(e);
 			}
 		});
 
+		jCheckBoxModelFiltering.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				SliderThreshold.setEnabled(jCheckBoxModelFiltering.isSelected());
+				jLabelThreshold.setEnabled(jCheckBoxModelFiltering.isSelected());
+			}
+		});
+
+		SliderThreshold.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				jLabelThreshold.setText(Utilities.format(SliderThreshold.getValue()/1000.0,5,3,false));
+			}
+		});
+		
+		ActionListener subsSchemeButtonListener = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CalculateNumberOfModels(e);
+				jCheckBoxClustering.setSelected(Button203SubsTypeCalcLike.isSelected());
+			}
+		};
 		// common event handling for set of models
 		Button3SubsTypeCalcLike
-				.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						CalculateNumberOfModels(e);
-					}
-				});
+				.addActionListener(subsSchemeButtonListener);
 		Button5SubsTypeCalcLike
-				.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						CalculateNumberOfModels(e);
-					}
-				});
+				.addActionListener(subsSchemeButtonListener);
 		Button7SubsTypeCalcLike
-				.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						CalculateNumberOfModels(e);
-					}
-				});
+				.addActionListener(subsSchemeButtonListener);
 		Button11SubsTypeCalcLike
-				.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						CalculateNumberOfModels(e);
-					}
-				});
+				.addActionListener(subsSchemeButtonListener);
+		Button203SubsTypeCalcLike
+				.addActionListener(subsSchemeButtonListener);
 		jCheckBoxPinv.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				CalculateNumberOfModels(e);
@@ -574,8 +648,10 @@ public class Frame_CalcLike extends JModelTestFrame {
 				options.setSubstTypeCode(1);
 			else if (Button7SubsTypeCalcLike.isSelected())
 				options.setSubstTypeCode(2);
-			else
+			else if (Button11SubsTypeCalcLike.isSelected())
 				options.setSubstTypeCode(3);
+			else
+				options.setSubstTypeCode(4);
 
 			if (jCheckBoxFrequencies.isSelected())
 				options.doF = true;
@@ -634,11 +710,16 @@ public class Frame_CalcLike extends JModelTestFrame {
 			 */else { /* should not be here */
 			}
 
+			if (jCheckBoxModelFiltering.isSelected()) {
+				options.setGuidedSearchThreshold(SliderThreshold.getValue()/1000.0);
+			} else {
+				options.setGuidedSearchThreshold(0.0d);
+			}
 			// build set of models
 			options.setCandidateModels();
 
 			// build progress frame
-			progressFrame = new Frame_Progress(options.numModels, this, options);
+			progressFrame = new Frame_Progress(options.getNumModels(), this, options);
 
 			setVisible(false);
 
@@ -674,6 +755,10 @@ public class Frame_CalcLike extends JModelTestFrame {
 			TextFieldNcat.setEnabled(true);
 			TextFieldNcat.setText("4");
 
+			jCheckBoxClustering.setSelected(false);
+			jCheckBoxModelFiltering.setSelected(false);
+			SliderThreshold.setValue(DEFAULT_THRESHOLD);
+			
 			CalculateNumberOfModels(null);
 			jLabelUserTopology.setText("");
 			jLabelUserTree.setText("");
@@ -701,8 +786,10 @@ public class Frame_CalcLike extends JModelTestFrame {
 				numberOfModels = 5;
 			else if (Button7SubsTypeCalcLike.isSelected())
 				numberOfModels = 7;
-			else
+			else if (Button11SubsTypeCalcLike.isSelected())
 				numberOfModels = 11;
+			else
+				numberOfModels = 203;
 
 			if (jCheckBoxFrequencies.isSelected())
 				numberOfModels *= 2;
@@ -714,14 +801,14 @@ public class Frame_CalcLike extends JModelTestFrame {
 					|| jCheckBoxGamma.isSelected())
 				numberOfModels *= 2;
 
-			options.numModels = numberOfModels;
-			jLabelNumModels.setText("Number of models = " + numberOfModels);
+			options.setNumModels(numberOfModels);
+			jLabelNumModels.setText("N. Models = " + numberOfModels);
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
 	}
 
-	private void SliderChangeListener(ChangeEvent e) {
+	private void processorsSliderChangeListener(ChangeEvent e) {
 		jLabelNumProcessors.setText(String.valueOf(SliderProcessors.getValue()));
 	}
 	

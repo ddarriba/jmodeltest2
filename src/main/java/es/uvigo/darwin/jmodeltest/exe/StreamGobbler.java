@@ -24,6 +24,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
+import es.uvigo.darwin.jmodeltest.ApplicationOptions;
+import es.uvigo.darwin.jmodeltest.utilities.Utilities;
+
 class StreamGobbler extends Thread {
 	private InputStream is;
 	private String type;
@@ -45,10 +48,28 @@ class StreamGobbler extends Thread {
 			BufferedReader br = new BufferedReader(isr);
 			String line = null;
 			while ((line = br.readLine()) != null) {
-				if (pw != null)
-					pw.println(line);
-				else
-					System.out.println(type + ">" + line);
+				if (line.contains("patterns found")) {
+					try {
+						int numPatterns =
+							Integer.parseInt(Utilities.firstNumericToken(line));
+						ApplicationOptions options = ApplicationOptions.getInstance();
+						if (Math.abs(options.getNumPatterns()) == 0) {
+							options.setNumPatterns(numPatterns);
+						} else {
+							if (Math.abs(options.getNumPatterns() - numPatterns) > 0) {
+								// number of patterns has changed!!!
+								// temporary number of patterns is updated
+								options.setNumPatterns(numPatterns);
+							}
+						}
+					} catch (NumberFormatException nfe) {
+						// ignore
+					}
+					
+				}
+				if (pw != null) {
+					pw.println(type + ">" + line);
+				}
 			}
 			if (pw != null)
 				pw.flush();

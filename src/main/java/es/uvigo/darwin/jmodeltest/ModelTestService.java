@@ -136,19 +136,19 @@ public class ModelTestService {
 			boolean doModelAveraging, double confidenceInterval) {
 		InformationCriterion criterion;
 		switch (ic) {
-		case InformationCriterion.AIC:
+		case InformationCriterion.IC_AIC:
 			criterion = new AIC(writePAUPblock, doImportances,
 					doModelAveraging, confidenceInterval);
 			break;
-		case InformationCriterion.AICc:
+		case InformationCriterion.IC_AICc:
 			criterion = new AICc(writePAUPblock, doImportances,
 					doModelAveraging, confidenceInterval);
 			break;
-		case InformationCriterion.BIC:
+		case InformationCriterion.IC_BIC:
 			criterion = new BIC(writePAUPblock, doImportances,
 					doModelAveraging, confidenceInterval);
 			break;
-		case InformationCriterion.DT:
+		case InformationCriterion.IC_DT:
 			criterion = new DT(writePAUPblock, doImportances, doModelAveraging,
 					confidenceInterval);
 			break;

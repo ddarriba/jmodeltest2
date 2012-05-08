@@ -19,18 +19,23 @@ package es.uvigo.darwin.jmodeltest.utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.swing.text.Document;
 
+import pal.alignment.Alignment;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.gui.XManager;
+import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
+import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 public final class Utilities {
 
@@ -42,6 +47,20 @@ public final class Utilities {
 	public Utilities() {
 	}
 
+	public static String firstNumericToken(String str) {
+		StringTokenizer st = new StringTokenizer(str);
+		String token = "";
+		boolean found = false;
+		while (st.hasMoreTokens() && !found) {
+			token = st.nextToken();
+			found |= isNumber(token);
+		}
+		if (found)
+			return token;
+		else
+			return null;
+	}
+	
 	public static String lastToken(String str) {
 		StringTokenizer st = new StringTokenizer(str);
 		String token = "";
@@ -141,17 +160,12 @@ public final class Utilities {
 	}
 
 	public static boolean isNumber(String s) {
-		String validChars = "0123456789.";
-		boolean isNumber = true;
-
-		for (int i = 0; i < s.length() && isNumber; i++) {
-			char c = s.charAt(i);
-			if (validChars.indexOf(c) == -1)
-				isNumber &= false;
-			else
-				isNumber &= true;
+		try {
+			Double.parseDouble(s);
+			return true;
+		} catch (NumberFormatException ex) {
+			return false;
 		}
-		return isNumber;
 	}
 
 	public static void toConsoleEnd() {
@@ -371,4 +385,117 @@ public final class Utilities {
 		return C;
 	}
 
+	/**
+	 * Calculate invariable sites.
+	 * 
+	 * @param alignment the alignment
+	 * 
+	 * @return the invariable sites in the alignment
+	 */
+	public static int calculateInvariableSites (Alignment alignment) {
+
+		//use this function to estimate a good starting value for the InvariableSites distribution.
+		int numSites    = alignment.getSiteCount();
+		int numSeqs     = alignment.getSequenceCount();
+		int inv         = 0;
+		int tmp;
+		boolean tmpInv = true;
+		for(int i=0; i < numSites; i++) {
+			tmp     = indexOfChar(alignment.getData(0,i));
+			tmpInv  = true;
+			for(int j=0; j < numSeqs; j++) {
+				if(indexOfChar(alignment.getData(j,i)) != tmp) { //if at least one difference in column i:
+					j = numSeqs;    //we exit this for.
+					tmpInv = false; //i is not an invariable site.
+				}
+			}
+			if(tmpInv)
+				inv++;
+		}
+		return inv;
+	}
+	
+	private static int indexOfChar (char c) {
+		char[] charSet = {'A', 'C', 'G', 'T', 'a', 'c', 'g', 't'};
+		for (int charIndex = 0; charIndex < charSet.length; charIndex++)
+			if (charSet[charIndex] == c)
+				return charIndex % 4;
+
+		return -1;
+	}
+	
+	public static double calculateShannonSampleSize (Alignment alignment, boolean doJustShannonEntropy) {
+
+		int numSites = alignment.getSiteCount();
+		int numTaxa = alignment.getSequenceCount();
+		
+		//int    pattern[][]    = new int   [numSites][numSeqs];
+		double freqs  [][]    = new double[numSites][4];
+		byte   state  [][]    = new byte  [numSites][4];
+		double siteS  []      = new double[numSites];
+		int    sequences[]    = new int[numSites];
+		double shannonEntropy = 0.0;
+
+		//We simply count bases at positions and store in state[][]
+		for(int i=0; i < numSites; i++) {
+			for(int j=0; j < numTaxa; j++) {
+				//state[i][indexOfchar(alignment.getData(j,i))]++;
+				int index = indexOfChar(alignment.getData(j,i));
+				if(index >= 0) {
+					state[i][index]++;
+					sequences[i]++;
+				}
+				//state[i][sP.pattern[j][i]]++;
+			}
+		}
+
+		//For each alignment position, we calculate aminoacid frequencies. And also...
+		//For each alignment position, we calculate Shannon Entropy based on previous frequencies.
+		for(int i=0; i < numSites; i++) {
+			for(int j=0; j < 4; j++) {
+				//freqs[i][j] = (double)state[i][j]/(double)numSeqs;
+				freqs[i][j] = (double)state[i][j]/(double)sequences[i];
+				if(freqs[i][j] > 0)
+					siteS[i]   += freqs[i][j]*Math.log(freqs[i][j])/Math.log(2);
+			}
+		}
+
+		//We sum positions entropies over the whole alignment.
+		for(int i=0; i < numSites; i++) {
+			shannonEntropy += siteS[i];
+		}
+
+		if(doJustShannonEntropy) {
+			return -1.0*shannonEntropy; //sum of shannon Entropy positions.
+		} else { //if Options.SHANNON_NxL
+			double meanShannonEntropy;
+			double maxShannonEntropy = 0;
+			double normalizedShannonEntropy = 0;
+			meanShannonEntropy = -1.0*shannonEntropy/(double)numSites; //mean S for sites
+			//let's normalize ShannonEntropy from 0 to 1:
+			for(int i=0; i<4; i++) {
+				maxShannonEntropy += (1.0/(double)4)*Math.log(1.0/(double)4)/Math.log(2);
+			}
+			//by this moment we normalize by a "rule of three"
+			normalizedShannonEntropy = -1.0*meanShannonEntropy/maxShannonEntropy;
+			return (double)numSites*(double)numTaxa*normalizedShannonEntropy; //NxL x averaged Shannon entropy
+		}
+	}
+	
+	public static double calculateShannonSampleSize (File alignmentFile, boolean doJustShannonEntropy) {
+		Alignment alignment = null;
+		try {
+			alignment = AlignmentReader.readAlignment(
+					new PrintWriter(System.err),
+					alignmentFile.getAbsolutePath(), false);
+		} catch (AlignmentParseException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return (calculateShannonSampleSize(alignment, doJustShannonEntropy));
+	}
 } // end of class

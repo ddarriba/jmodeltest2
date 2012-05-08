@@ -34,10 +34,10 @@ import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 public class PhymlSingleModel extends Observable implements Runnable {
 
 	private int verbose = 0;
-	private static final String CURRENT_DIRECTORY = System
-			.getProperty("user.dir");
 
-	public String PHYML_PATH = CURRENT_DIRECTORY + "/exe/phyml/";
+	private static String CURRENT_DIRECTORY = ModelTestConfiguration.PATH;
+
+	public String PHYML_PATH = CURRENT_DIRECTORY + "exe/phyml/";
 
 	private String phymlStatFileName;
 	private String phymlTreeFileName;
@@ -49,7 +49,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	private long endTime;
 	private String commandLine;
 	private int index;
-	private boolean justGetJCTree;
+	private boolean justGetJCTree = false;
+	private boolean ignoreGaps = false;
 	private boolean interrupted = false;
 	private ApplicationOptions options;
 	private int numberOfThreads = -1;
@@ -59,12 +60,12 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	}
 
 	public PhymlSingleModel(Model model, int index, boolean justGetJCTree,
-			ApplicationOptions options) {
+			boolean ignoreGaps, ApplicationOptions options) {
 		this.options = options;
 		this.model = model;
 		this.index = index;
 		this.justGetJCTree = justGetJCTree;
-
+		this.ignoreGaps = ignoreGaps;
 		PHYML_GLOBAL = ModelTestConfiguration.isGlobalPhymlBinary();
 		if (PHYML_GLOBAL) {
 			PHYML_PATH = "";
@@ -88,32 +89,40 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 	public PhymlSingleModel(Model model, int index, boolean justGetJCTree,
 			ApplicationOptions options, int numberOfThreads) {
-		this(model, index, justGetJCTree, options);
+		this(model, index, justGetJCTree, false, options);
 		this.numberOfThreads = numberOfThreads;
 	}
 
 	public boolean compute() {
-		// run phyml
-		notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index, model,
-				null);
-
-		startTime = System.currentTimeMillis();
-
-		writePhyml3CommandLine(model, justGetJCTree);
-		executeCommandLine();
-		if (!interrupted) {
-			parsePhyml3Files(model);
-		}
-
-		endTime = System.currentTimeMillis();
-
-		model.setComputationTime(endTime - startTime);
-
-		// completed
-		if (!interrupted) {
-			notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, index,
-					model, Utilities.calculateRuntime(startTime, endTime));
-
+		if (model.getLnL() < 1e-5 || ignoreGaps) {
+			// run phyml
+			notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index, model,
+					null);
+	
+			startTime = System.currentTimeMillis();
+	
+			writePhyml3CommandLine(model, justGetJCTree);
+			executeCommandLine();
+			if (!interrupted) {
+				parsePhyml3Files(model);
+			}
+	
+			endTime = System.currentTimeMillis();
+	
+			model.setComputationTime(endTime - startTime);
+	
+			// completed
+			if (!interrupted) {
+				int value = 0;
+				if (ignoreGaps) {
+					value = ProgressInfo.VALUE_IGAPS_OPTIMIZATION;
+				} else {
+					value = ProgressInfo.VALUE_REGULAR_OPTIMIZATION;
+				}
+				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, value,
+						model, Utilities.calculateRuntime(startTime, endTime));
+	
+			}
 		}
 		return !interrupted;
 	}
@@ -131,33 +140,38 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	private void writePhyml3CommandLine(Model currentModel,
 			boolean justGetJCtree) {
 
+		StringBuilder sb = new StringBuilder();
+
 		// input file
-		commandLine = " -i " + options.getAlignmentFile().getAbsolutePath();
+		sb.append(" -i ").append(options.getAlignmentFile().getAbsolutePath());
 
 		// data type is nucleotide
-		commandLine += " -d " + "nt";
+		sb.append(" -d nt");
 
 		// number of data sets
-		commandLine += " -n " + "1";
+		sb.append(" -n 1");
 
 		// no bootrstrap or aLRT
-		commandLine += " -b " + "0";
+		sb.append(" -b 0");
 
+		if (ignoreGaps) {
+			sb.append(" --no_gap");
+		}
 		// set execution id
-		commandLine += " --run_id " + model.getName();
+		sb.append(" --run_id ").append(model.getName());
 
 		// set custom model
-		commandLine += " -m " + currentModel.getPartition();
+		sb.append(" -m ").append(currentModel.getPartition());
 
 		// optimize base frequencies if needed
 		if (currentModel.ispF())
-			commandLine += " -f m"; // changed from -f e DP200509
+			sb.append(" -f m"); // changed from -f e DP200509
 		else
-			commandLine += " -f 0.25,0.25,0.25,0.25";
+			sb.append(" -f 0.25,0.25,0.25,0.25");
 
 		// optimize pinvar if needed
 		if (currentModel.ispI())
-			commandLine += " -v " + "e";
+			sb.append(" -v e");
 
 		// optimize rate parameters
 		// if (currentModel.pT || currentModel.pR)
@@ -165,30 +179,30 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 		// optimize alpha if needed
 		if (currentModel.ispG()) {
-			commandLine += " -c " + options.numGammaCat;
-			commandLine += " -a e";
+			sb.append(" -c ").append(options.numGammaCat);
+			sb.append(" -a e");
 		} else
-			commandLine += " -c " + 1;
+			sb.append(" -c 1");
 
 		// search strategy
 		switch (options.treeSearchOperations) {
 		case SPR:
-			commandLine += " -s " + "SPR";
+			sb.append(" -s SPR");
 			break;
 		case BEST:
-			commandLine += " -s " + "BEST";
+			sb.append(" -s BEST");
 			break;
 		default:
-			commandLine += " -s " + "NNI";
+			sb.append(" -s NNI");
 		}
 
 		// threaded version
 		if (numberOfThreads > 0) {
-			commandLine += " --num_threads " + numberOfThreads;
+			sb.append(" --num_threads ").append(numberOfThreads);
 		}
 
 		// avoid memory warning
-		commandLine += " --no_memory_check";
+		sb.append(" --no_memory_check");
 
 		// do optimize topology?
 		/*
@@ -199,8 +213,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		 * branch lengths are fixed.
 		 */
 		if (justGetJCtree) {
-			commandLine += " -o " + "r"; // both tree topology and branch
-											// lengths are fixed.
+			sb.append(" -o r"); // both tree topology and branch
+								// lengths are fixed.
 		}
 		/*
 		 * else if (ModelTest.userTreeExists) // use user tree for all models {
@@ -209,19 +223,20 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		 */
 		// use a single tree for all models
 		else if (options.userTopologyExists || options.fixedTopology) {
-			commandLine += " -u " + options.getTreeFile().getAbsolutePath();
-			commandLine += " -o " + "lr"; // tree topology fixed; optimize
-											// branch lengths
+			sb.append(" -u ").append(options.getTreeFile().getAbsolutePath());
+			sb.append(" -o lr"); // tree topology fixed; optimize
+									// branch lengths
 		} else if (!options.optimizeMLTopology) // use BIONJ tree for
 												// each model
 		{
-			commandLine += " -o " + "lr"; // tree topology fixed; optimize
-											// branch lengths
+			sb.append(" -o lr"); // tree topology fixed; optimize
+									// branch lengths
 		} else {
-			commandLine += " -o " + "tlr"; // optimize tree topology and branch
-											// lengthss
+			sb.append(" -o tlr"); // optimize tree topology and branch
+									// lengthss
 		} // use ML optimized tree for each model
 
+		commandLine = sb.toString();
 	}
 
 	/***************************
@@ -250,7 +265,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 			// get process and execute command line
 			Runtime rt = Runtime.getRuntime();
-			Process proc = rt.exec(cmd, null, PHYML_PATH.equals("")?null:dir);
+			Process proc = rt.exec(cmd, null, PHYML_PATH.equals("") ? null
+					: dir);
 			ProcessManager.getInstance().registerProcess(proc);
 
 			// any error message?
@@ -284,7 +300,10 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			notifyObservers(ProgressInfo.INTERRUPTED, index, model, null);
 			interrupted = true;
 		} catch (Throwable t) {
-			notifyObservers(ProgressInfo.ERROR, index, model,
+			notifyObservers(
+					ProgressInfo.ERROR,
+					index,
+					model,
 					"Cannot run the Phyml command line for some reason: "
 							+ t.getMessage());
 			interrupted = true;
@@ -311,123 +330,165 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		try {
 			TextInputStream phymlStatFile = new TextInputStream(
 					phymlStatFileName);
-			while ((line = phymlStatFile.readLine()) != null) {
-				if (line.length() > 0 && line.startsWith(". Log-likelihood")) {
-					currentModel.setLnL((-1.0)
-							* Double.parseDouble(Utilities.lastToken(line)));
-					if (showParsing)
-						System.err.println("Reading lnL = "
-								+ currentModel.getLnL());
-				} else if (line.length() > 0
-						&& line.startsWith(". Discrete gamma model")) {
-					if (Utilities.lastToken(line).equals("Yes")) {
-						// currentModel.pG = true;
-						line = phymlStatFile.readLine();
-						currentModel.setNumGammaCat(Integer.parseInt(Utilities
-								.lastToken(line)));
-						if (showParsing)
-							System.err.println("Reading numGammaCat = "
-									+ currentModel.getNumGammaCat());
-						line = phymlStatFile.readLine();
-						currentModel.setShape(Double.parseDouble(Utilities
-								.lastToken(line)));
-						if (showParsing)
-							System.err.println("Reading shape = "
-									+ currentModel.getShape());
+			if (ignoreGaps) {
+				while ((line = phymlStatFile.readLine()) != null) {
+					if (line.length() > 0) {
+						if (line.startsWith(". Log-likelihood")) {
+							currentModel
+									.setLnLIgnoringGaps((-1.0)
+											* Double.parseDouble(Utilities
+													.lastToken(line)));
+						} else if (line.contains("Unconstrained likelihood")) {
+							double unconstrainedLnL = (-1.0)
+									* Double.parseDouble(Utilities.lastToken(line));
+							currentModel.setUnconstrainedLnL(unconstrainedLnL);
+							if (Math.abs(options.getUnconstrainedLnL()
+										- unconstrainedLnL) > 1e-10) {
+								// uLK has changed!!!
+								// temporary uLK is updated
+								options.setUnconstrainedLnL(unconstrainedLnL);
+							}
+						} 
 					}
-				} else if (line.length() > 0
-						&& line.startsWith(". Nucleotides frequencies")) {
-					// currentModel.pF = true; ??
-					line = phymlStatFile.readLine();
-					while (line.trim().length() == 0)
-						// get rid of any number of returns
-						line = phymlStatFile.readLine();
-					currentModel.setfA(Double.parseDouble(Utilities
-							.lastToken(line)));
-					line = phymlStatFile.readLine();
-					currentModel.setfC(Double.parseDouble(Utilities
-							.lastToken(line)));
-					line = phymlStatFile.readLine();
-					currentModel.setfG(Double.parseDouble(Utilities
-							.lastToken(line)));
-					line = phymlStatFile.readLine();
-					currentModel.setfT(Double.parseDouble(Utilities
-							.lastToken(line)));
-					if (showParsing) {
-						System.err.println("Reading fA = "
-								+ currentModel.getfA());
-						System.err.println("Reading fC = "
-								+ currentModel.getfC());
-						System.err.println("Reading fG = "
-								+ currentModel.getfG());
-						System.err.println("Reading fT = "
-								+ currentModel.getfT());
-					}
-				} else if (line.length() > 0
-						&& line.startsWith(". Proportion of invariant")) {
-					// currentModel.pI = true;
-					currentModel.setPinv(Double.parseDouble(Utilities
-							.lastToken(line)));
-					if (showParsing)
-						System.err.println("Reading pinv = "
-								+ currentModel.getPinv());
 				}
-				// with custom models phyml does not provide a ti/tv. We have to
-				// calculate it from the rate parameters
-
-				else if (line.length() > 0
-						&& line.startsWith(". GTR relative rate parameters")) {
-					line = phymlStatFile.readLine();
-					while (line.trim().length() == 0)
-						// get rid of any number of returns
-						line = phymlStatFile.readLine();
-					currentModel.setRa(Double.parseDouble(Utilities
-							.lastToken(line)));
-					line = phymlStatFile.readLine();
-					currentModel.setRb(Double.parseDouble(Utilities
-							.lastToken(line)));
-					line = phymlStatFile.readLine();
-					currentModel.setRc(Double.parseDouble(Utilities
-							.lastToken(line)));
-					line = phymlStatFile.readLine();
-					currentModel.setRd(Double.parseDouble(Utilities
-							.lastToken(line)));
-					line = phymlStatFile.readLine();
-					currentModel.setRe(Double.parseDouble(Utilities
-							.lastToken(line)));
-					line = phymlStatFile.readLine();
-					currentModel.setRf(Double.parseDouble(Utilities
-							.lastToken(line))); // for
-												// latest
-												// phyml3
-												// feb08
-					if (showParsing) {
-						System.err.println("Reading Ra = "
-								+ currentModel.getRa());
-						System.err.println("Reading Rb = "
-								+ currentModel.getRb());
-						System.err.println("Reading Rc = "
-								+ currentModel.getRc());
-						System.err.println("Reading Rd = "
-								+ currentModel.getRd());
-						System.err.println("Reading Re = "
-								+ currentModel.getRe());
-						System.err.println("Reading Rf = "
-								+ currentModel.getRf());
-					}
-					// with custom models phyml does not provide a ti/tv, so we
-					// calculate it from the rate parameters
-					// note this is kappa and we need to transform it to ti/tv
-					if (currentModel.ispT()) {
-						currentModel.setKappa(currentModel.getRb());
-						currentModel
-								.setTitv(currentModel.getKappa()
-										* (currentModel.getfA()
-												* currentModel.getfG() + currentModel
-												.getfC() * currentModel.getfT())
-										/ ((currentModel.getfA() + currentModel
-												.getfG()) * (currentModel
-												.getfC() + currentModel.getfT())));
+			} else {
+				while ((line = phymlStatFile.readLine()) != null) {
+					if (line.length() > 0) {
+						if (line.startsWith(". Log-likelihood")) {
+							currentModel
+									.setLnL((-1.0)
+											* Double.parseDouble(Utilities
+													.lastToken(line)));
+							if (showParsing)
+								System.err.println("Reading lnL = "
+										+ currentModel.getLnL());
+						} else if (line.startsWith(". Discrete gamma model")) {
+							if (Utilities.lastToken(line).equals("Yes")) {
+								// currentModel.pG = true;
+								line = phymlStatFile.readLine();
+								currentModel.setNumGammaCat(Integer
+										.parseInt(Utilities.lastToken(line)));
+								if (showParsing)
+									System.err.println("Reading numGammaCat = "
+											+ currentModel.getNumGammaCat());
+								line = phymlStatFile.readLine();
+								currentModel.setShape(Double.parseDouble(Utilities
+										.lastToken(line)));
+								if (showParsing)
+									System.err.println("Reading shape = "
+											+ currentModel.getShape());
+							}
+						} else if (line.startsWith(". Nucleotides frequencies")) {
+							// currentModel.pF = true; ??
+							line = phymlStatFile.readLine();
+							while (line.trim().length() == 0)
+								// get rid of any number of returns
+								line = phymlStatFile.readLine();
+							currentModel.setfA(Double.parseDouble(Utilities
+									.lastToken(line)));
+							line = phymlStatFile.readLine();
+							currentModel.setfC(Double.parseDouble(Utilities
+									.lastToken(line)));
+							line = phymlStatFile.readLine();
+							currentModel.setfG(Double.parseDouble(Utilities
+									.lastToken(line)));
+							line = phymlStatFile.readLine();
+							currentModel.setfT(Double.parseDouble(Utilities
+									.lastToken(line)));
+							if (showParsing) {
+								System.err.println("Reading fA = "
+										+ currentModel.getfA());
+								System.err.println("Reading fC = "
+										+ currentModel.getfC());
+								System.err.println("Reading fG = "
+										+ currentModel.getfG());
+								System.err.println("Reading fT = "
+										+ currentModel.getfT());
+							}
+						} else if (line.startsWith(". Proportion of invariant")) {
+							// currentModel.pI = true;
+							currentModel.setPinv(Double.parseDouble(Utilities
+									.lastToken(line)));
+							if (showParsing)
+								System.err.println("Reading pinv = "
+										+ currentModel.getPinv());
+						} else if (line.contains("Unconstrained likelihood")) {
+							double unconstrainedLnL = (-1.0)
+									* Double.parseDouble(Utilities.lastToken(line));
+							if (!options.isAmbiguous()) {
+								currentModel.setUnconstrainedLnL(unconstrainedLnL);
+							} else {
+								currentModel.setUnconstrainedLnL(0.0d);
+							}
+							if (Math.abs(options.getUnconstrainedLnL()) <= 1e-10) {
+								options.setUnconstrainedLnL(unconstrainedLnL);
+							} else {
+								if (Math.abs(options.getUnconstrainedLnL()
+										- unconstrainedLnL) > 1e-10) {
+									// uLK has changed!!!
+									// temporary uLK is updated
+									options.setUnconstrainedLnL(unconstrainedLnL);
+								}
+							}
+							if (showParsing)
+								System.err.println("Reading unconstrained logLK = "
+										+ currentModel.getUnconstrainedLnL());
+						} else if (line
+								.startsWith(". GTR relative rate parameters")) {
+							line = phymlStatFile.readLine();
+							while (line.trim().length() == 0)
+								// get rid of any number of returns
+								line = phymlStatFile.readLine();
+							currentModel.setRa(Double.parseDouble(Utilities
+									.lastToken(line)));
+							line = phymlStatFile.readLine();
+							currentModel.setRb(Double.parseDouble(Utilities
+									.lastToken(line)));
+							line = phymlStatFile.readLine();
+							currentModel.setRc(Double.parseDouble(Utilities
+									.lastToken(line)));
+							line = phymlStatFile.readLine();
+							currentModel.setRd(Double.parseDouble(Utilities
+									.lastToken(line)));
+							line = phymlStatFile.readLine();
+							currentModel.setRe(Double.parseDouble(Utilities
+									.lastToken(line)));
+							line = phymlStatFile.readLine();
+							currentModel.setRf(Double.parseDouble(Utilities
+									.lastToken(line)));
+							if (showParsing) {
+								System.err.println("Reading Ra = "
+										+ currentModel.getRa());
+								System.err.println("Reading Rb = "
+										+ currentModel.getRb());
+								System.err.println("Reading Rc = "
+										+ currentModel.getRc());
+								System.err.println("Reading Rd = "
+										+ currentModel.getRd());
+								System.err.println("Reading Re = "
+										+ currentModel.getRe());
+								System.err.println("Reading Rf = "
+										+ currentModel.getRf());
+							}
+							// with custom models phyml does not provide a ti/tv, so
+							// we
+							// calculate it from the rate parameters
+							// note this is kappa and we need to transform it to
+							// ti/tv
+							if (currentModel.ispT()) {
+								currentModel.setKappa(currentModel.getRb());
+								currentModel
+										.setTitv(currentModel.getKappa()
+												* (currentModel.getfA()
+														* currentModel.getfG() + currentModel
+														.getfC()
+														* currentModel.getfT())
+												/ ((currentModel.getfA() + currentModel
+														.getfG()) * (currentModel
+														.getfC() + currentModel
+														.getfT())));
+							}
+						}
 					}
 				}
 			}
@@ -462,7 +523,6 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			notifyObservers(ProgressInfo.ERROR, index, model, "ML tree for "
 					+ currentModel.getName() + " is invalid.");
 		}
-
 		Utilities.deleteFile(phymlStatFileName);
 		Utilities.deleteFile(phymlTreeFileName);
 

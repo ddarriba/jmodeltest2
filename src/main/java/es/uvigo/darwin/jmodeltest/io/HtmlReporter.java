@@ -59,8 +59,19 @@ public abstract class HtmlReporter {
 			"resources" + File.separator + "logo0.png" };
 	private static TreeFacade treeFacade = new TreeFacadeImpl();
 	private static Map<String, Object> datamodel;
-	private static File logDir = new File(ModelTestConfiguration.getLogDir());
-	private static File imagesDir = new File(logDir.getPath()+File.separator+"images");
+	private static File LOG_DIR;
+	private static File IMAGES_DIR;
+	private static String RESOURCES_DIR;
+	
+	static {
+		String strLogDir = ModelTestConfiguration.getLogDir();
+		if (!strLogDir.startsWith(File.separator)) {
+			strLogDir = ModelTestConfiguration.PATH + strLogDir;
+		}
+		LOG_DIR = new File(strLogDir);
+		IMAGES_DIR = new File(strLogDir + File.separator + "images");
+		RESOURCES_DIR = ModelTestConfiguration.PATH + "resources" + File.separator + "template";
+	}
 	
 	public static void buildReport(ApplicationOptions options, Model models[],
 			File mOutputFile) {
@@ -79,7 +90,7 @@ public abstract class HtmlReporter {
 				outputFile = mOutputFile;
 			}
 		} else {
-			outputFile = new File(logDir.getPath() + File.separator
+			outputFile = new File(LOG_DIR.getPath() + File.separator
 					+ ApplicationOptions.getInstance().getInputFile().getName()
 					+ ".jmodeltest." + Calendar.getInstance().getTimeInMillis()
 					+ ".html");
@@ -87,7 +98,14 @@ public abstract class HtmlReporter {
 		
 		// Add the values in the datamodel
 		datamodel = new HashMap<String, Object>();
-
+		java.util.Date current_time = new java.util.Date();
+		datamodel.put("date", current_time.toString());
+		datamodel.put("system", System.getProperty("os.name") + " "
+				+ System.getProperty("os.version") + ", arch: "
+				+ System.getProperty("os.arch") + ", bits: "
+				+ System.getProperty("sun.arch.data.model") + ", numcores: "
+				+ Runtime.getRuntime().availableProcessors());
+		
 		fillInWithOptions(options);
 		fillInWithSortedModels(models);
 		datamodel.put("isTopologiesSummary", summary!=null ? new Integer(1) : new Integer(0));
@@ -109,8 +127,8 @@ public abstract class HtmlReporter {
 				aicConfModels.append(model.getName() + " ");
 			datamodel.put("aicConfidenceList", aicConfModels.toString());
 			buildChart(outputFile, ModelTest.getMyAIC());
-			datamodel.put("aicEuImagePath",imagesDir.getName() + File.separator + outputFile.getName() + "_eu_AIC.png");
-			datamodel.put("aicRfImagePath",imagesDir.getName() + File.separator + outputFile.getName() + "_rf_AIC.png");
+			datamodel.put("aicEuImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_eu_AIC.png");
+			datamodel.put("aicRfImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_rf_AIC.png");
 		}
 
 		if (options.doAICc) {
@@ -127,8 +145,8 @@ public abstract class HtmlReporter {
 				aiccConfModels.append(model.getName() + " ");
 			datamodel.put("aiccConfidenceList", aiccConfModels.toString());
 			buildChart(outputFile, ModelTest.getMyAICc());
-			datamodel.put("aiccEuImagePath",imagesDir.getName() + File.separator + outputFile.getName() + "_eu_AICc.png");
-			datamodel.put("aiccRfImagePath",imagesDir.getName() + File.separator + outputFile.getName() + "_rf_AICc.png");
+			datamodel.put("aiccEuImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_eu_AICc.png");
+			datamodel.put("aiccRfImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_rf_AICc.png");
 		}
 
 		if (options.doBIC) {
@@ -145,8 +163,8 @@ public abstract class HtmlReporter {
 				bicConfModels.append(model.getName() + " ");
 			datamodel.put("bicConfidenceList", bicConfModels.toString());
 			buildChart(outputFile, ModelTest.getMyBIC());
-			datamodel.put("bicEuImagePath",imagesDir.getName() + File.separator + outputFile.getName() + "_eu_BIC.png");
-			datamodel.put("bicRfImagePath",imagesDir.getName() + File.separator + outputFile.getName() + "_rf_BIC.png");
+			datamodel.put("bicEuImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_eu_BIC.png");
+			datamodel.put("bicRfImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_rf_BIC.png");
 		}
 
 		if (options.doDT) {
@@ -163,8 +181,8 @@ public abstract class HtmlReporter {
 				dtConfModels.append(model.getName() + " ");
 			datamodel.put("dtConfidenceList", dtConfModels.toString());
 			buildChart(outputFile, ModelTest.getMyDT());
-			datamodel.put("dtEuImagePath",imagesDir.getName() + File.separator + outputFile.getName() + "_eu_DT.png");
-			datamodel.put("dtRfImagePath",imagesDir.getName() + File.separator + outputFile.getName() + "_rf_DT.png");
+			datamodel.put("dtEuImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_eu_DT.png");
+			datamodel.put("dtRfImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_rf_DT.png");
 		}
 
 		datamodel.put("doAICAveragedPhylogeny",
@@ -218,28 +236,30 @@ public abstract class HtmlReporter {
 	// Process a template using FreeMarker and print the results
 	static void freemarkerDo(Map<String, Object> datamodel, String template,
 			File outputFile) throws Exception {
-		File resourcesDir = new File("resources" + File.separator + "template");
-		if (!logDir.exists() || !logDir.isDirectory()) {
-			logDir.delete();
-			logDir.mkdir();
+		if (!LOG_DIR.exists() || !LOG_DIR.isDirectory()) {
+			LOG_DIR.delete();
+			LOG_DIR.mkdir();
 		}
-		if (!imagesDir.exists() || !imagesDir.isDirectory()) {
-			imagesDir.delete();
-			imagesDir.mkdir();
+		if (!IMAGES_DIR.exists() || !IMAGES_DIR.isDirectory()) {
+			IMAGES_DIR.delete();
+			IMAGES_DIR.mkdir();
 		}
 		
 		// Check auxiliary files
 		for (String file : TEMPLATE_DIRS) {
-			File auxDir = new File(logDir.getPath() + File.separator + file);
+			File auxDir = new File(LOG_DIR.getPath() + File.separator + file);
 			if (!auxDir.exists()) {
 				auxDir.mkdirs();
 			}
 		}
+
 		for (String file : TEMPLATE_FILES) {
-			File auxFile = new File(logDir.getPath() + File.separator + file);
+			File auxFile = new File(LOG_DIR.getPath() + File.separator + file);
+			System.out.println("COPY FROM  TO " + auxFile);
 			if (!auxFile.exists()) {
-				File inFile = new File(resourcesDir.getPath() + File.separator
+				File inFile = new File(RESOURCES_DIR + File.separator
 						+ file);
+				System.out.println("COPY FROM "+inFile+" TO " + auxFile);
 				if (inFile.exists()) {
 					copyFile(inFile, auxFile);
 				}
@@ -248,7 +268,7 @@ public abstract class HtmlReporter {
 		
 		Configuration cfg = new Configuration();
 
-		cfg.setDirectoryForTemplateLoading(resourcesDir);
+		cfg.setDirectoryForTemplateLoading(new File(RESOURCES_DIR));
 
 		Template tpl = cfg.getTemplate(template);
 		OutputStreamWriter output = new FileWriter(outputFile);
@@ -263,8 +283,8 @@ public abstract class HtmlReporter {
 			arguments.append(argument + " ");
 		datamodel.put("arguments", arguments);
 		datamodel.put("alignName", options.getInputFile());
-		datamodel.put("numTaxa", options.numTaxa);
-		datamodel.put("seqLength", options.numSites);
+		datamodel.put("numTaxa", options.getNumTaxa());
+		datamodel.put("seqLength", options.getNumSites());
 		datamodel.put("phymlVersion", RunPhyml.PHYML_VERSION);
 		datamodel.put("phymlBinary", Utilities.getBinaryVersion());
 		datamodel.put("candidateModels", ModelTest.getCandidateModels().length);
@@ -293,7 +313,7 @@ public abstract class HtmlReporter {
 		StringBuffer optimizedParameters = new StringBuffer(
 				"Substitution parameters ");
 		if (options.countBLasParameters)
-			optimizedParameters.append("+ " + options.numBranches
+			optimizedParameters.append("+ " + options.getNumBranches()
 					+ " branch lengths ");
 		if (options.optimizeMLTopology)
 			optimizedParameters.append("+ topology");
@@ -570,14 +590,18 @@ public abstract class HtmlReporter {
 		int width = 500;
 		int height = 300;
 		try {
-			ChartUtilities.saveChartAsPNG(new File(imagesDir.getPath() + File.separator + mOutputFile.getName() + "_rf_" + ic + ".png"), 
+			System.out.println(" TO PUT ON " + IMAGES_DIR);
+			if (!IMAGES_DIR.exists()) {
+				IMAGES_DIR.mkdir();
+			}
+			ChartUtilities.saveChartAsPNG(new File(IMAGES_DIR.getPath() + File.separator + mOutputFile.getName() + "_rf_" + ic + ".png"), 
 					RFHistogram.buildRFHistogram(ic),
 					width, height);
-			ChartUtilities.saveChartAsPNG(new File(imagesDir.getPath() + File.separator + mOutputFile.getName() + "_eu_" + ic + ".png"), 
+			ChartUtilities.saveChartAsPNG(new File(IMAGES_DIR.getPath() + File.separator + mOutputFile.getName() + "_eu_" + ic + ".png"), 
 					RFHistogram.buildEuclideanHistogram(ic),
 					width, height);
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 	}
 }

@@ -1,13 +1,11 @@
 package es.uvigo.darwin.jmodeltest.exe;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 
-import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
+import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.model.Model;
-import es.uvigo.darwin.jmodeltest.utilities.ModelDef;
+import es.uvigo.darwin.jmodeltest.model.ModelConstants;
 
 public class GuidedSearchManager {
 
@@ -23,48 +21,18 @@ public class GuidedSearchManager {
 
 	private double guidedSearchThreshold;
 	private Model gtrModel;
-	private boolean filterFrequencies;
-	private boolean filterRateMatrix;
-	private boolean filterRateVariation;
+	private boolean doFilterFrequencies;
+	private boolean doFilterRateMatrix;
+	private boolean doFilterRateVariation;
+	private boolean invFilter = false;
+	private boolean gammaFilter = false;
+	private boolean gammaInvFilter = false;
+	private boolean freqsFilter = false;	
+	private boolean ratesFilter[] = new boolean[RATE_PAIRS];
 
-	private static ModelDef models[];
-	private static ModelDef equalFreqmodels[];
-	@SuppressWarnings("unchecked")
-	private static ArrayList<ModelDef> rateFilter[] = new ArrayList[15];
-	private static ArrayList<ModelDef> freqFilter = new ArrayList<ModelDef>();
-
-	private HashSet<ModelDef> filter;
-	private boolean filterInv = false;
-	private boolean filterGamma = false;
-	private boolean filterGammaInv = false;
 
 	static {
-		models = new ModelDef[] { ModelDef.JC, ModelDef.F81, ModelDef.HKY,
-				ModelDef.K80, ModelDef.TRN, ModelDef.TRNef, ModelDef.TPM1uf,
-				ModelDef.TPM1, ModelDef.TPM2uf, ModelDef.TPM2, ModelDef.TPM3uf,
-				ModelDef.TPM3, ModelDef.TIM1ef, ModelDef.TIM1, ModelDef.TIM2ef,
-				ModelDef.TIM2, ModelDef.TIM3ef, ModelDef.TIM3, ModelDef.TVM,
-				ModelDef.TVMef, ModelDef.SYM, ModelDef.GTR };
-
-		equalFreqmodels = new ModelDef[] { ModelDef.JC, ModelDef.K80,
-				ModelDef.TRNef, ModelDef.TPM1, ModelDef.TPM2, ModelDef.TPM3,
-				ModelDef.TIM1ef, ModelDef.TIM2ef, ModelDef.TIM3ef,
-				ModelDef.TVMef, ModelDef.SYM };
-
-		for (ModelDef model : equalFreqmodels) {
-			freqFilter.add(model);
-		}
-
-		freqFilter.addAll(Arrays.asList(equalFreqmodels));
-
-		for (int i = 0; i < RATE_PAIRS; i++) {
-			rateFilter[i] = new ArrayList<ModelDef>();
-			for (ModelDef model : models) {
-				if (model.isEqualRate(i)) {
-					rateFilter[i].add(model);
-				}
-			}
-		}
+		
 	}
 
 	public GuidedSearchManager(double guidedSearchThreshold, Model gtrModel,
@@ -73,15 +41,14 @@ public class GuidedSearchManager {
 
 		this.guidedSearchThreshold = guidedSearchThreshold;
 		this.gtrModel = gtrModel;
-		this.filterFrequencies = filterFrequencies;
-		this.filterRateMatrix = filterRateMatrix;
-		this.filterRateVariation = filterRateVariation;
+		this.doFilterFrequencies = filterFrequencies;
+		this.doFilterRateMatrix = filterRateMatrix;
+		this.doFilterRateVariation = filterRateVariation;
 
-		System.out.println(" ");
-		gtrModel.print(new TextOutputStream(new PrintStream(System.out)));
-		System.out.println(" ");
+		ModelTest.getMainConsole().println("[Heuristic search] Set up model filter...");
+		gtrModel.print(ModelTest.getMainConsole());
 		
-		filter = setUpFilter(this.guidedSearchThreshold, this.gtrModel);
+		setUpFilter(this.guidedSearchThreshold, this.gtrModel);
 
 	}
 
@@ -91,21 +58,29 @@ public class GuidedSearchManager {
 		for (Model model : models) {
 			boolean included = true;
 
-			for (ModelDef mDef : filter) {
-				if (mDef.isName(model.getName())) {
-					included = false;
-					break;
+			int rateIndex = 0;
+			for (int i=0; i<5; i++) {
+				for (int j=i+1; j<6; j++) {
+					if (checkRates(model.getPartition(), i, j)
+							&& ratesFilter[rateIndex]) {
+						included = false;
+					}
+					rateIndex++;
 				}
 			}
 
+			if (!model.ispF()) {
+				included &= !freqsFilter;
+			}
+			
 			if (model.ispI()) {
 				if (model.ispG()) {
-					included &= !filterGammaInv;
+					included &= !gammaInvFilter;
 				} else {
-					included &= !filterInv;
+					included &= !invFilter;
 				}
 			} else if (model.ispG()) {
-				included &= !filterGamma;
+				included &= !gammaFilter;
 			}
 
 			if (included) {
@@ -113,13 +88,76 @@ public class GuidedSearchManager {
 			}
 		}
 
+		if (modelsArray.size() < models.length) {
+			ModelTest.getMainConsole().println("[Heuristic search] Candidate models set reduced to " + modelsArray.size() + " models");
+		} else {
+			ModelTest.getMainConsole().println("[Heuristic search] Candidate models set is not reduced (" + modelsArray.size() + " models)");
+		}
+		
+		return modelsArray.toArray(new Model[0]);
+	}
+	
+	public static String[] getPartitions(String partition, int k) {
+
+		ArrayList<String> partitionsArray = new ArrayList<String>();	
+		if (k>0 && k<6) {
+			boolean equalRates[] = new boolean[] { 
+					checkRates(partition,0,1), checkRates(partition,0,2), checkRates(partition,0,3),
+					checkRates(partition,0,4), checkRates(partition,0,5), checkRates(partition,1,2),
+					checkRates(partition,1,3), checkRates(partition,1,4), checkRates(partition,1,5),
+					checkRates(partition,2,3), checkRates(partition,2,4), checkRates(partition,2,5),
+					checkRates(partition,3,4), checkRates(partition,3,5), checkRates(partition,4,5)};
+			
+			for (String curPartition : ModelConstants.fullModelSet.get(k)) {
+				boolean included = true;
+	
+				int rateIndex = 0;
+				for (int i=0; i<5; i++) {
+					for (int j=i+1; j<6; j++) {
+						if (equalRates[rateIndex] && !checkRates(curPartition, i, j)) {
+							included = false;
+							break;
+						}
+						rateIndex++;
+					}
+				}
+	
+				if (included) {
+					partitionsArray.add(curPartition);
+				}
+			}
+		} else {
+			return new String[]{"012345"};
+		}
+
+		return partitionsArray.toArray(new String[0]);
+	}
+	
+	public static Model[] getModelsSubset(Model[] models, String partition, int k) {
+
+		ArrayList<Model> modelsArray = new ArrayList<Model>();
+		for (String curPartition : getPartitions(partition, k)) {
+			for (Model model : models) {
+				if (model.getPartition().equals(curPartition)) {
+					modelsArray.add(model);
+				}
+			}
+		}
+		if (k < 6) {
+			ModelTest.getMainConsole().println("[Clustering search] Obtain next step models from partition " + partition + "...");
+		}
+		ModelTest.getMainConsole().println("[Clustering search] Step " + (7-k) + "/6: " + modelsArray.size() + " models.");
+		
 		return modelsArray.toArray(new Model[0]);
 	}
 
-	private HashSet<ModelDef> setUpFilter(double guidedSearchThreshold,
+	private static boolean checkRates(String partition, int p0, int p1) {
+		return partition.charAt(p0) == partition.charAt(p1);
+	}
+	
+	private void setUpFilter(double guidedSearchThreshold,
 			Model gtrModel) {
 
-		HashSet<ModelDef> filter = new HashSet<ModelDef>();
 		double threshold = adjustThreshold(guidedSearchThreshold,
 				gtrModel.getLnL());
 
@@ -152,34 +190,45 @@ public class GuidedSearchManager {
 			}
 		}
 
-		if (filterFrequencies
-				&& computeFreqs(new double[] { gtrModel.getfA(),
+		if (doFilterFrequencies) {
+			if (computeFreqs(new double[] { gtrModel.getfA(),
 						gtrModel.getfC(), gtrModel.getfG(), gtrModel.getfT() }) < (1 - threshold)) {
-			System.out.println("*** FILTER FREQUENCIES");
-			filter.addAll(freqFilter);
+				ModelTest.getMainConsole().println("[Heuristic search] Filtering models with equal frequencies");
+				freqsFilter = true;
+			} else {
+				freqsFilter = false;
+			}
+		} else {
+			freqsFilter = false;
 		}
 
-		if (filterRateMatrix) {
+		if (doFilterRateMatrix) {
+			boolean doRatesFilter = false;
 			for (int k = 0; k < RATE_PAIRS; k++) {
-				if (rate[k] > threshold && hasVar) {
-					filter.addAll(rateFilter[k]);
-					System.out.println("*** FILTER RATE " + k);
-				}
+				ratesFilter[k] = (rate[k] > threshold && hasVar);
+				doRatesFilter |= ratesFilter[k];
+			}
+			if (doRatesFilter) {
+				ModelTest.getMainConsole().println("[Heuristic search] Filtering models with certain equal rates");
 			}
 		}
 
-		filterGamma = filterRateVariation
+		gammaFilter = doFilterRateVariation
 				&& gtrModel.getShape() > MIN_GAMMA_FILTER;
-		filterInv = filterRateVariation
+		invFilter = doFilterRateVariation
 				&& (gtrModel.getPinv() < MAX_INV_FILTER && gtrModel.getShape() > MIN_GAMMA_INV_FILTER);
-		filterGammaInv = filterRateVariation
+		gammaInvFilter = doFilterRateVariation
 				&& (gtrModel.getShape() > MIN_GAMMA_FILTER && gtrModel
 						.getPinv() < MAX_INV_FILTER);
-		if (filterGamma | filterInv | filterGammaInv) {
-			System.out.println("*** FILTER RATE VARIATION! " + filterGamma + filterInv + filterGammaInv);
+		if (invFilter) {
+			ModelTest.getMainConsole().println("[Heuristic search] Filtering +I models");
 		}
-
-		return filter;
+		if (gammaFilter) {
+			ModelTest.getMainConsole().println("[Heuristic search] Filtering +G models");
+		}
+		if (gammaInvFilter) {
+			ModelTest.getMainConsole().println("[Heuristic search] Filtering +I+G models");
+		}
 	}
 
 	private static double computeRates(double rate1, double rate2) {

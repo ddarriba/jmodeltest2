@@ -34,18 +34,18 @@ public class MyTableModel extends AbstractTableModel {
 
 	final String[] columnNamesModel = { "ID", "Name", "Partition", "-lnL", "p",
 			"fA", "fC", "fG", "fT", "ti/tv", "R(a)", "R(b)", "R(c)", "R(d)",
-			"R(e)", "R(f)", "p-inv", "shape" };
+			"R(e)", "R(f)", "p-inv", "shape"};
 	final String[] columnNamesAIC = { "ID", "Name", "Partition", "-lnL", "p",
-			"AIC", "deltaAIC", "weight", "cumWeight" };
+			"AIC", "deltaAIC", "weight", "cumWeight", "uDelta" };
 
 	final String[] columnNamesAICc = { "ID", "Name", "Partition", "-lnL", "p",
-			"AICc", "deltaAICc", "weight", "cumWeight" };
+			"AICc", "deltaAICc", "weight", "cumWeight", "uDelta" };
 
 	final String[] columnNamesBIC = { "ID", "Name", "Partition", "-lnL", "p",
-			"BIC", "deltaBIC", "weight", "cumWeight" };
+			"BIC", "deltaBIC", "weight", "cumWeight", "uDelta" };
 
 	final String[] columnNamesDT = { "ID", "Name", "Partition", "-lnL", "p",
-			"DT", "deltaDT", "weight", "cumWeight" };
+			"DT", "deltaDT", "weight", "cumWeight", "-" };
 
 	private String[] columnNames;
 	private Object[][] data;
@@ -116,38 +116,36 @@ public class MyTableModel extends AbstractTableModel {
 					data[i][15] = "-";
 				}
 
+				System.out.println(ModelTest.getCandidateModels()[i].getName() + " -> " + ModelTest.getCandidateModels()[i].getPinv() + " -> " + ModelTest.getCandidateModels()[i].getShape());
 				if (ModelTest.getCandidateModels()[i].ispI()) {
-					data[i][16] = new Double(Round(
-							ModelTest.getCandidateModels()[i].getPinv(),
-							precision));
+						data[i][16] = Utilities.format(ModelTest.getCandidateModels()[i].getPinv(), precision+2, precision, false);
 				} else {
 					data[i][16] = "-";
 				}
 
-				if (ModelTest.getCandidateModels()[i].ispI()) {
+				if (ModelTest.getCandidateModels()[i].ispG()) {
 					if (ModelTest.getCandidateModels()[i].getShape() != ModelTest.INFINITY) {
-						data[i][17] = new Double(Round(
-								ModelTest.getCandidateModels()[i].getShape(),
-								precision));
+						data[i][17] = Utilities.format(ModelTest.getCandidateModels()[i].getShape(), precision+2, precision, false);
 					} else {
 						data[i][17] = "inf";
 					}
 				} else {
 					data[i][17] = "-";
 				}
+				
 			}
 		} else if (whichTable.equals("AIC")) {
 			columnNames = columnNamesAIC;
-			data = new Object[size][9];
+			data = new Object[size][10];
 		} else if (whichTable.equals("AICc")) {
 			columnNames = columnNamesAICc;
-			data = new Object[size][9];
+			data = new Object[size][10];
 		} else if (whichTable.equals("BIC")) {
 			columnNames = columnNamesBIC;
-			data = new Object[size][9];
+			data = new Object[size][10];
 		} else if (whichTable.equals("DT")) {
 			columnNames = columnNamesDT;
-			data = new Object[size][9];
+			data = new Object[size][10];
 		}
 	}
 
@@ -204,6 +202,13 @@ public class MyTableModel extends AbstractTableModel {
 				data[i][8] = new Double(Round(
 						ModelTest.getCandidateModels()[i].getCumAICw(),
 						precision));
+				if (ModelTest.getCandidateModels()[i].getUnconstrainedLnL() > 0.0d) {
+					data[i][9] = new Double(Round(
+							ModelTest.getCandidateModels()[i].getUAICd(),
+							precision));
+				} else {
+					data[i][9] = "-";
+				}
 			}
 		} else if (whichTable.equals("AICc")) {
 			for (i = 0; i < size; i++) {
@@ -226,6 +231,13 @@ public class MyTableModel extends AbstractTableModel {
 				data[i][8] = new Double(Round(
 						ModelTest.getCandidateModels()[i].getCumAICcw(),
 						precision));
+				if (ModelTest.getCandidateModels()[i].getUnconstrainedLnL() > 0.0d) {
+					data[i][9] = new Double(Round(
+							ModelTest.getCandidateModels()[i].getUAICcd(),
+							precision));
+				} else {
+					data[i][9] = "-";
+				}
 			}
 		} else if (whichTable.equals("BIC")) {
 			for (i = 0; i < size; i++) {
@@ -246,6 +258,13 @@ public class MyTableModel extends AbstractTableModel {
 				data[i][8] = new Double(Round(
 						ModelTest.getCandidateModels()[i].getCumBICw(),
 						precision));
+				if (ModelTest.getCandidateModels()[i].getUnconstrainedLnL() > 0.0d) {
+					data[i][9] = new Double(Round(
+							ModelTest.getCandidateModels()[i].getUBICd(),
+							precision));
+				} else {
+					data[i][9] = "-";
+				}
 			}
 		} else if (whichTable.equals("DT")) {
 			for (i = 0; i < size; i++) {
@@ -266,6 +285,7 @@ public class MyTableModel extends AbstractTableModel {
 				data[i][8] = new Double(Round(
 						ModelTest.getCandidateModels()[i].getCumDTw(),
 						precision));
+				data[i][9] = "";
 			}
 		}
 	}

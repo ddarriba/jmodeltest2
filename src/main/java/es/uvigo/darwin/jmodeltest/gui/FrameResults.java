@@ -68,26 +68,26 @@ public class FrameResults extends JModelTestFrame {
 	private javax.swing.JScrollPane scrollPaneDT = new javax.swing.JScrollPane();
 	private  javax.swing.JTable tableDT = new javax.swing.JTable();
 
-	private  MyTableModel modelModels = new MyTableModel("Model", options.numModels);
+	private  MyTableModel modelModels = new MyTableModel("Model", options.getNumModels());
 	TableSorter sorterModels = new TableSorter(modelModels);
 	JTable tempTableModels = new JTable(sorterModels);
 
-	private MyTableModel modelAIC = new MyTableModel("AIC", options.numModels);
+	private MyTableModel modelAIC = new MyTableModel("AIC", options.getNumModels());
 	TableSorter sorterAIC = new TableSorter(modelAIC);
 	JTable tempTableAIC = new JTable(sorterAIC);
 	MyTableCellRenderer AICRenderer = new MyTableCellRenderer(tempTableAIC,"AIC"); 
 
-	private MyTableModel modelAICc = new MyTableModel("AICc", options.numModels);
+	private MyTableModel modelAICc = new MyTableModel("AICc", options.getNumModels());
 	TableSorter sorterAICc = new TableSorter(modelAICc);
 	JTable tempTableAICc = new JTable(sorterAICc);
 	MyTableCellRenderer AICcRenderer = new MyTableCellRenderer(tempTableAICc,"AICc"); 
 
-	private MyTableModel modelBIC = new MyTableModel("BIC", options.numModels);
+	private MyTableModel modelBIC = new MyTableModel("BIC", options.getNumModels());
 	TableSorter sorterBIC = new TableSorter(modelBIC);
 	JTable tempTableBIC = new JTable(sorterBIC);
 	MyTableCellRenderer BICRenderer = new MyTableCellRenderer(tempTableBIC,"BIC"); 
 	
-	private MyTableModel modelDT = new MyTableModel("DT", options.numModels);
+	private MyTableModel modelDT = new MyTableModel("DT", options.getNumModels());
 	TableSorter sorterDT = new TableSorter(modelDT);
 	JTable tempTableDT = new JTable(sorterDT);
 	MyTableCellRenderer DTRenderer = new MyTableCellRenderer(tempTableDT,"DT"); 

@@ -24,6 +24,7 @@ import java.io.StringReader;
 import pal.tree.ReadTree;
 import pal.tree.Tree;
 import pal.tree.TreeParseException;
+import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 
 public class Model implements Serializable {
@@ -41,15 +42,18 @@ public class Model implements Serializable {
 	
 	private boolean pF, pT, pR, pI, pG, pV;
 	
-	private boolean isCandidate, isInAICinterval, isInAICcinterval, 
+	private boolean isInAICinterval, isInAICcinterval, 
 			isInBICinterval, isInDTinterval;
 	
 	private double lnL;
+	/* Unconstrained LK */
+	private double unconstrainedLnL;
+	private double lnLIgnoringGaps;
 
 	/* statistical */
-	private double AIC, AICd, AICw, cumAICw;
-	private double AICc, AICcd, AICcw, cumAICcw;
-	private double BIC, BICd, BICw, cumBICw;
+	private double AIC, AICd, AICw, cumAICw, uAICd;
+	private double AICc, AICcd, AICcw, cumAICcw, uAICcd;
+	private double BIC, BICd, BICw, cumBICw, uBICd;
 	private double DT, DTd, DTw, cumDTw;
 
 	private double fA, fG, fC, fT, titv, kappa;
@@ -57,34 +61,14 @@ public class Model implements Serializable {
 	
 	private long computationTime;
 
-	public static Model JC, JCI, JCG, JCIG, F81, F81I, F81G, F81IG, K80, K80I,
-			K80G, K80IG, HKY, HKYI, HKYG, HKYIG, TrNef, TrNefI, TrNefG,
-			TrNefIG, TrN, TrNI, TrNG, TrNIG, TPM, TPMI, TPMG, TPMIG, TPM1,
-			TPM1I, TPM1G, TPM1IG, TPM1uf, TPM1ufI, TPM1ufG, TPM1ufIG, TPM2,
-			TPM2I, TPM2G, TPM2IG, TPMuf, TPMufI, TPMufG, TPMufIG, TPM2uf,
-			TPM2ufI, TPM2ufG, TPM2ufIG, TPM3, TPM3I, TPM3G, TPM3IG, TPM3uf,
-			TPM3ufI, TPM3ufG, TPM3ufIG, TIMef, TIMefI, TIMefG, TIMefIG, TIM,
-			TIMI, TIMG, TIMIG, TIM1ef, TIM1efI, TIM1efG, TIM1efIG, TIM1, TIM1I,
-			TIM1G, TIM1IG, TIM2ef, TIM2efI, TIM2efG, TIM2efIG, TIM2, TIM2I,
-			TIM2G, TIM2IG, TIM3ef, TIM3efI, TIM3efG, TIM3efIG, TIM3, TIM3I,
-			TIM3G, TIM3IG, TVMef, TVMefI, TVMefG, TVMefIG, TVM, TVMI, TVMG,
-			TVMIG, SYM, SYMI, SYMG, SYMIG, GTR, GTRI, GTRG, GTRIG;
-
-	//TODO: As the constructor is never called with known values, this
-	//      kind of constructor with lots of parameters is totally unnecessary.
-	public Model(int mid, String mname, String mpartition, double mlnL,
+	public Model(int mid, String mname, String mpartition,
 			int mparameters, boolean mpF, boolean mpT, boolean mpV,
-			boolean mpR, boolean mpI, boolean mpG, int mTi, int mTv,
-			double mfA,	double mfC, double mfG, double mfT, double mtitv, 
-			double mkappa, double mRa, double mRb, double mRc, double mRd, 
-			double mRe,	double mRf, double mpinv, double mshape, /* int mnumGammaCat, */
-			boolean misCandidate) {
+			boolean mpR, boolean mpI, boolean mpG, int mTi, int mTv) {
 		
 		id = mid;
 		name = mname;
 		partition = mpartition; // model substitution specification (e.g. GTR =
 								// 012345)
-		lnL = mlnL;
 		K = mparameters;
 		pF = mpF; // includes unequal base frequencies
 		pT = mpT; // includes ti/tv
@@ -94,23 +78,34 @@ public class Model implements Serializable {
 		pG = mpG; // includes gamma
 		numTi = mTi; // number of transition rates
 		numTv = mTv; // number of transversion rates
-		fA = mfA;
-		fC = mfC;
-		fG = mfG;
-		fT = mfT;
-		titv = mtitv;
-		kappa = mkappa;
-		Ra = mRa;
-		Rb = mRb;
-		Rc = mRc;
-		Rd = mRd;
-		Re = mRe;
-		Rf = mRf;
-		pinv = mpinv;
-		shape = mshape;
-		isCandidate = misCandidate;
+		
+		lnL = 0.0;
+		pinv = 0.0;
+		shape = ModelTest.INFINITY;
 	}
 
+	public Model(int mid, String mname, String mpartition,
+			int mparameters) {
+		
+		id = mid;
+		name = mname;
+		partition = mpartition; // model substitution specification (e.g. GTR =
+								// 012345)
+		K = mparameters;
+		pF = false; // includes unequal base frequencies
+		pT = false; // includes ti/tv
+		pV = false; // only for phyml: includes a Ti/Tv, apart from R(x)
+		pR = false; // includes Rates R(x)
+		pI = false; // includes p-inv
+		pG = false; // includes gamma
+		numTi = 0; // number of transition rates
+		numTv = 0; // number of transversion rates
+		
+		lnL = 0.0;
+		pinv = 0.0;
+		shape = ModelTest.INFINITY;
+	}
+	
 	/****************************
 	 * print ************************************ * Print model components * *
 	 ************************************************************************/
@@ -207,6 +202,22 @@ public class Model implements Serializable {
 		return lnL;
 	}
 
+	public void setLnLIgnoringGaps(double lnLIgnoringGaps) {
+		this.lnLIgnoringGaps = lnLIgnoringGaps;
+	}
+
+	public double getLnLIgnoringGaps() {
+		return lnLIgnoringGaps;
+	}
+	
+	public double getUnconstrainedLnL() {
+		return unconstrainedLnL;
+	}
+
+	public void setUnconstrainedLnL(double unconstrainedLnL) {
+		this.unconstrainedLnL = unconstrainedLnL;
+	}
+	
 	public void setAIC(double aIC) {
 		AIC = aIC;
 	}
@@ -231,6 +242,14 @@ public class Model implements Serializable {
 		return AICw;
 	}
 
+	public void setUAICd(double uAICd) {
+		this.uAICd = uAICd;
+	}
+
+	public double getUAICd() {
+		return uAICd;
+	}
+	
 	public void setCumAICw(double cumAICw) {
 		this.cumAICw = cumAICw;
 	}
@@ -267,6 +286,14 @@ public class Model implements Serializable {
 		this.cumAICcw = cumAICcw;
 	}
 
+	public void setUAICcd(double uAICcd) {
+		this.uAICcd = uAICcd;
+	}
+
+	public double getUAICcd() {
+		return uAICcd;
+	}
+	
 	public double getCumAICcw() {
 		return cumAICcw;
 	}
@@ -295,6 +322,14 @@ public class Model implements Serializable {
 		return BICw;
 	}
 
+	public void setUBICd(double uBICd) {
+		this.uBICd = uBICd;
+	}
+
+	public double getUBICd() {
+		return uBICd;
+	}
+	
 	public void setDT(double dT) {
 		DT = dT;
 	}
@@ -542,10 +577,6 @@ public class Model implements Serializable {
 
 	public boolean isInAICinterval() {
 		return isInAICinterval;
-	}
-
-	public boolean isCandidate() {
-		return isCandidate;
 	}
 
 	public int getNumTv() {

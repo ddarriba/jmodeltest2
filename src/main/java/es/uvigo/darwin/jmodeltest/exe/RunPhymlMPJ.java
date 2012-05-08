@@ -77,7 +77,6 @@ public class RunPhymlMPJ extends RunPhyml {
 
 		notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_OK, models.length,
 				null, null);
-
 	}
 
 	public void request() {
@@ -124,7 +123,7 @@ public class RunPhymlMPJ extends RunPhyml {
 				// compute
 				myModels.add(model);
 				PhymlSingleModel runenv = new PhymlSingleModel(model, 0, false,
-						options);
+						false, options);
 				runenv.addObserver(this);
 
 				if (!runenv.compute())
@@ -153,7 +152,7 @@ public class RunPhymlMPJ extends RunPhyml {
 				notifyObservers(ProgressInfo.BASE_TREE_INIT, 0, models[0], null);
 
 				PhymlSingleModel jcModel = new PhymlSingleModel(models[0], 0,
-						true, options);
+						true, false, options);
 				jcModel.run();
 
 				// create JCtree file

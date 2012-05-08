@@ -23,7 +23,6 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Locale;
 
-import pal.alignment.Alignment;
 import pal.tree.Tree;
 import pal.tree.TreeParseException;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
@@ -135,18 +134,14 @@ public class Simulation {
 //						.createTempFile("jmodeltest", "input.aln");
 				ModelTestService.readAlignment(file, options.getAlignmentFile());
 
-				Alignment alignment = AlignmentReader.readAlignment(
+				options.setAlignment(AlignmentReader.readAlignment(
 						new PrintWriter(System.err),
-						options.getAlignmentFile().getAbsolutePath(), true); // file
-				options.numTaxa = alignment.getSequenceCount();
-				options.numSites = alignment.getSiteCount();
-				options.numBranches = 2 * options.numTaxa - 3;
+						options.getAlignmentFile().getAbsolutePath(), true)); // file
 
 				outConsole.println(" OK.");
 				outConsole.println("  number of sequences: "
-						+ options.numTaxa);
-				outConsole.println("  number of sites: " + options.numSites);
-				options.sampleSize = options.numSites;
+						+ options.getNumTaxa());
+				outConsole.println("  number of sites: " + options.getNumSites());
 			} catch (Exception e)// file cannot be read correctly
 			{
 				System.err.println("\nThe specified file \""
@@ -203,21 +198,21 @@ public class Simulation {
 
 		// calculate number of models
 		if (options.getSubstTypeCode() == 0)
-			options.numModels = 3;
+			options.setNumModels(3);
 		else if (options.getSubstTypeCode() == 1)
-			options.numModels = 5;
+			options.setNumModels(5);
 		else if (options.getSubstTypeCode() == 2)
-			options.numModels = 7;
+			options.setNumModels(7);
 		else
-			options.numModels = 11;
+			options.setNumModels(11);
 
 		if (options.doF)
-			options.numModels *= 2;
+			options.setNumModels(options.getNumModels() * 2);
 
 		if (options.doI && options.doG)
-			options.numModels *= 4;
+			options.setNumModels(options.getNumModels() * 4);
 		else if (options.doI || options.doG)
-			options.numModels *= 2;
+			options.setNumModels(options.getNumModels() * 2);
 
 		// build set of models
 		options.setCandidateModels();
@@ -230,7 +225,7 @@ public class Simulation {
 		if (!append)
 			parameterConsole
 					.println("data\tname\tln\tK\tfA\tfC\tfG\tfT\tkappa\ttitv\trAC\tAG\trAT\trCG\trCT\trGT\tpinvI\tshapeG\tpinvIG\tshapeIG");
-		for (i = 0; i < options.numModels; i++) {
+		for (i = 0; i < options.getNumModels(); i++) {
 			treeConsole.println(options.getInputFile().getName() + "\t"
 					+ ModelTest.getCandidateModels()[i].getName() + "\t"
 					+ ModelTest.getCandidateModels()[i].getTreeString());

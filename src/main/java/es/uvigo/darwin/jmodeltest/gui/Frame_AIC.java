@@ -20,9 +20,12 @@ package es.uvigo.darwin.jmodeltest.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -37,23 +40,25 @@ import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.selection.AIC;
 import es.uvigo.darwin.jmodeltest.selection.AICc;
+import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
 public class Frame_AIC extends JModelTestFrame {
 
 	private static final long serialVersionUID = 201104031100L;
 
-	private JPanel PanelAICSettings = new JPanel();
-	private JTextField TextFieldTaxaAIC = new JTextField();
-	private JTextField TextFieldSizeAICc = new JTextField();
-	private JButton RunButtonAIC = new JButton();
-	private JButton CancelButtonAIC = new JButton();
-	private JButton JButtonDefaultAIC = new JButton();
-	private JCheckBox jCheckBoxAICc = new JCheckBox();
+	private JPanel panelAICSettings = new JPanel();
+	private JTextField textTaxaAIC = new JTextField();
+	private JTextField textSizeAICc = new JTextField();
+	private JButton runButtonAIC = new JButton();
+	private JButton cancelButtonAIC = new JButton();
+	private JButton buttonDefaultAIC = new JButton();
+	private JCheckBox checkBoxAICc = new JCheckBox();
 
-	private JCheckBox jCheckBoxPAUPblock = new JCheckBox();
-	private JCheckBox jCheckBoxAveraging = new JCheckBox();
-	private JCheckBox jCheckBoxImportance = new JCheckBox();
-	private JSlider JSliderInterval = new JSlider();
+	private JCheckBox checkBoxPAUPblock = new JCheckBox();
+	private JCheckBox checkBoxAveraging = new JCheckBox();
+	private JCheckBox checkBoxImportance = new JCheckBox();
+	private JSlider sliderInterval = new JSlider();
+	private JComboBox<ApplicationOptions.SampleSizeMode> comboSampleSizeMode = new JComboBox<ApplicationOptions.SampleSizeMode>(ApplicationOptions.SampleSizeMode.values());
 
 	private AIC myAIC;
 	private AICc myAICc;
@@ -62,157 +67,187 @@ public class Frame_AIC extends JModelTestFrame {
 	}
 
 	public void initComponents() throws Exception {
-		PanelAICSettings.setSize(new java.awt.Dimension(490, 240));
-		PanelAICSettings
+		panelAICSettings.setSize(490, 240);
+		panelAICSettings
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(new java.awt.Color(
 								153, 153, 153), 1, false), "AIC Settings", 4,
 						2, new java.awt.Font("Application", 1, 10),
 						new java.awt.Color(102, 102, 153)));
-		PanelAICSettings.setLocation(new java.awt.Point(10, 10));
-		PanelAICSettings.setVisible(true);
-		PanelAICSettings.setLayout(null);
+		panelAICSettings.setLocation(10, 10);
+		panelAICSettings.setVisible(true);
+		panelAICSettings.setLayout(null);
 
-		RunButtonAIC.setVisible(true);
-		RunButtonAIC.setSize(new java.awt.Dimension(190, 40));
-		RunButtonAIC.setText("Do AIC calculations");
-		RunButtonAIC.setLocation(new java.awt.Point(280, 190));
-		getRootPane().setDefaultButton(RunButtonAIC);
+		runButtonAIC.setVisible(true);
+		runButtonAIC.setSize(190, 40);
+		runButtonAIC.setText("Do AIC calculations");
+		runButtonAIC.setLocation(280, 190);
+		getRootPane().setDefaultButton(runButtonAIC);
 
-		JButtonDefaultAIC.setVisible(true);
-		JButtonDefaultAIC.setSize(new java.awt.Dimension(141, 40));
-		JButtonDefaultAIC.setText("Default Settings");
-		JButtonDefaultAIC.setLocation(new java.awt.Point(10, 190));
+		buttonDefaultAIC.setVisible(true);
+		buttonDefaultAIC.setSize(141, 40);
+		buttonDefaultAIC.setText("Default Settings");
+		buttonDefaultAIC.setLocation(10, 190);
 
-		CancelButtonAIC.setVisible(true);
-		CancelButtonAIC.setSize(new java.awt.Dimension(110, 40));
-		CancelButtonAIC.setText("Cancel");
-		CancelButtonAIC.setLocation(new java.awt.Point(160, 190));
+		cancelButtonAIC.setVisible(true);
+		cancelButtonAIC.setSize(110, 40);
+		cancelButtonAIC.setText("Cancel");
+		cancelButtonAIC.setLocation(160, 190);
 
-		jCheckBoxAICc.setVisible(true);
-		jCheckBoxAICc.setSize(new java.awt.Dimension(170, 20));
-		jCheckBoxAICc.setText("Use AICc correction");
-		jCheckBoxAICc.setLocation(new java.awt.Point(30, 30));
-		jCheckBoxAICc.setSelected(false);
+		checkBoxAICc.setVisible(true);
+		checkBoxAICc.setSize(170, 20);
+		checkBoxAICc.setText("Use AICc correction");
+		checkBoxAICc.setLocation(30, 30);
+		checkBoxAICc.setSelected(false);
 
-		TextFieldSizeAICc.setEnabled(false);
-		TextFieldSizeAICc
+		textSizeAICc.setEnabled(false);
+		textSizeAICc
 				.setToolTipText("Enter the sample size you want to use for the AICc correction and click RETURN. By default this is the number of sites in the alignment");
-		TextFieldSizeAICc
+		textSizeAICc
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(new java.awt.Color(
 								153, 153, 153), 1, false), "Sample size", 4, 2,
 						new java.awt.Font("Application", 1, 10),
 						new java.awt.Color(102, 102, 153)));
-		TextFieldSizeAICc.setVisible(true);
-		TextFieldSizeAICc.setSize(new java.awt.Dimension(100, 40));
-		TextFieldSizeAICc.setText("" + options.sampleSize);
-		TextFieldSizeAICc.setHorizontalAlignment(JTextField.RIGHT);
-		TextFieldSizeAICc.setLocation(new java.awt.Point(300, 20));
+		textSizeAICc.setVisible(true);
+		textSizeAICc.setSize(170, 40);
+		options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.ALIGNMENT);
+		textSizeAICc.setText(Utilities.format(options.getSampleSize(),10,4,false));
+		textSizeAICc.setHorizontalAlignment(JTextField.RIGHT);
+		textSizeAICc.setLocation(300, 20);
 
-		jCheckBoxImportance.setVisible(true);
-		jCheckBoxImportance.setSize(new java.awt.Dimension(260, 20));
-		jCheckBoxImportance.setText("Calculate parameter importances");
-		jCheckBoxImportance.setLocation(new java.awt.Point(30, 70));
-		jCheckBoxImportance.setSelected(true);
+		checkBoxImportance.setVisible(true);
+		checkBoxImportance.setSize(260, 20);
+		checkBoxImportance.setText("Calculate parameter importances");
+		checkBoxImportance.setLocation(30, 70);
+		checkBoxImportance.setSelected(true);
 
-		jCheckBoxAveraging.setVisible(true);
-		jCheckBoxAveraging.setSize(new java.awt.Dimension(260, 20));
-		jCheckBoxAveraging.setText("Do model averaging");
-		jCheckBoxAveraging.setLocation(new java.awt.Point(30, 110));
-		jCheckBoxAveraging.setSelected(true);
+		checkBoxAveraging.setVisible(true);
+		checkBoxAveraging.setSize(260, 20);
+		checkBoxAveraging.setText("Do model averaging");
+		checkBoxAveraging.setLocation(30, 110);
+		checkBoxAveraging.setSelected(true);
 
-		jCheckBoxPAUPblock.setVisible(true);
-		jCheckBoxPAUPblock.setSize(new java.awt.Dimension(260, 20));
-		jCheckBoxPAUPblock.setText("Write PAUP* block");
-		jCheckBoxPAUPblock.setLocation(new java.awt.Point(30, 150));
-		jCheckBoxPAUPblock.setSelected(false);
-		jCheckBoxPAUPblock
+		checkBoxPAUPblock.setVisible(true);
+		checkBoxPAUPblock.setSize(260, 20);
+		checkBoxPAUPblock.setText("Write PAUP* block");
+		checkBoxPAUPblock.setLocation(30, 150);
+		checkBoxPAUPblock.setSelected(false);
+		checkBoxPAUPblock
 				.setToolTipText("Writes a block of PAUP* commands implementing the selected model");
 
-		JSliderInterval.setVisible(true);
-		JSliderInterval
+		comboSampleSizeMode.setVisible(true);
+		comboSampleSizeMode.setSize(170, 40);
+		comboSampleSizeMode.setLocation(300, 60);
+		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
+		comboSampleSizeMode
+			.setToolTipText("Select the mode the sample size is computed.");
+		comboSampleSizeMode
+		.setBorder(new BorderUIResource.TitledBorderUIResource(
+				new LineBorder(new java.awt.Color(
+						153, 153, 153), 1, false), "Sample size mode", 4, 2,
+				new java.awt.Font("Application", 1, 10),
+				new java.awt.Color(102, 102, 153)));
+		
+		sliderInterval.setVisible(true);
+		sliderInterval
 				.setToolTipText("Set the confidence interval for model averaging and/or parameter importance");
-		JSliderInterval
+		sliderInterval
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(new java.awt.Color(
 								153, 153, 153), 1, false),
 						"Confidence interval = 100%", 4, 2, new java.awt.Font(
 								"Application", 1, 10), new java.awt.Color(102,
 								102, 153)));
-		JSliderInterval.setSize(new java.awt.Dimension(170, 70));
-		JSliderInterval.setLocation(new java.awt.Point(300, 70));
-		JSliderInterval.setMinimum(0);
-		JSliderInterval.setMaximum(100);
-		JSliderInterval.setValue(100);
-		JSliderInterval.setMajorTickSpacing(20);
-		JSliderInterval.setMinorTickSpacing(5);
-		JSliderInterval.setPaintTicks(true);
-		JSliderInterval.setPaintLabels(true);
-		JSliderInterval.setEnabled(true);
-		JSliderInterval.setFont(XManager.FONT_SLIDER);
+		sliderInterval.setSize(170, 70);
+		sliderInterval.setLocation(300, 105);
+		sliderInterval.setMinimum(0);
+		sliderInterval.setMaximum(100);
+		sliderInterval.setValue(100);
+		sliderInterval.setMajorTickSpacing(20);
+		sliderInterval.setMinorTickSpacing(5);
+		sliderInterval.setPaintTicks(true);
+		sliderInterval.setPaintLabels(true);
+		sliderInterval.setEnabled(true);
+		sliderInterval.setFont(XManager.FONT_SLIDER);
 
-		setLocation(new java.awt.Point(281, 80));
+		setLocation(281, 80);
 		getContentPane().setLayout(null);
 		setTitle("Akaike Information Criterion (AIC) Settings");
 
-		PanelAICSettings.add(RunButtonAIC);
-		PanelAICSettings.add(JButtonDefaultAIC);
-		PanelAICSettings.add(CancelButtonAIC);
-		PanelAICSettings.add(jCheckBoxAICc);
-		PanelAICSettings.add(TextFieldTaxaAIC);
-		PanelAICSettings.add(TextFieldSizeAICc);
+		panelAICSettings.add(runButtonAIC);
+		panelAICSettings.add(buttonDefaultAIC);
+		panelAICSettings.add(cancelButtonAIC);
+		panelAICSettings.add(checkBoxAICc);
+		panelAICSettings.add(textTaxaAIC);
+		panelAICSettings.add(textSizeAICc);
 		// PanelAICSettings.add(jCheckBoxIncludeBL_AIC);
-		PanelAICSettings.add(jCheckBoxAveraging);
-		PanelAICSettings.add(jCheckBoxImportance);
-		PanelAICSettings.add(jCheckBoxPAUPblock);
-		PanelAICSettings.add(JSliderInterval);
-		getContentPane().add(PanelAICSettings);
+		panelAICSettings.add(checkBoxAveraging);
+		panelAICSettings.add(checkBoxImportance);
+		panelAICSettings.add(checkBoxPAUPblock);
+		panelAICSettings.add(sliderInterval);
+		panelAICSettings.add(comboSampleSizeMode);
+		getContentPane().add(panelAICSettings);
 
-		setSize(new java.awt.Dimension(510, 280));
+		setSize(510, 280);
 		setResizable(false);
 
 		// event handling
 
-		jCheckBoxAICc.addChangeListener(new ChangeListener() {
+		checkBoxAICc.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				jCheckBoxAICcStateChanged(e);
 			}
 		});
 
-		jCheckBoxAveraging
+		checkBoxAveraging
 				.addChangeListener(new ChangeListener() {
 					public void stateChanged(ChangeEvent e) {
 						jCheckBoxAveragingStateChanged(e);
 					}
 				});
 
-		jCheckBoxImportance
+		checkBoxImportance
 				.addChangeListener(new ChangeListener() {
 					public void stateChanged(ChangeEvent e) {
 						jCheckBoxImportanceStateChanged(e);
 					}
 				});
 
-		JSliderInterval
+		sliderInterval
 				.addChangeListener(new ChangeListener() {
 					public void stateChanged(ChangeEvent e) {
 						JSliderIntervalStateChanged(e);
 					}
 				});
+		
+		comboSampleSizeMode
+		.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if ((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem() != ApplicationOptions.SampleSizeMode.USER) {
+					options.setSampleSizeMode((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem());
+					textSizeAICc.setText(Utilities.format(options.getSampleSize(),10,4,false));
+					textSizeAICc.setEnabled(false);
+				} else {
+					textSizeAICc.setEnabled(true);
+				}
+			}
+		});
 
-		JButtonDefaultAIC
+		buttonDefaultAIC
 				.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent e) {
 						JButtonDefaultAICActionPerformed(e);
 					}
 				});
-		CancelButtonAIC.addActionListener(new java.awt.event.ActionListener() {
+		cancelButtonAIC.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				CancelButtonAICActionPerformed(e);
 			}
 		});
-		RunButtonAIC.addActionListener(new java.awt.event.ActionListener() {
+		runButtonAIC.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				RunButtonAICActionPerformed(e);
 			}
@@ -263,54 +298,54 @@ public class Frame_AIC extends JModelTestFrame {
 	}
 
 	public void jCheckBoxAICcStateChanged(ChangeEvent e) {
-		if (jCheckBoxAICc.isSelected()) {
-			TextFieldSizeAICc.setEnabled(true);
-			RunButtonAIC.setText("Do AICc calculations");
+		if (checkBoxAICc.isSelected()) {
+			textSizeAICc.setEnabled(true);
+			runButtonAIC.setText("Do AICc calculations");
 		} else {
-			TextFieldSizeAICc.setEnabled(false);
-			RunButtonAIC.setText("Do AIC calculations");
+			textSizeAICc.setEnabled(false);
+			runButtonAIC.setText("Do AIC calculations");
 		}
 	}
 
 	public void jCheckBoxImportanceStateChanged(ChangeEvent e) {
-		if (jCheckBoxImportance.isSelected()) {
-			JSliderInterval.setEnabled(true);
+		if (checkBoxImportance.isSelected()) {
+			sliderInterval.setEnabled(true);
 		} else {
-			if (!jCheckBoxAveraging.isSelected())
-				JSliderInterval.setEnabled(false);
+			if (!checkBoxAveraging.isSelected())
+				sliderInterval.setEnabled(false);
 		}
 	}
 
 	public void jCheckBoxAveragingStateChanged(ChangeEvent e) {
-		if (jCheckBoxAveraging.isSelected()) {
-			JSliderInterval.setEnabled(true);
+		if (checkBoxAveraging.isSelected()) {
+			sliderInterval.setEnabled(true);
 		} else {
-			if (!jCheckBoxImportance.isSelected())
-				JSliderInterval.setEnabled(false);
+			if (!checkBoxImportance.isSelected())
+				sliderInterval.setEnabled(false);
 		}
 	}
 
 	public void JSliderIntervalStateChanged(ChangeEvent e) {
-		JSliderInterval
+		sliderInterval
 				.setBorder(new BorderUIResource.TitledBorderUIResource(
 						new LineBorder(new java.awt.Color(
 								153, 153, 153), 1, false),
-						"Confidence interval = " + JSliderInterval.getValue()
+						"Confidence interval = " + sliderInterval.getValue()
 								+ "%", 4, 2, new java.awt.Font("Application",
 								1, 10), new java.awt.Color(102, 102, 153)));
 	}
 
 	public void JButtonDefaultAICActionPerformed(java.awt.event.ActionEvent e) {
-		jCheckBoxAICc.setSelected(false);
-		TextFieldSizeAICc.setEnabled(false);
-		TextFieldSizeAICc.setText("" + options.sampleSize);
-		RunButtonAIC.setText("Do AIC calculations");
+		checkBoxAICc.setSelected(false);
+		textSizeAICc.setEnabled(false);
+		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
+		runButtonAIC.setText("Do AIC calculations");
 		ApplicationOptions.getInstance().countBLasParameters = true;
 		XManager.getInstance().selectedMenuResultsBLasParameters(true);
-		jCheckBoxPAUPblock.setSelected(false);
-		jCheckBoxAveraging.setSelected(true);
-		jCheckBoxImportance.setSelected(true);
-		JSliderInterval.setValue(100);
+		checkBoxPAUPblock.setSelected(false);
+		checkBoxAveraging.setSelected(true);
+		checkBoxImportance.setSelected(true);
+		sliderInterval.setValue(100);
 	}
 
 	public void CancelButtonAICActionPerformed(java.awt.event.ActionEvent e) {
@@ -330,15 +365,13 @@ public class Frame_AIC extends JModelTestFrame {
 			setVisible(false);
 			dispose();
 
-			writePAUPblock = jCheckBoxPAUPblock.isSelected();
-			doImportances = jCheckBoxImportance.isSelected();
-			doModelAveraging = jCheckBoxAveraging.isSelected();
+			writePAUPblock = checkBoxPAUPblock.isSelected();
+			doImportances = checkBoxImportance.isSelected();
+			doModelAveraging = checkBoxAveraging.isSelected();
 
-			credibleInterval = JSliderInterval.getValue() / 100.0;
+			credibleInterval = sliderInterval.getValue() / 100.0;
 
-			if (jCheckBoxAICc.isSelected()) {
-				options.sampleSize = Integer.parseInt(TextFieldSizeAICc
-						.getText());
+			if (checkBoxAICc.isSelected()) {
 				myAICc = new AICc(writePAUPblock, doImportances,
 						doModelAveraging, credibleInterval);
 				myAICc.compute();

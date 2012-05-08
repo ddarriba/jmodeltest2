@@ -24,13 +24,14 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 import mpi.MPI;
 import mpi.MPIException;
-import pal.alignment.Alignment;
 import pal.tree.Tree;
 import pal.tree.TreeParseException;
 import es.uvigo.darwin.jmodeltest.exe.RunConsense;
@@ -65,7 +66,7 @@ import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
  *         ddarriba@udc.es
  * @author David Posada, University of Vigo, Spain dposada@uvigo.es |
  *         darwin.uvigo.es
- * @version 2.0.2 (Feb 2012)
+ * @version 2.1 (May 2012)
  */
 public class ModelTest {
 
@@ -83,7 +84,7 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.0.2";
+	public static final String CURRENT_VERSION = "2.1";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
@@ -243,23 +244,23 @@ public class ModelTest {
 
 			// calculate number of models
 			if (options.getSubstTypeCode() == 0)
-				options.numModels = 3;
+				options.setNumModels(3);
 			else if (options.getSubstTypeCode() == 1)
-				options.numModels = 5;
+				options.setNumModels(5);
 			else if (options.getSubstTypeCode() == 2)
-				options.numModels = 7;
+				options.setNumModels(7);
 			else if (options.getSubstTypeCode() == 3)
-				options.numModels = 11;
+				options.setNumModels(11);
 			else
-				options.numModels = 203;
+				options.setNumModels(203);
 
 			if (options.doF)
-				options.numModels *= 2;
+				options.setNumModels(options.getNumModels() * 2);
 
 			if (options.doI && options.doG)
-				options.numModels *= 4;
+				options.setNumModels(options.getNumModels() * 4);
 			else if (options.doI || options.doG)
-				options.numModels *= 2;
+				options.setNumModels(options.getNumModels() * 2);
 			options.setCandidateModels();
 		}
 		// build set of models
@@ -277,13 +278,19 @@ public class ModelTest {
 						getCandidateModels());
 			}
 		} else {
-			runPhyml = new RunPhymlThread(new ConsoleProgressObserver(options),
+//			if (options.getSubstTypeCode() == 4) {
+//				runPhyml = new RunPhymlClustering(new ConsoleProgressObserver(options),
+//						options, getCandidateModels());	
+//			} else {
+				runPhyml = new RunPhymlThread(new ConsoleProgressObserver(options),
 					options, getCandidateModels());
+//			}
 		}
 		runPhyml.execute();
 
 		if (MPJ_ME == 0) {
 
+			List<Model> bestModels = new ArrayList<Model>();
 			// do AIC if selected
 			if (options.doAIC) {
 				myAIC = new AIC(options.writePAUPblock, options.doImportances,
@@ -291,11 +298,7 @@ public class ModelTest {
 				myAIC.compute();
 				minAIC = myAIC.getMinModel();
 				AICwasCalculated = true;
-				myAIC.print(MAIN_CONSOLE);
-				if (options.doAveragedPhylogeny) {
-					consensusAIC = new RunConsense(myAIC,
-							options.consensusType, options.confidenceInterval);
-				}
+				bestModels.add(minAIC);
 			}
 
 			// do AICc if selected
@@ -306,10 +309,8 @@ public class ModelTest {
 				myAICc.compute();
 				minAICc = myAICc.getMinModel();
 				AICcwasCalculated = true;
-				myAICc.print(MAIN_CONSOLE);
-				if (options.doAveragedPhylogeny) {
-					consensusAICc = new RunConsense(myAICc,
-							options.consensusType, options.confidenceInterval);
+				if (!bestModels.contains(minAICc)) {
+					bestModels.add(minAICc);
 				}
 			}
 
@@ -320,10 +321,8 @@ public class ModelTest {
 				myBIC.compute();
 				minBIC = myBIC.getMinModel();
 				BICwasCalculated = true;
-				myBIC.print(MAIN_CONSOLE);
-				if (options.doAveragedPhylogeny) {
-					consensusBIC = new RunConsense(myBIC,
-							options.consensusType, options.confidenceInterval);
+				if (!bestModels.contains(minBIC)) {
+					bestModels.add(minBIC);
 				}
 			}
 
@@ -334,13 +333,40 @@ public class ModelTest {
 				myDT.compute();
 				minDT = myDT.getMinModel();
 				DTwasCalculated = true;
+			}
+			
+			if (options.isAmbiguous() && options.isForceCheckULnL()) {
+				runPhyml.executeIgnoreGaps(bestModels.toArray(new Model[0]));
+			}
+			
+			if (options.doAIC) {
+				myAIC.print(MAIN_CONSOLE);
+				if (options.doAveragedPhylogeny) {
+					consensusAIC = new RunConsense(myAIC,
+							options.consensusType, options.confidenceInterval);
+				}
+			}
+			if (options.doAICc) {
+				myAICc.print(MAIN_CONSOLE);
+				if (options.doAveragedPhylogeny) {
+					consensusAICc = new RunConsense(myAICc,
+							options.consensusType, options.confidenceInterval);
+				}
+			}
+			if (options.doBIC) {
+				myBIC.print(MAIN_CONSOLE);
+				if (options.doAveragedPhylogeny) {
+					consensusBIC = new RunConsense(myBIC,
+							options.consensusType, options.confidenceInterval);
+				}
+			}
+			if (options.doDT) {
 				myDT.print(MAIN_CONSOLE);
 				if (options.doAveragedPhylogeny) {
 					consensusDT = new RunConsense(myDT, options.consensusType,
 							options.confidenceInterval);
 				}
 			}
-			
 			// do hLRT if selected
 			if (options.doHLRT) {
 				myHLRT = new HLRT();
@@ -527,6 +553,9 @@ public class ModelTest {
 							case 11:
 								options.setSubstTypeCode(3);
 								break;
+							case 203:
+								options.setSubstTypeCode(4);
+								break;
 							default:
 								System.err
 										.println(error
@@ -575,17 +604,73 @@ public class ModelTest {
 					}
 				}
 
-				else if (arg.equals("-n")) {
+				else if (arg.equals("-G")) {
 					if (i < arguments.length) {
 						try {
-							String sampleSize = arguments[i++];
-							options.sampleSize = Integer.parseInt(sampleSize);
+							Double threshold = Double.parseDouble(arguments[i++]);
+							options.setGuidedSearchThreshold(threshold);
 						} catch (NumberFormatException e) {
-							System.err.println(error
-									+ "-n option requires a sample size.");
+							System.err
+									.println(error
+											+ "-G option requires a threshold.");
 							PrintUsage();
 						}
 					} else {
+						System.err
+								.println(error
+										+ "-G option requires a threshold.");
+						PrintUsage();
+					}
+				}
+				
+				else if (arg.equals("-H")) {
+					if (i < arguments.length) {
+						String criterion = arguments[i++];
+						if (criterion.equals("AIC")) {
+							options.setHeuristicInformationCriterion(InformationCriterion.IC_AIC);
+						} else if (criterion.equals("BIC")) {
+							options.setHeuristicInformationCriterion(InformationCriterion.IC_BIC);
+						} else if (criterion.equals("AICc")) {
+							options.setHeuristicInformationCriterion(InformationCriterion.IC_AICc);
+						} else {
+							System.err
+							.println(error
+									+ "-H argument is invalid (AIC, BIC, AICc).");
+							PrintUsage();							
+						}
+					} else {
+						System.err
+								.println(error
+										+ "-H option requires an argument (AIC, BIC, AICc).");
+						PrintUsage();
+					}
+				}
+				
+				else if (arg.equals("-n")) {
+					if (i < arguments.length) {
+						String sampleSize = arguments[i++];
+						if (sampleSize.equalsIgnoreCase("ALIGNMENT")) {
+							options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.ALIGNMENT);
+						} else if (sampleSize.equalsIgnoreCase("ALIGNMENT_VAR")) {
+							options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.ALIGNMENT_VAR);
+						} else if (sampleSize.equalsIgnoreCase("NxL")) {
+							options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.NxL);
+						} else if (sampleSize.equalsIgnoreCase("SHANNON")) {
+							options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.SHANNON);
+						} else if (sampleSize.equalsIgnoreCase("SHANNON_NxL")) {
+							options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.SHANNON_NxL);
+						} else {
+							try {
+								options.setSampleSizeModeUser(Integer.parseInt(sampleSize));
+							} catch (NumberFormatException e) {
+								System.err.println("Number ex.");
+								System.err.println(error
+										+ "-n option requires a sample size.");
+								PrintUsage();
+							}
+						}
+					} else {
+						System.err.println("Args ex.");
 						System.err.println(error
 								+ "-n option requires a sample size.");
 						PrintUsage();
@@ -678,6 +763,10 @@ public class ModelTest {
 					options.doDT = true;
 				}
 
+				else if (arg.equals("-uLnL")) {
+					options.setForceCheckULnL(true);
+				}
+				
 				else if (arg.equals("-p")) {
 					options.doImportances = true;
 				}
@@ -936,14 +1025,23 @@ public class ModelTest {
 		if (MPJ_ME == 0) {
 			String usage = "\njModelTest command usage"
 					+ "\n -d: input data file (e.g., -d data.phy)"
-					+ "\n -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11; default is 3)"
+					+ "\n -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)"
 					+ "\n -f: include models with unequals base frecuencies (e.g., -f) (default is false)"
 					+ "\n -i: include models with a proportion invariable sites (e.g., -i) (default is false)"
 					+ "\n -g: include models with rate variation among sites and number of categories (e.g., -g 8) (default is false & 4 categories)"
-					+ "\n -t: base tree for likelihood calculations (fixed (BIONJ-JC), BIONJ, ML) (e.g., -t BIONJ) (default is ML)"
+					+ "\n -t: base tree for likelihood calculations (e.g., -t BIONJ)"
+					+ "\n     fixed  (common BIONJ-JC topology)"
+					+ "\n     BIONJ  (Neighbor-Joining topology)"
+					+ "\n     ML     (Maximum Likelihood topology) (default)"
 					+ "\n -u: user tree for likelihood calculations  (e.g., -u data.tre)"
 					+ "\n -S: tree topology search operation option (NNI (fast), SPR (a bit slower), BEST (best of NNI and SPR)) (default is BEST)"
-					+ "\n -n: sample size (-n235) (default is  the number of sites)"
+					+ "\n -n: sample size (e.g., -n NxL , or -n 547"
+					+ "\n     ALIGNMENT     (number of sites) (default)"
+					+ "\n     ALIGNMENT_VAR (number of variable sites)"
+					+ "\n     NxL           (number of sites multiplied by number of taxa)"
+					+ "\n     SHANNON       (Shannon entropy)"
+					+ "\n     SHANNON_NxL   (normalized Shannon entropy multiplied by NxL)"
+					+ "\n     [SampleSize]  (user defined value)"
 					+ "\n -AIC: calculate the Akaike Information Criterion (e.g., -AIC) (default is false)"
 					+ "\n -AICc: calculate the corrected Akaike Information Criterion (e.g., -AICc) (default is false)"
 					+ "\n -BIC: calculate the Bayesian Information Criterion (e.g., -BIC) (default is false)"
@@ -960,6 +1058,10 @@ public class ModelTest {
 					+ "\n -h: confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)"
 					+ "\n -a: estimate model-averaged phylogeny for each active criterion (e.g., -a) (default is false)"
 					+ "\n -z: strict consensus type for model-averaged phylogeny (e.g., -z) (default is majority rule)"
+					+ "\n -G: heuristic search. Requires a threshold > 0 (e.g., -G 0.1)"
+					+ "\n -H: information criterion for clustering search (AIC, AICc, BIC). (e.g., -H AIC) (default is BIC)"
+					+ "\n -uLnL: calculate delta AIC,AICc,BIC against unconstrained likelihood (e.g., -uLnL)"
+					+ "\n        (default is false if the input alignment has gaps or ambiguous characters)"
 					+ "\n -tr: number of threads to execute (default is "
 					+ Runtime.getRuntime().availableProcessors()
 					+ ")"
@@ -1123,18 +1225,17 @@ public class ModelTest {
 				ModelTestService.readAlignment(inputFile,
 						options.getAlignmentFile());
 
-				Alignment alignment = AlignmentReader.readAlignment(
+				options.setAlignment(AlignmentReader.readAlignment(
 						new PrintWriter(System.err), options.getAlignmentFile()
-								.getAbsolutePath(), true); // file
-				options.numTaxa = alignment.getSequenceCount();
-				options.numSites = alignment.getSiteCount();
-				options.numBranches = 2 * options.numTaxa - 3;
+								.getAbsolutePath(), true)); // file
 
 				MAIN_CONSOLE.println(" OK.");
 				MAIN_CONSOLE.println("  number of sequences: "
-						+ options.numTaxa);
-				MAIN_CONSOLE.println("  number of sites: " + options.numSites);
-				options.sampleSize = options.numSites;
+						+ options.getNumTaxa());
+				MAIN_CONSOLE.println("  number of sites: " + options.getNumSites());
+				MAIN_CONSOLE.println("  ambiguity : "
+						+ options.isAmbiguous());
+				options.checkSampleSize();
 			} catch (Exception e)// file cannot be read correctly
 			{
 				System.err.println("\nThe specified file \""
@@ -1395,7 +1496,7 @@ public class ModelTest {
 	 *            the candidateModels to set
 	 */
 	public static void setCandidateModels(Model[] candidateModels) {
-		ApplicationOptions.getInstance().numModels = candidateModels.length;
+		ApplicationOptions.getInstance().setNumModels(candidateModels.length);
 		ModelTest.candidateModels = candidateModels;
 	}
 
@@ -1417,6 +1518,17 @@ public class ModelTest {
 		return hostname;
 	}
 
+	public static void purgeModels() {
+		List<Model> modelList = new ArrayList<Model>();
+		for (Model model : candidateModels) {
+			if (model.getLnL() > 0) {
+				modelList.add(model);
+			}
+		}
+		candidateModels = modelList.toArray(new Model[0]);
+		ApplicationOptions.getInstance().setNumModels(candidateModels.length);
+	}
+	
 	public class NullPrinter extends OutputStream {
 
 		@Override
@@ -1426,6 +1538,6 @@ public class ModelTest {
 		}
 
 	}
-
+	
 } // class ModelTest
 

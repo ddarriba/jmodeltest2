@@ -29,13 +29,25 @@ public class ProgressInfo {
 	public static final int SINGLE_OPTIMIZATION_COMPLETED = 5;
 	public static final int OPTIMIZATION_COMPLETED_OK = 6;
 	public static final int OPTIMIZATION_COMPLETED_INTERRUPTED = 7;
-	public static final int INTERRUPTED = 8;
-	public static final int ERROR = 9;
+	public static final int REOPTIMIZATION_INIT = 8;
+	public static final int REOPTIMIZATION_COMPLETED = 9;
+	public static final int GTR_OPTIMIZATION_INIT = 10;
+	public static final int GTR_OPTIMIZATION_COMPLETED = 11;
+	public static final int GTR_NOT_FOUND = 12;
+	public static final int INTERRUPTED = 20;
+	public static final int ERROR = 21;
+	
+	public static final int VALUE_REGULAR_OPTIMIZATION = 1;
+	public static final int VALUE_IGAPS_OPTIMIZATION = 2;
+	
 	
 	private int type;
 	private Model model;
 	private int value;
 	private String message;
+	private boolean doHeuristicSearch = false;
+	private int heuristicStage;
+	private int numModelsInStage;
 	
 	public ProgressInfo(int type, int value, Model model, String message) {
 		this.type = type;
@@ -58,5 +70,26 @@ public class ProgressInfo {
 	
 	public String getMessage() {
 		return message;
+	}
+	
+	public boolean isHeuristicSearch() {
+		return doHeuristicSearch;
+	}
+	
+	public int getNumModelsInStage() {
+		return numModelsInStage;
+	}
+	
+	public void setNumModelsInStage(int numModelsInStage) {
+		this.numModelsInStage = numModelsInStage;
+	}
+	
+	public int getHeuristicStage() {
+		return heuristicStage;
+	}
+	
+	public void setHeuristicStage(int heuristicStage) {
+		this.heuristicStage = heuristicStage;
+		this.doHeuristicSearch = (heuristicStage > 0);
 	}
 }

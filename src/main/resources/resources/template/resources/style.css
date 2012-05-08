@@ -367,9 +367,10 @@ table.topologies-info td.topo-rank {
 #selection-caption {
 	display: block;
 	padding: 10px;
-  	height: 300px;
+  	height: 330px;
   	width: 320px;
 	float: left;
+	overflow-y: auto;
 }
 
 img.distances-img {

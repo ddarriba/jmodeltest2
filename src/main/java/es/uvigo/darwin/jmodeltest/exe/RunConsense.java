@@ -124,16 +124,16 @@ public class RunConsense {
 				double weight;
 				// set criterion
 				switch (criterion.getType()) {
-				case InformationCriterion.AIC:
+				case InformationCriterion.IC_AIC:
 					weight = m.getAICw();
 					break;
-				case InformationCriterion.AICc:
+				case InformationCriterion.IC_AICc:
 					weight = m.getAICcw();
 					break;
-				case InformationCriterion.BIC:
+				case InformationCriterion.IC_BIC:
 					weight = m.getBICw();
 					break;
-				case InformationCriterion.DT:
+				case InformationCriterion.IC_DT:
 					weight = m.getDTw();
 					break;
 				default:
@@ -252,7 +252,7 @@ public class RunConsense {
 		stream.println("*                                                             *");
 		stream.println("---------------------------------------------------------------");
 
-		if (criterion.getType() == InformationCriterion.DT)
+		if (criterion.getType() == InformationCriterion.IC_DT)
 			Utilities
 					.printRed("\nWarning: The DT weights used for this model averaged phylogeny are very gross"
 							+ " and should be used with caution. See the program documentation.\n");

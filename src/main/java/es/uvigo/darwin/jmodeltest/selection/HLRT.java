@@ -72,7 +72,7 @@ public class HLRT
 		if (forward)
 			currentModel = ModelTest.getCandidateModels()[0];	
 		else
-			currentModel = ModelTest.getCandidateModels()[options.numModels-1];
+			currentModel = ModelTest.getCandidateModels()[options.getNumModels()-1];
 			
 		stream.println("\n\n\n---------------------------------------------------------------");
 		stream.println("*                                                             *");
@@ -220,7 +220,7 @@ public class HLRT
 		if (forward)
 			currentModel = ModelTest.getCandidateModels()[0];	
 		else
-			currentModel = ModelTest.getCandidateModels()[options.numModels-1];
+			currentModel = ModelTest.getCandidateModels()[options.getNumModels()-1];
 			
 		stream.println("\n\n\n---------------------------------------------------------------");
 		stream.println("*                                                             *");

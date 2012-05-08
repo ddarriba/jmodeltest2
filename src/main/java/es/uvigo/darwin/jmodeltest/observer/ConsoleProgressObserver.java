@@ -64,12 +64,20 @@ public class ConsoleProgressObserver implements Observer {
 				break;
 
 			case ProgressInfo.OPTIMIZATION_INIT:
-				this.totalModels = options.numModels;
+				this.totalModels = options.getNumModels();
 				stream.println(" ");stream.println(" ");
 				stream.println("::Progress::");
 				stream.println(" ");
 				stream.println("Model \t\t Exec. Time \t Total Time \t -lnL");
 				stream.println("-------------------------------------------------------------------------");
+				break;
+			
+			case ProgressInfo.GTR_OPTIMIZATION_INIT:
+				stream.println("[Heuristic search] Optimizing " + info.getModel().getName() + " model");
+				break;
+				
+			case ProgressInfo.GTR_OPTIMIZATION_COMPLETED:
+				stream.println("[Heuristic search] Starting model filtering");
 				break;
 				
 			case ProgressInfo.SINGLE_OPTIMIZATION_INIT:
@@ -78,17 +86,52 @@ public class ConsoleProgressObserver implements Observer {
 			case ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED:
 				completedModels++;
 				stream.print(info.getModel().getName() + "\t");
+				double modelLnL;
+				if (info.getValue() == ProgressInfo.VALUE_REGULAR_OPTIMIZATION) {
+					modelLnL = info.getModel().getLnL(); 
+				} else {
+					modelLnL = info.getModel().getLnLIgnoringGaps();
+				}
 				if (info.getModel().getName().length()<8)
 					stream.print("\t");
 				stream.print(info.getMessage() + "\t" 
 						+ Utilities.calculateRuntime(startTime, System.currentTimeMillis()) + "\t" 
-						+ String.format(Locale.ENGLISH, "%5.4f", info.getModel().getLnL()));
+						+ String.format(Locale.ENGLISH, "%13.4f", modelLnL));
 				if (ModelTest.MPJ_RUN && threadScheduling) {
 					stream.println(" ");
 				} else {
-					stream.println("\t (" + completedModels + "/" + totalModels + ")");
+					if (info.isHeuristicSearch() && info.getValue() == ProgressInfo.VALUE_REGULAR_OPTIMIZATION) {
+						stream.println("\t ["+info.getHeuristicStage()+"/6] (" + completedModels + "/" + info.getNumModelsInStage() + ")");
+						if (completedModels == info.getNumModelsInStage()) {
+							completedModels = 0;
+						}
+					} else {
+						stream.println("\t (" + completedModels + "/" + totalModels + ")");
+					}
 				}
 				break;
+				
+			case ProgressInfo.REOPTIMIZATION_INIT:
+				this.totalModels = info.getValue();
+				this.completedModels = 0;
+				this.startTime = System.currentTimeMillis();
+				stream.println(" ");stream.println(" ");
+				stream.println("Some models should be reoptimized for checking lnL against the unconstrained likelihood");
+				stream.println(" ");
+				stream.println("Model \t\t Exec. Time \t Total Time\t-lnL w/o gaps");
+				stream.println("-------------------------------------------------------------------------");
+				break;
+				
+			case ProgressInfo.REOPTIMIZATION_COMPLETED:
+
+				stream.println(" ");
+
+				stream.println("  Unconstrained -lnL       = " + options.getUnconstrainedLnL());
+				stream.println("  Number of patterns found = " + options.getNumPatterns());
+
+				stream.println(" ");
+				break;
+				
 			case ProgressInfo.INTERRUPTED:
 				stream.println(" ");
 				stream.println("Computation of likelihood scores discontinued ...");
@@ -109,6 +152,12 @@ public class ConsoleProgressObserver implements Observer {
 					ModelTest.getMainConsole().println(" ");
 				}
 
+				if (options.isAmbiguous()) {
+				stream.println("  Best-fit models should be reoptimized for comparison with unconstrained likelihood");
+				} else {
+					stream.println("  Unconstrained -lnL       = " + options.getUnconstrainedLnL());
+					stream.println("  Number of patterns found = " + options.getNumPatterns());
+				}
 				stream.println(" ");
 				stream.println("Computation of likelihood scores completed. It took "
 						+ Utilities.calculateRuntime(startTime,

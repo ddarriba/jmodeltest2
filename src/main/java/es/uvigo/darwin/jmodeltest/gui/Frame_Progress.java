@@ -63,7 +63,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	private static final int V_INNER_MARGIN = 5;
 	private static final int SECTION_WIDTH = WINDOW_WIDTH - 2 * H_MARGIN;
 	private static final int HEADER_HEIGHT = LABEL_HEIGHT + 2 * V_INNER_MARGIN;
-	private static final int FOOTER_HEIGHT = 2 * PROGRESS_BAR_HEIGHT + 3
+	private static int FOOTER_HEIGHT = 2 * PROGRESS_BAR_HEIGHT + 3
 			* V_INNER_MARGIN;
 	private static final int THREADS_SECTIONS_VLOC = HEADER_HEIGHT + 2
 			* V_MARGIN;
@@ -95,6 +95,8 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	private JProgressBar progressBarLike = new JProgressBar();
 	private JLabel progressBarLikeLabel = new JLabel();
 	private JLabel timerLabel = new JLabel();
+	private int maxNumOfModelsPerStage[] = new int[]{1,15,10,6,3,1};
+	private JLabel footerStageLabel = new JLabel();
 
 	/** Timer for calculate the elapsed time **/
 	private long startTime;
@@ -103,6 +105,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 
 	private int completedModels = 0;
 	private int totalModels;
+	private int currentStage = 1;
 
 	private boolean interrupted;
 
@@ -204,28 +207,47 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 		// BOTTOM SECTION
 		int FOOTER_SECTION_VLOC = THREADS_SECTIONS_VLOC + threadsPanelHeight
 				+ V_MARGIN;
-		footerPanel.setSize(SECTION_WIDTH, FOOTER_HEIGHT);
+		footerPanel.setSize(SECTION_WIDTH, FOOTER_HEIGHT + (options.isClusteringSearch()?30:0));
 		footerPanel.setLocation(H_MARGIN, FOOTER_SECTION_VLOC);
 		footerPanel.setBorder(new BorderUIResource.LineBorderUIResource(
 				XManager.PANEL_BORDER_COLOR));
 		footerPanel.setLayout(null);
 		footerPanel.setVisible(true);
 
-		progressBarLike.setMaximum(maximum);
+		if (options.isClusteringSearch()) {
+			footerStageLabel.setSize(80,20);
+			footerStageLabel.setLocation(H_MARGIN,V_INNER_MARGIN);
+			footerStageLabel.setVisible(true);
+			footerStageLabel.setText("Step 1/6");
+			footerPanel.add(footerStageLabel);
+		}
+
+		int progressBarVPosition = V_INNER_MARGIN;
+		if (options.isClusteringSearch()) {
+			int scaleFactor = (options.doI?2:1) * (options.doG?2:1) * (options.doF?2:1);
+			for (int i=0; i<6; i++) {
+				this.maxNumOfModelsPerStage[i] *= scaleFactor;
+			}
+			progressBarVPosition += 30;
+			FOOTER_HEIGHT += 30;
+		}
+
+		int initialMaxValue = options.isClusteringSearch()?maxNumOfModelsPerStage[0]:maximum;
+		progressBarLike.setMaximum(initialMaxValue);
 		progressBarLike.setValue(0);
 		progressBarLike.setStringPainted(true);
 		progressBarLike.setString(null);
-
+	
 		progressBarLike.setSize(SECTION_WIDTH - 2 * H_MARGIN,
 				PROGRESS_BAR_HEIGHT);
-		progressBarLike.setLocation(H_MARGIN, V_INNER_MARGIN);
+		progressBarLike.setLocation(H_MARGIN, progressBarVPosition);
 		progressBarLike.setVisible(true);
 
 		progressBarCancelButton.setVisible(true);
 		progressBarCancelButton.setSize(BUTTON_WIDTH, PROGRESS_BAR_HEIGHT);
 		progressBarCancelButton.setText("Cancel");
 		progressBarCancelButton.setLocation((SECTION_WIDTH - BUTTON_WIDTH) / 2,
-				PROGRESS_BAR_HEIGHT + 2 * V_INNER_MARGIN);
+				PROGRESS_BAR_HEIGHT + V_INNER_MARGIN + progressBarVPosition);
 
 		// MAIN WINDOW
 
@@ -343,6 +365,20 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 						+ info.getModel().getTreeString() + "\n");
 				break;
 
+			case ProgressInfo.GTR_OPTIMIZATION_INIT:
+				stream.println("[Heuristic search] Optimizing " + info.getModel().getName() + " model");
+				threadProgressModelLabel[0].setText("Computing " + info.getModel().getName() + " model for heuristic search");
+				threadProgressModelLabel[0].setForeground(XManager.LABEL_GREEN_COLOR);
+				threadProgressBar[0].setIndeterminate(true);
+				break;
+
+			case ProgressInfo.GTR_OPTIMIZATION_COMPLETED:
+				stream.println("[Heuristic search] OK");
+				threadProgressModelLabel[0].setText(NO_MODEL);
+				threadProgressModelLabel[0].setForeground(XManager.LABEL_FAIL_COLOR);
+				threadProgressBar[0].setIndeterminate(false);
+				break;
+				
 			case ProgressInfo.SINGLE_OPTIMIZATION_INIT:
 				for (int i = 0; i < numberOfThreads; i++) {
 					JLabel progressLabel = threadProgressModelLabel[i];
@@ -385,16 +421,29 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 							break;
 						}
 					}
-					progressBarLikeLabel.setText("Completed " + completedModels
+					if (options.isClusteringSearch()) {
+						if (currentStage != info.getHeuristicStage()) {
+							currentStage = info.getHeuristicStage();
+							completedModels = 0;
+							footerStageLabel.setText("Step " + currentStage + "/6");
+							int newMaximum = maxNumOfModelsPerStage[currentStage-1];
+							progressBarLike.setMaximum(newMaximum);
+						}
+						progressBarLikeLabel.setText("["+ currentStage +"/6]" + completedModels
+								+ "/" + info.getNumModelsInStage());
+					} else {
+						progressBarLikeLabel.setText("Completed " + completedModels
 							+ "/" + totalModels);
+					}
 
 					progressBarLike.setValue(completedModels);
 				} catch (NullPointerException e) {
 					// Ignore...
 				}
 
+				String modelTab = (info.getModel().getName().length() > 10)?"\t":"\t\t";
 				stream.println(info.getModel().getName()
-						+ "\t\t"
+						+ modelTab
 						+ info.getMessage()
 						+ "\t"
 						+ Utilities.calculateRuntime(startTime,
@@ -471,7 +520,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 											+ numComputedModels + " models "
 											+ baseTree);
 
-					if (numComputedModels == options.numModels) {
+					if (options.isClusteringSearch() || (numComputedModels == options.getNumModels())) {
 						XManager.getInstance().setLikeLabelColor(
 								XManager.LABEL_BLUE_COLOR);
 

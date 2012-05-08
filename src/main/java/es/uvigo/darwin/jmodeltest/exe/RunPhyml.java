@@ -17,9 +17,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package es.uvigo.darwin.jmodeltest.exe;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
@@ -38,7 +45,7 @@ import es.uvigo.darwin.jmodeltest.utilities.Utilities;
  *         ddarriba@udc.es
  * @author David Posada, University of Vigo, Spain dposada@uvigo.es |
  *         darwin.uvigo.es
- * @version 2.0.2 (Feb 2012)
+ * @version 2.1 (May 2012)
  */
 public abstract class RunPhyml extends Observable implements Observer {
 
@@ -49,6 +56,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 
 	protected ApplicationOptions options;
 	protected Model[] models;
+	protected Model gtrModel = null;
 
 	public static final String PHYML_VERSION = "3.0";
 
@@ -76,6 +84,31 @@ public abstract class RunPhyml extends Observable implements Observer {
 		deleteFiles();
 		printSettings(ModelTest.getMainConsole());
 
+		// locate GTR model
+		String searchFor;
+		int gtrParams;
+		if (options.doI && options.doG) {
+			searchFor="GTR+I+G";
+			gtrParams = 10;
+		} else if(options.doI) {
+			searchFor="GTR+I";
+			gtrParams = 9;
+		} else if(options.doG) {
+			searchFor="GTR+G";
+			gtrParams = 9;
+		} else {
+			searchFor="GTR";
+			gtrParams = 8;
+		}
+		for (int i = (models.length - 1); i >= 0; i--) {
+			if (models[i].getName().startsWith(searchFor)) {
+				gtrModel = models[i];
+				break;
+			}
+		}
+		if (gtrModel == null) {
+			gtrModel = new Model(0, searchFor, "012345", gtrParams, false, false, false, true, options.doI, options.doG, 2, 4);
+		}
 		// estimate a NJ-JC tree if needed
 		if (options.fixedTopology) {
 			Model jcModel = null;
@@ -90,7 +123,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 				notifyObservers(ProgressInfo.BASE_TREE_INIT, 0, jcModel, null);
 
 				PhymlSingleModel jcModelPhyml = new PhymlSingleModel(jcModel,
-						0, true, options);
+						0, true, false, options);
 				jcModelPhyml.run();
 
 				// create JCtree file
@@ -105,40 +138,85 @@ public abstract class RunPhyml extends Observable implements Observer {
 
 		}
 
-		if (options.getGuidedSearchThreshold() > 0.0) {
+		if (options.isGuidedSearch()) {
 
-			// compute GTR model
-			Model gtrModel = null;
-			for (int i = (models.length - 1); i >= 0; i--) {
-				if (models[i].getName().startsWith("GTR+I+G")) {
-					gtrModel = models[i];
-					PhymlSingleModel gtrPhymlModel = new PhymlSingleModel(
-							gtrModel, 0, false, options);
-					gtrPhymlModel.run();
-					break;
-				}
-			}
 			if (gtrModel != null) {
+				// compute GTR model
+				notifyObservers(ProgressInfo.GTR_OPTIMIZATION_INIT, models.length, gtrModel, null);
+				PhymlSingleModel gtrPhymlModel = new PhymlSingleModel(
+						gtrModel, 0, false, false, options);
+				gtrPhymlModel.run();
+				notifyObservers(ProgressInfo.GTR_OPTIMIZATION_COMPLETED, models.length, gtrModel, null);
+				
 				GuidedSearchManager gsm = new GuidedSearchManager(
 						options.getGuidedSearchThreshold(), gtrModel,
 						filterFrequencies, filterRateMatrix,
 						filterRateVariation);
-
+	
 				models = gsm.filterModels(models);
 				ModelTest.setCandidateModels(models);
-				System.out.println("Tenemors " + models.length + " modelos");
+			} else {
+				notifyObservers(ProgressInfo.GTR_NOT_FOUND, models.length, models[0], null);
 			}
 		}
 
 		// compute likelihood scores for all models
-		// System.out.print("computing likelihood scores for "
-		// + models.length + " models with Phyml " + PHYML_VERSION);
 
 		notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0, models[0], null);
 
 		doPhyml();
+
 	}
 
+	public void executeIgnoreGaps(Model[] models) {
+		notifyObservers(ProgressInfo.REOPTIMIZATION_INIT, models.length, models[0], null);
+		parallelExecute(models, true);
+		notifyObservers(ProgressInfo.REOPTIMIZATION_COMPLETED, models.length, null, null);
+	}
+	
+	protected boolean parallelExecute(Model models[], boolean ignoreGaps) {
+		
+		ExecutorService threadPool = Executors.newFixedThreadPool(options
+				.getNumberOfThreads());
+		Collection<Callable<Object>> c = new ArrayList<Callable<Object>>();
+		int current = 0;
+		for (Model model : models) {
+			if (model != null) {
+				PhymlSingleModel psm = new PhymlSingleModel(model, current, false,
+						ignoreGaps, options);
+				psm.addObserver(this);
+				c.add(Executors.callable(psm));
+	
+				current++;
+			}
+		}
+
+		Collection<Future<Object>> futures = null;
+		try {
+			futures = threadPool.invokeAll(c);
+		} catch (InterruptedException e) {
+			notifyObservers(ProgressInfo.INTERRUPTED, 0, null, null);
+		}
+
+		if (futures != null) {
+			for (Future<Object> f : futures) {
+				try {
+					f.get();
+				} catch (InterruptedException ex) {
+					notifyObservers(ProgressInfo.INTERRUPTED, 0, null, null);
+					ex.printStackTrace();
+					return false;
+				} catch (ExecutionException ex) {
+					// Internal exception while computing model.
+					// Let's continue with errors
+					ex.printStackTrace();
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
 	/***************************
 	 * printSettings ***************************** * Prints the settings for the
 	 * likelihood calculation * * *
@@ -159,7 +237,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 		stream.println(" Phyml version = " + PHYML_VERSION);
 		stream.println(" Phyml binary = " + Utilities.getBinaryVersion());
 		stream.println(" Candidate models = " + models.length);
-		stream.print("  number of substitution schemes = ");
+		stream.print("   number of substitution schemes = ");
 
 		if (options.getSubstTypeCode() == 0)
 			stream.println("3");
@@ -171,25 +249,25 @@ public abstract class RunPhyml extends Observable implements Observer {
 			stream.println("11");
 
 		if (options.doF)
-			stream.println("  including models with equal/unequal base frequencies (+F)");
+			stream.println("   including models with equal/unequal base frequencies (+F)");
 		else
-			stream.println("  including only models with equal base frequencies");
+			stream.println("   including only models with equal base frequencies");
 
 		if (options.doI)
-			stream.println("  including models with/without a proportion of invariable sites (+I)");
+			stream.println("   including models with/without a proportion of invariable sites (+I)");
 		else
-			stream.println("  including only models without a proportion of invariable sites");
+			stream.println("   including only models without a proportion of invariable sites");
 
 		if (options.doG)
-			stream.println("  including models with/without rate variation among sites (+G)"
+			stream.println("   including models with/without rate variation among sites (+G)"
 					+ " (nCat = " + options.numGammaCat + ")");
 		else
-			stream.println("  including only models without rate variation among sites");
+			stream.println("   including only models without rate variation among sites");
 
 		stream.print(" Optimized free parameters (K) =");
 		stream.print(" substitution parameters");
 		if (options.countBLasParameters)
-			stream.print(" + " + options.numBranches + " branch lengths");
+			stream.print(" + " + options.getNumBranches() + " branch lengths");
 		if (options.optimizeMLTopology)
 			stream.print(" + topology");
 		stream.println(" ");
@@ -202,17 +280,13 @@ public abstract class RunPhyml extends Observable implements Observer {
 					+ options.getInputTreeFile().getName() + ") = ");
 			stream.println(options.getUserTree());
 			stream.println(" ");
-		}
-		/*
-		 * else if (ModelTest.userTreeExists)
-		 * stream.println("fixed user tree (topology + branch lengths)");
-		 */
-		else if (options.fixedTopology)
+		} else if (options.fixedTopology) {
 			stream.println("fixed BIONJ-JC tree topology");
-		else if (options.optimizeMLTopology)
+		} else if (options.optimizeMLTopology) {
 			stream.println("ML tree");
-		else
+		} else {
 			stream.println("BIONJ tree");
+		}
 
 		if (options.optimizeMLTopology) {
 			stream.print(" Tree topology search operation = ");
@@ -228,6 +302,14 @@ public abstract class RunPhyml extends Observable implements Observer {
 				break;
 			}
 		}
+		if (options.isClusteringSearch()) {
+			stream.println(" Using hill-climbing hierarchical clustering");
+		}
+		
+		if (options.isGuidedSearch()) {
+			stream.println(" Using heuristic model filtering ");
+		}
+		stream.println(" ");
 	}
 
 	protected abstract Object doPhyml();

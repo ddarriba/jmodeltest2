@@ -47,8 +47,8 @@ public abstract class AlignmentReader {
 			String line = in.readLine();
 			in.close();
 			StringTokenizer reader = new StringTokenizer(line);
-			options.numTaxa = Integer.parseInt(reader.nextToken());
-			options.numSites = Integer.parseInt(reader.nextToken());
+			options.setNumTaxa(Integer.parseInt(reader.nextToken()));
+			options.setNumSites(Integer.parseInt(reader.nextToken()));
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(new JFrame(),
 					"Could not read the input alignment",
@@ -56,16 +56,16 @@ public abstract class AlignmentReader {
 					JOptionPane.ERROR_MESSAGE);
 		}
 
-		if (options.numTaxa <= 4)
+		if (options.getNumTaxa() <= 4)
 			JOptionPane.showMessageDialog(new JFrame(),
 					"The number of taxa does not seem to be correct: "
-							+ options.numTaxa, "jModelTest error",
+							+ options.getNumTaxa(), "jModelTest error",
 					JOptionPane.ERROR_MESSAGE);
 
-		if (options.numSites <= 1)
+		if (options.getNumSites() <= 1)
 			JOptionPane.showMessageDialog(new JFrame(),
 					"The number of sites does not seem to be correct: "
-							+ options.numTaxa, "jModelTest error",
+							+ options.getNumTaxa(), "jModelTest error",
 					JOptionPane.ERROR_MESSAGE);
 	}
 
@@ -112,22 +112,22 @@ public abstract class AlignmentReader {
 				String line = in.readLine();
 				in.close();
 				StringTokenizer reader = new StringTokenizer(line);
-				options.numTaxa = Integer.parseInt(reader.nextToken());
-				options.numSites = Integer.parseInt(reader.nextToken());
-				options.numBranches = 2 * options.numTaxa - 3;
+				options.setNumTaxa(Integer.parseInt(reader.nextToken()));
+				options.setNumSites(Integer.parseInt(reader.nextToken()));
+				options.setNumBranches(2 * options.getNumTaxa() - 3);
 				goodFile = true;
 
-				if (options.numTaxa < 4) {
+				if (options.getNumTaxa() < 4) {
 					JOptionPane.showMessageDialog(new JFrame(),
-							"The number of taxa (" + options.numTaxa
+							"The number of taxa (" + options.getNumTaxa()
 									+ ") does not seem to be correct!",
 							"jModeltest error", JOptionPane.ERROR_MESSAGE);
 					goodFile = false;
 				}
 
-				if (options.numSites <= 1) {
+				if (options.getNumSites() <= 1) {
 					JOptionPane.showMessageDialog(new JFrame(),
-							"The number of sites (" + options.numSites
+							"The number of sites (" + options.getNumSites()
 									+ ") does not seem to be correct!",
 							"jModeltest error", JOptionPane.ERROR_MESSAGE);
 					goodFile = false;
@@ -149,6 +149,5 @@ public abstract class AlignmentReader {
 
 		return goodFile;
 	}
-
 } // class AlignmentReader
 

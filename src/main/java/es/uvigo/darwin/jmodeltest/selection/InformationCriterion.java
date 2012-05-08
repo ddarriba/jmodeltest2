@@ -30,10 +30,10 @@ public abstract class InformationCriterion {
 
 	protected ApplicationOptions options = ApplicationOptions.getInstance();
 	
-	public static final int AIC  = 1;
-	public static final int AICc = 2;
-	public static final int BIC  = 3;
-	public static final int DT   = 4;
+	public static final int IC_AIC  = 1;
+	public static final int IC_AICc = 2;
+	public static final int IC_BIC  = 3;
+	public static final int IC_DT   = 4;
 	
 	private static final String[] names = {"", "AIC", "AICc", "BIC", "DT"};
 	
@@ -47,6 +47,9 @@ public abstract class InformationCriterion {
 	protected List<Model> confidenceModels;
 	protected double cumWeight;
 	protected Model minModel;
+	
+	protected boolean doCheckAgainstULK;
+	protected Model unconstrainedModel;
 
 	// importances
 	protected double ifA, ifG, ifC, ifT;
@@ -63,14 +66,30 @@ public abstract class InformationCriterion {
 	
 	public InformationCriterion(boolean mwritePAUPblock, boolean mdoImportances,
 			boolean mdoModelAveraging, double minterval) {
-		numModels = options.numModels;
-		models = ModelTest.getCandidateModels();
+		List<Model> modelList = new ArrayList<Model>();
+		for (Model model : ModelTest.getCandidateModels()) {
+			if (model.getLnL() > 0) {
+				modelList.add(model);
+			}
+		}
+		models = modelList.toArray(new Model[0]);
+		numModels = models.length;
 		order = new int[numModels];
 		writePAUPblock = mwritePAUPblock;
 		doImportances = mdoImportances;
 		doModelAveraging = mdoModelAveraging;
 		confidenceInterval = minterval;
 		confidenceModels = new ArrayList<Model>();
+		
+		doCheckAgainstULK = (getType() != IC_DT && 
+				(options.getNumPatterns() > 0) &&
+				(options.getUnconstrainedLnL() > 1e-10));
+		
+		if (doCheckAgainstULK) {
+			unconstrainedModel = new Model(numModels, "UModel", "-", 
+					options.getNumPatterns() - 1);
+			unconstrainedModel.setLnL(options.getUnconstrainedLnL());
+		}
 	}
 	/**************************************************************
 	 * parameterImportance 
@@ -390,13 +409,13 @@ public abstract class InformationCriterion {
 	@Override
 	public String toString() {
 		switch (getType()) {
-		case AIC:
+		case IC_AIC:
 			return "AIC";
-		case BIC:
+		case IC_BIC:
 			return "BIC";
-		case AICc:
+		case IC_AICc:
 			return "AICc";
-		case DT:
+		case IC_DT:
 			return "DT";
 		}
 		return null;
@@ -427,13 +446,25 @@ public abstract class InformationCriterion {
 					+ minModel.getTreeString());
 		}
 
+		// update unconstrained model
+		if (unconstrainedModel != null) {
+			unconstrainedModel.setLnL(minModel.getUnconstrainedLnL());
+		}
+		
 		// print weights
 		stream.println(" ");stream.println(" ");
 		stream.println("* "+criterion+" MODEL SELECTION : Selection uncertainty");
 		stream.println(" ");
-		stream.println("Model             -lnL    K         "+criterion+"      delta      weight cumWeight");
+		stream.printf("Model             -lnL    K        %4s      delta      weight cumWeight", criterion);
+		if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
+			stream.println("       uDelta");
+		} else {
+			stream.println("");
+		}
 		stream.print  ("------------------------------------------------------------------------");
-
+		if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
+			stream.print  ("-------------");
+		}
 		for (i = 0; i < numModels; i++) {
 			j = order[i];
 			// j = i;
@@ -443,7 +474,7 @@ public abstract class InformationCriterion {
 			if (options.countBLasParameters)
 				stream.printf("   %2d", models[j].getK());
 			else
-				stream.printf("  %2d", models[j].getK() - options.numBranches);
+				stream.printf("  %2d", models[j].getK() - options.getNumBranches());
 			stream.printf("  %10.4f", getValue(models[j]));
 			stream.printf("  %9.4f", getDelta(models[j]));
 			if (getWeight(models[j]) > 0.0001)
@@ -451,8 +482,21 @@ public abstract class InformationCriterion {
 			else
 				stream.printf("   %4.2e", getWeight(models[j]));
 			stream.printf("   %7.4f", getCumWeight(models[j]));
+			if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
+				if (!options.isAmbiguous()) {
+					stream.printf("   %10.4f", getUDelta(models[j]));
+				} else if (i==0){
+					stream.printf("   %10.4f", setUDelta(models[j]));
+				} else {
+					stream.print("            -");
+				}
+			}
 		}
-
+		stream.print("\n------------------------------------------------------------------------");
+		if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
+			stream.print  ("-------------");
+		}
+		stream.println("");
 		printFooter(stream);
 		
 		Utilities.toConsoleEnd();
@@ -554,16 +598,20 @@ public abstract class InformationCriterion {
 	public int getNumModels() { return numModels; }
 	
 	public abstract void compute();
+	public abstract double computeSingle(Model model);
+	
 	//public abstract void print (TextOutputStream stream);
 	public abstract void buildConfidenceInterval ();
 	public abstract double getMinModelValue();
 	public abstract double getMinModelWeight();
 	public abstract double getValue(Model m);
 	public abstract double getDelta(Model m);
+	public abstract double getUDelta(Model m);
+	public abstract double setUDelta(Model m);
 	public abstract double getWeight(Model m);
 	public abstract double getCumWeight(Model m);
 	protected abstract void printHeader(TextOutputStream stream);
 	protected abstract void printFooter(TextOutputStream stream);
 	public abstract int getType(); 
-
+	
 }

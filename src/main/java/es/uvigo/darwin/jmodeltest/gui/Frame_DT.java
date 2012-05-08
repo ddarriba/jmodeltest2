@@ -20,9 +20,12 @@ package es.uvigo.darwin.jmodeltest.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -36,23 +39,25 @@ import javax.swing.plaf.BorderUIResource;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.selection.DT;
+import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
 public class Frame_DT extends JModelTestFrame {
 
 	private static final long serialVersionUID = 201104031100L;
 	
-	private JPanel PanelDTSettings = new JPanel();
-	private JTextField TextFieldTaxaDT = new JTextField();
-	private JTextField TextFieldSizeDT = new JTextField();
-	private JButton RunButtonDT = new JButton();
-	private JButton CancelButtonDT = new JButton();
-	private JButton JButtonDefaultDT = new JButton();
+	private JPanel panelDTSettings = new JPanel();
+	private JTextField textTaxaDT = new JTextField();
+	private JTextField textSizeDT = new JTextField();
+	private JButton runButtonDT = new JButton();
+	private JButton cancelButtonDT = new JButton();
+	private JButton buttonDefaultDT = new JButton();
 
-	private JCheckBox jCheckBoxIncludeBL_DT = new JCheckBox();
-	private JCheckBox jCheckBoxPAUPblock = new JCheckBox();
-	private JCheckBox jCheckBoxAveraging = new JCheckBox();
-	private JCheckBox jCheckBoxImportance = new JCheckBox();
-	private JSlider JSliderInterval = new JSlider();
+	private JCheckBox checkBoxIncludeBL_DT = new JCheckBox();
+	private JCheckBox checkBoxPAUPblock = new JCheckBox();
+	private JCheckBox checkBoxAveraging = new JCheckBox();
+	private JCheckBox checkBoxImportance = new JCheckBox();
+	private JSlider sliderInterval = new JSlider();
+	private JComboBox<ApplicationOptions.SampleSizeMode> comboSampleSizeMode = new JComboBox<ApplicationOptions.SampleSizeMode>(ApplicationOptions.SampleSizeMode.values());
 
 	private DT myDT;
 
@@ -60,120 +65,147 @@ public class Frame_DT extends JModelTestFrame {
 	}
 
 	public void initComponents() throws Exception {
-		PanelDTSettings.setSize(new java.awt.Dimension(490, 240));
-		PanelDTSettings.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "DT Settings", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
-		PanelDTSettings.setLocation(new java.awt.Point(10, 10));
-		PanelDTSettings.setVisible(true);
-		PanelDTSettings.setLayout(null);
+		panelDTSettings.setSize(490, 240);
+		panelDTSettings.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "DT Settings", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
+		panelDTSettings.setLocation(10, 10);
+		panelDTSettings.setVisible(true);
+		panelDTSettings.setLayout(null);
 
-		RunButtonDT.setVisible(true);
-		RunButtonDT.setSize(new java.awt.Dimension(190, 40));
-		RunButtonDT.setText("Do DT calculations");
-		RunButtonDT.setLocation(new java.awt.Point(280, 190));
-		getRootPane().setDefaultButton(RunButtonDT);
+		runButtonDT.setVisible(true);
+		runButtonDT.setSize(190, 40);
+		runButtonDT.setText("Do DT calculations");
+		runButtonDT.setLocation(280, 190);
+		getRootPane().setDefaultButton(runButtonDT);
 
-		JButtonDefaultDT.setVisible(true);
-		JButtonDefaultDT.setSize(new java.awt.Dimension(141, 40));
-		JButtonDefaultDT.setText("Default Settings");
-		JButtonDefaultDT.setLocation(new java.awt.Point(10, 190));
+		buttonDefaultDT.setVisible(true);
+		buttonDefaultDT.setSize(141, 40);
+		buttonDefaultDT.setText("Default Settings");
+		buttonDefaultDT.setLocation(10, 190);
 
-		CancelButtonDT.setVisible(true);
-		CancelButtonDT.setSize(new java.awt.Dimension(110, 40));
-		CancelButtonDT.setText("Cancel");
-		CancelButtonDT.setLocation(new java.awt.Point(160, 190));
+		cancelButtonDT.setVisible(true);
+		cancelButtonDT.setSize(110, 40);
+		cancelButtonDT.setText("Cancel");
+		cancelButtonDT.setLocation(160, 190);
 
-		TextFieldSizeDT.setToolTipText("Enter the sample size you want to use for the DT and click RETURN. By default this is the number of sites in the alignment");
-		TextFieldSizeDT.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "Sample size", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
-		TextFieldSizeDT.setVisible(true);
-		TextFieldSizeDT.setSize(new java.awt.Dimension(100, 40));
-		TextFieldSizeDT.setText(""+options.sampleSize);
-		TextFieldSizeDT.setHorizontalAlignment(JTextField.RIGHT);
-		TextFieldSizeDT.setLocation(new java.awt.Point(30, 20));
-		TextFieldSizeDT.setEnabled(true);
+		textSizeDT.setToolTipText("Enter the sample size you want to use for the DT and click RETURN. By default this is the number of sites in the alignment");
+		textSizeDT.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "Sample size", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
+		textSizeDT.setVisible(true);
+		textSizeDT.setSize(100, 40);
+		textSizeDT.setText(Utilities.format(options.getSampleSize(),10,4,false));
+		textSizeDT.setHorizontalAlignment(JTextField.RIGHT);
+		textSizeDT.setLocation(30, 20);
+		textSizeDT.setEnabled(false);
 
-		jCheckBoxImportance.setVisible(true);
-		jCheckBoxImportance.setSize(new java.awt.Dimension(260, 20));
-		jCheckBoxImportance.setText("Calculate parameter importances");
-		jCheckBoxImportance.setLocation(new java.awt.Point(30, 70));
-		jCheckBoxImportance.setSelected(true);
+		comboSampleSizeMode.setVisible(true);
+		comboSampleSizeMode.setSize(170, 40);
+		comboSampleSizeMode.setLocation(220, 20);
+		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
+		comboSampleSizeMode
+			.setToolTipText("Select the mode the sample size is computed.");
+		comboSampleSizeMode
+		.setBorder(new BorderUIResource.TitledBorderUIResource(
+				new LineBorder(new java.awt.Color(
+						153, 153, 153), 1, false), "Sample size mode", 4, 2,
+				new java.awt.Font("Application", 1, 10),
+				new java.awt.Color(102, 102, 153)));
+		
+		checkBoxImportance.setVisible(true);
+		checkBoxImportance.setSize(260, 20);
+		checkBoxImportance.setText("Calculate parameter importances");
+		checkBoxImportance.setLocation(30, 70);
+		checkBoxImportance.setSelected(true);
 
-		jCheckBoxAveraging.setVisible(true);
-		jCheckBoxAveraging.setSize(new java.awt.Dimension(260, 20));
-		jCheckBoxAveraging.setText("Do model averaging");
-		jCheckBoxAveraging.setLocation(new java.awt.Point(30, 110));
-		jCheckBoxAveraging.setSelected(true);
+		checkBoxAveraging.setVisible(true);
+		checkBoxAveraging.setSize(260, 20);
+		checkBoxAveraging.setText("Do model averaging");
+		checkBoxAveraging.setLocation(30, 110);
+		checkBoxAveraging.setSelected(true);
 
-		jCheckBoxPAUPblock.setVisible(true);
-		jCheckBoxPAUPblock.setSize(new java.awt.Dimension(260, 20));
-		jCheckBoxPAUPblock.setText("Write PAUP* block");
-		jCheckBoxPAUPblock.setLocation(new java.awt.Point(30, 150));
-		jCheckBoxPAUPblock.setSelected(false);
-		jCheckBoxPAUPblock.setToolTipText("Writes a block of PAUP* commands implementing the selected model");
+		checkBoxPAUPblock.setVisible(true);
+		checkBoxPAUPblock.setSize(260, 20);
+		checkBoxPAUPblock.setText("Write PAUP* block");
+		checkBoxPAUPblock.setLocation(30, 150);
+		checkBoxPAUPblock.setSelected(false);
+		checkBoxPAUPblock.setToolTipText("Writes a block of PAUP* commands implementing the selected model");
 
-		JSliderInterval.setVisible(true);
-		JSliderInterval.setToolTipText("Set the confidence interval for model averaging and/or parameter importance");
-		JSliderInterval.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "Confidence interval = 100%", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
-		JSliderInterval.setSize(new java.awt.Dimension(170, 70));
-		JSliderInterval.setLocation(new java.awt.Point(300, 70));
-		JSliderInterval.setMinimum(0);
-		JSliderInterval.setMaximum(100);
-		JSliderInterval.setValue(100);
-		JSliderInterval.setMajorTickSpacing(20);
-		JSliderInterval.setMinorTickSpacing(5);
-		JSliderInterval.setPaintTicks(true);
-		JSliderInterval.setPaintLabels(true);	
-		JSliderInterval.setEnabled(true);
-		JSliderInterval.setFont(XManager.FONT_SLIDER);
+		sliderInterval.setVisible(true);
+		sliderInterval.setToolTipText("Set the confidence interval for model averaging and/or parameter importance");
+		sliderInterval.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "Confidence interval = 100%", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
+		sliderInterval.setSize(170, 70);
+		sliderInterval.setLocation(300, 70);
+		sliderInterval.setMinimum(0);
+		sliderInterval.setMaximum(100);
+		sliderInterval.setValue(100);
+		sliderInterval.setMajorTickSpacing(20);
+		sliderInterval.setMinorTickSpacing(5);
+		sliderInterval.setPaintTicks(true);
+		sliderInterval.setPaintLabels(true);	
+		sliderInterval.setEnabled(true);
+		sliderInterval.setFont(XManager.FONT_SLIDER);
 					
-		setLocation(new java.awt.Point(281, 80));
+		setLocation(281, 80);
 		getContentPane().setLayout(null);
 		setTitle("Decision Theory (DT) Settings");
 
-		PanelDTSettings.add(TextFieldTaxaDT);
-		PanelDTSettings.add(TextFieldSizeDT);
-		PanelDTSettings.add(jCheckBoxIncludeBL_DT);
-		PanelDTSettings.add(jCheckBoxAveraging);
-		PanelDTSettings.add(jCheckBoxImportance);
-		PanelDTSettings.add(jCheckBoxPAUPblock);
-		PanelDTSettings.add(JSliderInterval);
-		PanelDTSettings.add(JButtonDefaultDT);
-		PanelDTSettings.add(CancelButtonDT);
-		PanelDTSettings.add(RunButtonDT);
-		getContentPane().add(PanelDTSettings);
+		panelDTSettings.add(textTaxaDT);
+		panelDTSettings.add(textSizeDT);
+		panelDTSettings.add(checkBoxIncludeBL_DT);
+		panelDTSettings.add(checkBoxAveraging);
+		panelDTSettings.add(checkBoxImportance);
+		panelDTSettings.add(checkBoxPAUPblock);
+		panelDTSettings.add(sliderInterval);
+		panelDTSettings.add(buttonDefaultDT);
+		panelDTSettings.add(cancelButtonDT);
+		panelDTSettings.add(runButtonDT);
+		getContentPane().add(panelDTSettings);
 
-		setSize(new java.awt.Dimension(510, 280));
+		setSize(510, 280);
 		setResizable(false);
 
-		jCheckBoxAveraging.addChangeListener(new ChangeListener() {
+		checkBoxAveraging.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				jCheckBoxAveragingStateChanged(e);
 			}
 		});
 
-		jCheckBoxImportance.addChangeListener(new ChangeListener() {
+		checkBoxImportance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				jCheckBoxImportanceStateChanged(e);
 			}
 		});
 
+		comboSampleSizeMode
+		.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if ((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem() != ApplicationOptions.SampleSizeMode.USER) {
+					options.setSampleSizeMode((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem());
+					textSizeDT.setText(Utilities.format(options.getSampleSize(),10,4,false));
+					textSizeDT.setEnabled(false);
+				} else {
+					textSizeDT.setEnabled(true);
+				}
+			}
+		});
 
-		JSliderInterval.addChangeListener(new ChangeListener() {
+		sliderInterval.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				JSliderIntervalStateChanged(e);
 			}
 		});
 
-		JButtonDefaultDT.addActionListener(new java.awt.event.ActionListener() {
+		buttonDefaultDT.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				JButtonDefaultDTActionPerformed(e);
 			}
 		});
-		CancelButtonDT.addActionListener(new java.awt.event.ActionListener() {
+		cancelButtonDT.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				CancelButtonDTActionPerformed(e);
 			}
 		});
-		RunButtonDT.addActionListener(new java.awt.event.ActionListener() {
+		runButtonDT.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				RunButtonDTActionPerformed(e);
 			}
@@ -224,47 +256,47 @@ public class Frame_DT extends JModelTestFrame {
 	
 	public void jCheckBoxImportanceStateChanged(ChangeEvent e) 
 		{
-		if (jCheckBoxImportance.isSelected())
+		if (checkBoxImportance.isSelected())
 			{
-			JSliderInterval.setEnabled(true);
+			sliderInterval.setEnabled(true);
 			}
 		else
 			{
-			if (!jCheckBoxAveraging.isSelected())
-				JSliderInterval.setEnabled(false);
+			if (!checkBoxAveraging.isSelected())
+				sliderInterval.setEnabled(false);
 			}
 		}
 
 	public void jCheckBoxAveragingStateChanged(ChangeEvent e) 
 		{
-		if (jCheckBoxAveraging.isSelected())
+		if (checkBoxAveraging.isSelected())
 			{
-			JSliderInterval.setEnabled(true);
+			sliderInterval.setEnabled(true);
 			}
 		else
 			{
-			if (!jCheckBoxImportance.isSelected())
-				JSliderInterval.setEnabled(false);
+			if (!checkBoxImportance.isSelected())
+				sliderInterval.setEnabled(false);
 			}
 		}
 	
 
 	public void JSliderIntervalStateChanged(ChangeEvent e) 
 		{
-		JSliderInterval.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "Confidence interval = " + JSliderInterval.getValue() + "%", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
+		sliderInterval.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "Confidence interval = " + sliderInterval.getValue() + "%", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
 		}
 
 				
 	public void JButtonDefaultDTActionPerformed(java.awt.event.ActionEvent e) 
 		{
-		TextFieldSizeDT.setEnabled(false);
-		TextFieldSizeDT.setText("" + options.sampleSize);
+		textSizeDT.setEnabled(false);
+		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
 		ApplicationOptions.getInstance().countBLasParameters = true;
 		XManager.getInstance().selectedMenuResultsBLasParameters(true);
-		jCheckBoxPAUPblock.setSelected(false);
-		jCheckBoxAveraging.setSelected(true);
-		jCheckBoxImportance.setSelected(true);
-		JSliderInterval.setValue(100);
+		checkBoxPAUPblock.setSelected(false);
+		checkBoxAveraging.setSelected(true);
+		checkBoxImportance.setSelected(true);
+		sliderInterval.setValue(100);
 		}
 	
 	public void CancelButtonDTActionPerformed(java.awt.event.ActionEvent e) 
@@ -290,11 +322,10 @@ public class Frame_DT extends JModelTestFrame {
 			setVisible(false);
 			dispose();
 
-			writePAUPblock = jCheckBoxPAUPblock.isSelected();
-			doImportances = jCheckBoxImportance.isSelected();
-			doModelAveraging = jCheckBoxAveraging.isSelected();
-			credibleInterval = JSliderInterval.getValue()/100.0;
-			options.sampleSize = Integer.parseInt(TextFieldSizeDT.getText());
+			writePAUPblock = checkBoxPAUPblock.isSelected();
+			doImportances = checkBoxImportance.isSelected();
+			doModelAveraging = checkBoxAveraging.isSelected();
+			credibleInterval = sliderInterval.getValue()/100.0;
 			
 			myDT = new DT(writePAUPblock, doImportances, doModelAveraging, credibleInterval);
 			myDT.compute();
