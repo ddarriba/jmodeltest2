@@ -432,6 +432,8 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 						progressBarLikeLabel.setText("["+ currentStage +"/6]" + completedModels
 								+ "/" + info.getNumModelsInStage());
 					} else {
+						//update total models
+						totalModels = options.getNumModels();
 						progressBarLikeLabel.setText("Completed " + completedModels
 							+ "/" + totalModels);
 					}

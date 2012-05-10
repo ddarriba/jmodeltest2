@@ -116,7 +116,6 @@ public class MyTableModel extends AbstractTableModel {
 					data[i][15] = "-";
 				}
 
-				System.out.println(ModelTest.getCandidateModels()[i].getName() + " -> " + ModelTest.getCandidateModels()[i].getPinv() + " -> " + ModelTest.getCandidateModels()[i].getShape());
 				if (ModelTest.getCandidateModels()[i].ispI()) {
 						data[i][16] = Utilities.format(ModelTest.getCandidateModels()[i].getPinv(), precision+2, precision, false);
 				} else {

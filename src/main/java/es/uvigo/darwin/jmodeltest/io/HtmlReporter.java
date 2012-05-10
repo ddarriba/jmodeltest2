@@ -255,11 +255,9 @@ public abstract class HtmlReporter {
 
 		for (String file : TEMPLATE_FILES) {
 			File auxFile = new File(LOG_DIR.getPath() + File.separator + file);
-			System.out.println("COPY FROM  TO " + auxFile);
 			if (!auxFile.exists()) {
 				File inFile = new File(RESOURCES_DIR + File.separator
 						+ file);
-				System.out.println("COPY FROM "+inFile+" TO " + auxFile);
 				if (inFile.exists()) {
 					copyFile(inFile, auxFile);
 				}
@@ -590,7 +588,6 @@ public abstract class HtmlReporter {
 		int width = 500;
 		int height = 300;
 		try {
-			System.out.println(" TO PUT ON " + IMAGES_DIR);
 			if (!IMAGES_DIR.exists()) {
 				IMAGES_DIR.mkdir();
 			}
