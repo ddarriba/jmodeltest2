@@ -67,9 +67,9 @@ public class RunPhymlThread extends RunPhyml {
 			if (gtrModel == null) {
 				globalBestModel = models[models.length-1];
 			}
-			double bestScore = Double.MAX_VALUE;
 			double globalBestScore = Double.MAX_VALUE;
 			for (int groups=6; groups>0; groups--) {
+				double bestScore = Double.MAX_VALUE;
 				String partition = globalBestModel==null?"012345":globalBestModel.getPartition();
 				Model[] currentModels = GuidedSearchManager.getModelsSubset(models, partition, groups);
 
@@ -99,7 +99,7 @@ public class RunPhymlThread extends RunPhyml {
 							bestScore = currentScore;
 						}
 					}
-				
+
 					// Check LnL
 					if (globalBestModel.getLnL()>0 && bestScore > globalBestScore) {
 						// End of algorithm

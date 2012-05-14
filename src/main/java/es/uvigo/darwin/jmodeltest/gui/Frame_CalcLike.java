@@ -237,34 +237,34 @@ public class Frame_CalcLike extends JModelTestFrame {
 		PanelNumberModelsCalcLike.setVisible(true);
 		PanelNumberModelsCalcLike.setLayout(null);
 		Button3SubsTypeCalcLike.setVisible(true);
-		Button3SubsTypeCalcLike.setSize(50, 20);
+		Button3SubsTypeCalcLike.setSize(45, 20);
 		Button3SubsTypeCalcLike.setText("3");
 		Button3SubsTypeCalcLike.setLocation(20, 20);
 		Button5SubsTypeCalcLike.setVisible(true);
-		Button5SubsTypeCalcLike.setSize(50, 20);
+		Button5SubsTypeCalcLike.setSize(45, 20);
 		Button5SubsTypeCalcLike.setText("5");
-		Button5SubsTypeCalcLike.setLocation(70, 20);
+		Button5SubsTypeCalcLike.setLocation(65, 20);
 		Button7SubsTypeCalcLike.setVisible(true);
-		Button7SubsTypeCalcLike.setSize(50, 20);
+		Button7SubsTypeCalcLike.setSize(45, 20);
 		Button7SubsTypeCalcLike.setText("7");
-		Button7SubsTypeCalcLike.setLocation(120, 20);
+		Button7SubsTypeCalcLike.setLocation(110, 20);
 		Button11SubsTypeCalcLike.setVisible(true);
 		Button11SubsTypeCalcLike.setSize(50, 20);
 		Button11SubsTypeCalcLike.setText("11");
-		Button11SubsTypeCalcLike.setLocation(170, 20);
+		Button11SubsTypeCalcLike.setLocation(155, 20);
 		Button11SubsTypeCalcLike.setSelected(true);
 		Button203SubsTypeCalcLike.setVisible(true);
 		Button203SubsTypeCalcLike.setSize(60, 20);
 		Button203SubsTypeCalcLike.setText("203");
-		Button203SubsTypeCalcLike.setLocation(220, 20);
+		Button203SubsTypeCalcLike.setLocation(205, 20);
 		Button203SubsTypeCalcLike.setSelected(true);
 		ButtonGroupNumberModelsCalcLike.add(Button3SubsTypeCalcLike);
 		ButtonGroupNumberModelsCalcLike.add(Button5SubsTypeCalcLike);
 		ButtonGroupNumberModelsCalcLike.add(Button7SubsTypeCalcLike);
 		ButtonGroupNumberModelsCalcLike.add(Button11SubsTypeCalcLike);
 		ButtonGroupNumberModelsCalcLike.add(Button203SubsTypeCalcLike);
-		jLabelNumModels.setSize(150, 20);
-		jLabelNumModels.setLocation(290, 20);
+		jLabelNumModels.setSize(165, 20);
+		jLabelNumModels.setLocation(275, 20);
 		jLabelNumModels.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		jLabelNumModels.setAlignmentY(JLabel.CENTER_ALIGNMENT);
 		jLabelNumModels.setVisible(true);
@@ -802,7 +802,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 				numberOfModels *= 2;
 
 			options.setNumModels(numberOfModels);
-			jLabelNumModels.setText("N. Models = " + numberOfModels);
+			jLabelNumModels.setText("NumModels = " + numberOfModels);
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
