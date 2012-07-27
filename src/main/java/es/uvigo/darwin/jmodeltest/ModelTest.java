@@ -243,25 +243,60 @@ public class ModelTest {
 			}
 
 			// calculate number of models
-			if (options.getSubstTypeCode() == 0)
-				options.setNumModels(3);
-			else if (options.getSubstTypeCode() == 1)
-				options.setNumModels(5);
-			else if (options.getSubstTypeCode() == 2)
-				options.setNumModels(7);
-			else if (options.getSubstTypeCode() == 3)
-				options.setNumModels(11);
-			else
-				options.setNumModels(203);
+			int numMatrices, numModels;
+			switch (options.getSubstTypeCode()) {
+			case 0:
+				numMatrices=3;
+				break;
+			case 1:
+				numMatrices=5;
+				break;
+			case 2:
+				numMatrices=7;
+				break;
+			case 3:
+				numMatrices=11;
+				break;
+			default:
+				numMatrices=203;
+			}
+			numModels=0;
 
-			if (options.doF)
-				options.setNumModels(options.getNumModels() * 2);
-
-			if (options.doI && options.doG)
-				options.setNumModels(options.getNumModels() * 4);
-			else if (options.doI || options.doG)
-				options.setNumModels(options.getNumModels() * 2);
-			options.setCandidateModels();
+			if (options.doM) {
+				numModels += numMatrices;
+			}
+			if (options.doF) {
+				numModels += numMatrices;
+			}
+			if (options.doI) {
+				numModels += numMatrices;
+			}
+			if (options.doIF) {
+				numModels += numMatrices;
+			}
+			if (options.doG) {
+				numModels += numMatrices;
+			}
+			if (options.doGF) {
+				numModels += numMatrices;
+			}
+			if (options.doIG) {
+				numModels += numMatrices;
+			}
+			if (options.doIGF) {
+				numModels += numMatrices;
+			}
+			
+			System.out.println(" NUMBER OF MODELS = " + numModels);
+			
+			if (numModels > 0) {
+				options.setNumModels(numModels);
+				options.setCandidateModels();
+			} else {
+				System.err
+				.println("\nCOMMAND LINE ERROR: Model set is empty. You cannot exclude M models without including unequal frequencies (-f) and/or rate variation (-i,-g arguments)");
+				PrintUsage();
+			}
 		}
 		// build set of models
 
@@ -503,6 +538,7 @@ public class ModelTest {
 		int i, j;
 		String arg = "";
 		String error = "\nCOMMAND LINE ERROR: ";
+		boolean userDefinedModelSet = false;
 		boolean isInputFile = false;
 		try {
 			i = 0;
@@ -575,19 +611,38 @@ public class ModelTest {
 						PrintUsage();
 					}
 				}
-
+				else if (arg.equals("-excludeM")) {
+					if (!userDefinedModelSet) {
+						options.doM = false;
+					}
+				}
 				else if (arg.equals("-f")) {
-					options.doF = true;
+					if (!userDefinedModelSet) {
+						options.doF = true;
+						options.doIF = options.doI;
+						options.doGF = options.doG;
+						options.doIGF = options.doI & options.doG;
+					}
 				}
 
 				else if (arg.equals("-i")) {
-					options.doI = true;
+					if (!userDefinedModelSet) {
+						options.doI = true;
+						options.doIG = options.doG; // & +I
+						options.doIG = options.doF; // & +I
+						options.doIGF = options.doG & options.doF; // & +I
+					}
 				}
 
 				else if (arg.equals("-g")) {
 					if (i < arguments.length) {
 						try {
-							options.doG = true;
+							if (!userDefinedModelSet) {
+								options.doG = true;
+								options.doIG = options.doI; // & +G
+								options.doGF = options.doF; // & +G
+								options.doIGF = options.doI & options.doF; // & +G
+							}
 							String type = arguments[i++];
 							options.numGammaCat = Integer.parseInt(type);
 						} catch (NumberFormatException e) {
@@ -602,7 +657,57 @@ public class ModelTest {
 										+ "-g option requires a number of gamma categories.");
 						PrintUsage();
 					}
+				} else if (arg.equals("-m")) {
+					userDefinedModelSet = true;
+					if (i < arguments.length) {
+						String type = arguments[i++];
+						options.doM = false;
+						options.doF = false;
+						options.doI = false;
+						options.doG = false;
+						options.doIG = false;
+						for (char c : type.toCharArray()) {
+							switch (c) {
+							case 'm':
+								options.doM = true;
+								break;
+							case 'i':
+								options.doI = true;
+								break;
+							case 'g':
+								options.doG = true;
+								break;
+							case 'h':
+								options.doIG = true;
+								break;
+							case 'f':
+								options.doF = true;
+								break;
+							case 'j':
+								options.doIF = true;
+								break;
+							case 'k':
+								options.doGF = true;
+								break;
+							case 'l':
+								options.doIGF = true;
+								break;
+							default:
+								System.err
+								.println(error
+										+ c +" parameter in -m option does not exist.");
+								PrintUsage();	
+							}
+						}
+					} else {
+						System.err
+								.println(error
+										+ "-g option requires a number of gamma categories.");
+						PrintUsage();
+					}
 				}
+				
+				
 
 				else if (arg.equals("-G")) {
 					if (i < arguments.length) {
@@ -1029,6 +1134,18 @@ public class ModelTest {
 					+ "\n -f: include models with unequals base frecuencies (e.g., -f) (default is false)"
 					+ "\n -i: include models with a proportion invariable sites (e.g., -i) (default is false)"
 					+ "\n -g: include models with rate variation among sites and number of categories (e.g., -g 8) (default is false & 4 categories)"
+					+ "\n -excludeM: exclude models without rate variation and unequal frequencies"
+					+ "\n -m: define the candidate models set"
+					+ "\n     'm' models without rate variation"
+					+ "\n     'f' unequal frequencies models (+F)"
+					+ "\n     'i' models with a proportion invariable sites (+I)"
+					+ "\n     'g' models with rate variation among sites and number of categories (+G)"
+					+ "\n         by default, 4 categories. You can change this setting with -g argument"
+					+ "\n     'h' models with a proportion invariable sites and rate variation among sites (+I+G)"
+					+ "\n         by default, 4 categories. You can change this setting with -g argument"
+					+ "\n     'j' models +I+F"
+					+ "\n     'k' models +G+F"
+					+ "\n     'l' models +I+G+F"
 					+ "\n -t: base tree for likelihood calculations (e.g., -t BIONJ)"
 					+ "\n     fixed  (common BIONJ-JC topology)"
 					+ "\n     BIONJ  (Neighbor-Joining topology)"

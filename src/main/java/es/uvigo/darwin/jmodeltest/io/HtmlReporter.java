@@ -296,6 +296,8 @@ public abstract class HtmlReporter {
 			datamodel.put("substSchemes", "11");
 
 		datamodel
+				.put("excludeM", options.doM ? new Integer(0) : new Integer(1));
+		datamodel
 				.put("includeF", options.doF ? new Integer(1) : new Integer(0));
 		datamodel
 				.put("includeG", options.doG ? new Integer(1) : new Integer(0));

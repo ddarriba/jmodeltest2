@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest.utilities;
 
 import java.io.File;
@@ -45,7 +45,7 @@ import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 public class Simulation {
 	private ApplicationOptions options;
-	
+
 	private static final double nil = -99999;
 
 	private static final String AIC = "AIC";
@@ -101,8 +101,9 @@ public class Simulation {
 			append = true;
 
 		// outfiles
-		TextOutputStream outConsole = ModelTest.setMainConsole(new TextOutputStream(
-				outdir + simsName + ".out", append));
+		TextOutputStream outConsole = ModelTest
+				.setMainConsole(new TextOutputStream(
+						outdir + simsName + ".out", append));
 		TextOutputStream treeConsole = new TextOutputStream(treedir + simsName
 				+ ".trees", append);
 		TextOutputStream parameterConsole = new TextOutputStream(parmdir
@@ -124,36 +125,36 @@ public class Simulation {
 
 		// open data file
 		File file = options.getInputFile();
-		outConsole.print("\n\nReading data file \"" + file.getName()
-				+ "\"...");
+		outConsole.print("\n\nReading data file \"" + file.getName() + "\"...");
 
 		if (file.exists()) {
 			try {
 
-//				File outputFile = File
-//						.createTempFile("jmodeltest", "input.aln");
-				ModelTestService.readAlignment(file, options.getAlignmentFile());
+				// File outputFile = File
+				// .createTempFile("jmodeltest", "input.aln");
+				ModelTestService
+						.readAlignment(file, options.getAlignmentFile());
 
 				options.setAlignment(AlignmentReader.readAlignment(
-						new PrintWriter(System.err),
-						options.getAlignmentFile().getAbsolutePath(), true)); // file
+						new PrintWriter(System.err), options.getAlignmentFile()
+								.getAbsolutePath(), true)); // file
 
 				outConsole.println(" OK.");
 				outConsole.println("  number of sequences: "
 						+ options.getNumTaxa());
-				outConsole.println("  number of sites: " + options.getNumSites());
+				outConsole.println("  number of sites: "
+						+ options.getNumSites());
 			} catch (Exception e)// file cannot be read correctly
 			{
-				System.err.println("\nThe specified file \""
-						+ file.getName()
+				System.err.println("\nThe specified file \"" + file.getName()
 						+ "\" cannot be read as an alignment");
 				outConsole.println(" failed.\n");
 				System.exit(0);
 			}
 		} else // file does not exist
 		{
-			System.err.println("\nThe specified file \""
-					+ file.getName() + "\" cannot be found");
+			System.err.println("\nThe specified file \"" + file.getName()
+					+ "\" cannot be found");
 			outConsole.println(" failed.\n");
 			System.exit(0);
 		}
@@ -182,10 +183,10 @@ public class Simulation {
 				System.exit(0);
 			}
 			if (tree != null) {
-				options.setUserTree(TreeUtilities.toNewick(tree, true,
-						false, false));
-				TextOutputStream out = new TextOutputStream(
-						options.getTreeFile().getAbsolutePath());
+				options.setUserTree(TreeUtilities.toNewick(tree, true, false,
+						false));
+				TextOutputStream out = new TextOutputStream(options
+						.getTreeFile().getAbsolutePath());
 				out.print(TreeUtilities.toNewick(tree, true, false, false));
 				out.close();
 				outConsole.println(" OK.");
@@ -197,28 +198,54 @@ public class Simulation {
 		System.err.print("Doing \"" + file.getName() + "\" ... ");
 
 		// calculate number of models
-		if (options.getSubstTypeCode() == 0)
-			options.setNumModels(3);
-		else if (options.getSubstTypeCode() == 1)
-			options.setNumModels(5);
-		else if (options.getSubstTypeCode() == 2)
-			options.setNumModels(7);
-		else
-			options.setNumModels(11);
+		int numMatrices, numModels;
+		switch (options.getSubstTypeCode()) {
+		case 0:
+			numMatrices = 3;
+			break;
+		case 1:
+			numMatrices = 5;
+			break;
+		case 2:
+			numMatrices = 7;
+			break;
+		case 3:
+			numMatrices = 11;
+			break;
+		default:
+			numMatrices = 203;
+		}
+		numModels = numMatrices;
 
-		if (options.doF)
-			options.setNumModels(options.getNumModels() * 2);
+		if (options.doF) {
+			numModels *= 2;
+		}
 
-		if (options.doI && options.doG)
-			options.setNumModels(options.getNumModels() * 4);
-		else if (options.doI || options.doG)
-			options.setNumModels(options.getNumModels() * 2);
-
-		// build set of models
-		options.setCandidateModels();
+		if (options.doI) {
+			numModels *=2;
+		}
+		if (options.doG) {
+			numModels *=2;
+		}
+		if (options.doI && options.doG && !options.doIG) {
+			numModels -= numMatrices;
+		}
+		if (!options.doM) {
+			numModels -= numMatrices;
+		}
+		
+		if (numModels > 0) {
+			options.setNumModels(numModels);
+			options.setCandidateModels();
+		} else {
+			System.err
+			.println("\nCOMMAND LINE ERROR: Model set is empty. You cannot exclude M models without including unequal frequencies (-f) and/or rate variation (-i,-g arguments)");
+			ModelTest.PrintUsage();
+		}
 
 		// calculate likelihoods with phyml in the command line
-		RunPhyml phymlrun = new RunPhymlThread(new ConsoleProgressObserver(options), options, ModelTest.getCandidateModels());
+		RunPhyml phymlrun = new RunPhymlThread(new ConsoleProgressObserver(
+				options), options, ModelTest.getCandidateModels());
 		phymlrun.execute();
 
 		// print all model trees to tree file and parameters to parms file
@@ -233,7 +260,8 @@ public class Simulation {
 					ModelTest.getCandidateModels()[i],
 					parameterConsole,
 					options.getInputFile().getName() + "\t"
-							+ ModelTest.getCandidateModels()[i].getName(), nil, nil);
+							+ ModelTest.getCandidateModels()[i].getName(), nil,
+					nil);
 		}
 
 		// do AIC if selected
@@ -412,16 +440,14 @@ public class Simulation {
 		ICtre.println(ic.getMinModel().getTreeString());
 		if (!append)
 			IC_parms.print("data\tname\tln\tK\tscore\tweigth\tfA\tfC\tfG\tfT\tkappa\ttitv\trAC\tAG\trAT\trCG\trCT\trGT\tpinvI\tshapeG\tpinvIG\tshapeIG\n");
-		printModelLine(ic.getMinModel(), IC_parms, options.getInputFile().getName()
-				+ "\t" + ic.getMinModel().getName(), ic.getMinModelValue(),
-				ic.getMinModelWeight());
+		printModelLine(ic.getMinModel(), IC_parms, options.getInputFile()
+				.getName() + "\t" + ic.getMinModel().getName(),
+				ic.getMinModelValue(), ic.getMinModelWeight());
 
 		if (options.doAveragedPhylogeny) {
-			new RunConsense(ic,	"50% majority rule", 
-					options.confidenceInterval);
+			new RunConsense(ic, "50% majority rule", options.confidenceInterval);
 			IC_mmi_mtre.println(ModelTest.averagedTreeString);
-			new RunConsense(ic, "strict",
-					options.confidenceInterval);
+			new RunConsense(ic, "strict", options.confidenceInterval);
 			IC_mmi_atre.println(ModelTest.averagedTreeString);
 		}
 		if (options.doImportances) {

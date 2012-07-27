@@ -88,10 +88,15 @@ public class ApplicationOptions implements Serializable {
 	public boolean doDT = false;
 	public boolean doDLRT = false;
 	public boolean doHLRT = false;
-	// whether to include the parameter base frequencies
-	public boolean doF = false;
+
+	public boolean doM = true;  // whether to include the naked M moldes
+	public boolean doF = false; // whether to include the parameter base frequencies
 	public boolean doI = false; // whether to include the parameter pinv
 	public boolean doG = false; // whether to include gamma
+	public boolean doIG = false; // whether to include gamma and pInv
+	public boolean doIF = false; 
+	public boolean doGF = false; 
+	public boolean doIGF = false; 
 	public int numGammaCat = 4;
 
 	public boolean backwardHLRTSelection = false;
@@ -204,16 +209,49 @@ public class ApplicationOptions implements Serializable {
 			int j = 0;
 			for (int i = 0; i < ModelTest.MAX_NUM_MODELS; i++) {
 				includeModel = true;
-				if (ModelConstants.substType[i] > substTypeCode)
+				if (!doM 
+						&& (ModelConstants.rateVariation[i] == 0)
+						&& ModelConstants.equalBaseFrequencies[i]) {
 					includeModel = false;
-				if (!doF && !ModelConstants.equalBaseFrequencies[i]) // is F
+				}
+				if (ModelConstants.substType[i] > substTypeCode) {
 					includeModel = false;
-				if (!doI && (ModelConstants.rateVariation[i] == 1 
-						|| ModelConstants.rateVariation[i] == 3))
+				}
+				if (!doF
+						&& (ModelConstants.rateVariation[i] == 0)
+						&& !ModelConstants.equalBaseFrequencies[i]) {
 					includeModel = false;
-				if (!doG && (ModelConstants.rateVariation[i] == 2
-						|| ModelConstants.rateVariation[i] == 3))
+				}
+				if (!doI 
+						&& (ModelConstants.rateVariation[i] == 1)
+						&& ModelConstants.equalBaseFrequencies[i]) {
 					includeModel = false;
+				}
+				if (!doIF 
+						&& (ModelConstants.rateVariation[i] == 1)
+						&& !ModelConstants.equalBaseFrequencies[i]) {
+					includeModel = false;
+				}
+				if (!doG 
+						&& (ModelConstants.rateVariation[i] == 2)
+						&& ModelConstants.equalBaseFrequencies[i]) {
+					includeModel = false;
+				}
+				if (!doGF 
+						&& (ModelConstants.rateVariation[i] == 2)
+						&& !ModelConstants.equalBaseFrequencies[i]) {
+					includeModel = false;
+				}
+				if (!doIG 
+						&& (ModelConstants.rateVariation[i] == 3)
+						&& ModelConstants.equalBaseFrequencies[i]) {
+					includeModel = false;
+				}
+				if (!doIGF 
+						&& (ModelConstants.rateVariation[i] == 3)
+						&& !ModelConstants.equalBaseFrequencies[i]) {
+					includeModel = false;
+				}
 	
 				if (includeModel) {
 					// System.out.println("Including model" + Model.modelName[i] +
@@ -232,13 +270,16 @@ public class ApplicationOptions implements Serializable {
 						baseFrequencies = (k/4==1);
 						rateVariation = (k%4);
 						includeModel = true;
+						if (!doM && (rateVariation == 0)) {
+							includeModel = false;
+						}
 						if (!doF && baseFrequencies)
 							includeModel = false;
-						if (!doI && (rateVariation == 1 
-								|| rateVariation == 3))
+						if (!doI && rateVariation == 1)
 							includeModel = false;
-						if (!doG && (rateVariation == 2
-								|| rateVariation == 3))
+						if (!doG && rateVariation == 2)
+							includeModel = false;
+						if (!doIG && rateVariation == 3)
 							includeModel = false;
 						if (includeModel) {
 							loadModelConstraints(ModelTest.getCandidateModel(j), j, partition, baseFrequencies, rateVariation, ratesCount);

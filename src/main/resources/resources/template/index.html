@@ -111,6 +111,9 @@
 		 Phyml binary = ${phymlBinary}<br/>
 		 Candidate models = ${candidateModels}<br/>
 		  number of substitution schemes = ${substSchemes}<br/>
+		  <#if excludeM == 1>
+		  excluding models without rate variation<br/>
+		  </#if>
 		  <#if includeF == 1>
 		  including models with equal/unequal base frequencies (+F)<br/>
 		  <#else>

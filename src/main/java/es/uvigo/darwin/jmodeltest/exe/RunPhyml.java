@@ -248,6 +248,9 @@ public abstract class RunPhyml extends Observable implements Observer {
 		else
 			stream.println("11");
 
+		if (!options.doM)
+			stream.println("   excluding models without rate variation and unequal base frequencies");
+		
 		if (options.doF)
 			stream.println("   including models with equal/unequal base frequencies (+F)");
 		else
