@@ -369,14 +369,14 @@ public class ModelTest {
 			}
 			// do hLRT if selected
 			if (options.doHLRT) {
-				myHLRT = new HLRT();
+				myHLRT = new HLRT(options);
 				myHLRT.compute(!options.backwardHLRTSelection,
 						options.confidenceLevelHLRT, options.writePAUPblock);
 			}
 
 			// do dLRT if selected
 			if (options.doDLRT) {
-				myHLRT = new HLRT();
+				myHLRT = new HLRT(options);
 				myHLRT.computeDynamical(!options.backwardHLRTSelection,
 						options.confidenceLevelHLRT, options.writePAUPblock);
 			}

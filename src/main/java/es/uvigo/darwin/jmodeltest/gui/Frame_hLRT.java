@@ -508,7 +508,7 @@ public class Frame_hLRT extends JModelTestFrame {
 			ModelTest.getMainConsole().println ("\nError: for backward hLRTs the hypothesis 2tv needs\nto be tested after the hypothesis 4tv");
 			}
 	
-		HLRT myHLRT = new HLRT();
+		HLRT myHLRT = new HLRT(options);
 		if (jCheckBoxDynamical.isSelected())
 			myHLRT.computeDynamical(forward, alpha, writePAUPblock);
 		else

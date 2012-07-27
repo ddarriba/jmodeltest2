@@ -262,7 +262,7 @@ public class Simulation {
 
 		// do hLRT if selected
 		if (options.doHLRT) {
-			HLRT myHLRT = new HLRT();
+			HLRT myHLRT = new HLRT(options);
 			myHLRT.compute(!options.backwardHLRTSelection,
 					options.confidenceLevelHLRT, options.writePAUPblock);
 			treeConsole.println(ModelTest.averagedTreeString);
@@ -270,7 +270,7 @@ public class Simulation {
 
 		// do dLRT if selected
 		if (options.doDLRT) {
-			HLRT myHLRT = new HLRT();
+			HLRT myHLRT = new HLRT(options);
 			myHLRT.computeDynamical(!options.backwardHLRTSelection,
 					options.confidenceLevelHLRT, options.writePAUPblock);
 		}
