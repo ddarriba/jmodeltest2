@@ -56,7 +56,7 @@ public class Frame_BIC extends JModelTestFrame {
 	private JCheckBox jCheckBoxAveraging = new JCheckBox();
 	private JCheckBox jCheckBoxImportance = new JCheckBox();
 	private JSlider JSliderInterval = new JSlider();
-	private JComboBox<ApplicationOptions.SampleSizeMode> comboSampleSizeMode = new JComboBox<ApplicationOptions.SampleSizeMode>(ApplicationOptions.SampleSizeMode.values());
+	private JComboBox comboSampleSizeMode = new JComboBox(ApplicationOptions.SampleSizeMode.values());
 
 	private BIC myBIC;
 

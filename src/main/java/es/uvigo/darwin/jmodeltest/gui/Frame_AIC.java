@@ -58,7 +58,7 @@ public class Frame_AIC extends JModelTestFrame {
 	private JCheckBox checkBoxAveraging = new JCheckBox();
 	private JCheckBox checkBoxImportance = new JCheckBox();
 	private JSlider sliderInterval = new JSlider();
-	private JComboBox<ApplicationOptions.SampleSizeMode> comboSampleSizeMode = new JComboBox<ApplicationOptions.SampleSizeMode>(ApplicationOptions.SampleSizeMode.values());
+	private JComboBox comboSampleSizeMode = new JComboBox(ApplicationOptions.SampleSizeMode.values());
 
 	private AIC myAIC;
 	private AICc myAICc;

@@ -530,11 +530,8 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 								+ Utilities.calculateRuntime(startTime,
 										System.currentTimeMillis()) + ".\n");
 
-						// calculations
-						if (options.fixedTopology) {
-							XManager.getInstance().enableMenuhLRT(true);
-							XManager.getInstance().enableMenuAveraging(false);
-						}
+						XManager.getInstance().enableMenuhLRT(options.fixedTopology | options.userTopologyExists);
+						XManager.getInstance().enableMenuAveraging(!(options.fixedTopology | options.userTopologyExists));
 
 						XManager.getInstance().enableMenuAIC(true);
 						XManager.getInstance().enableMenuBIC(true);
