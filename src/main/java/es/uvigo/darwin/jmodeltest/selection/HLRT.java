@@ -59,6 +59,7 @@ public class HLRT {
 		alphaLRT = alpha;
 		hypotheses = new String[ModelTest.testingOrder.size()];
 		i = 0;
+		
 		for (Enumeration<String> e = ModelTest.testingOrder.elements(); e
 				.hasMoreElements();)
 			hypotheses[i++] = e.nextElement();
@@ -71,7 +72,7 @@ public class HLRT {
 		else
 			currentModel = ModelTest.getCandidateModels()[options
 					.getNumModels() - 1];
-
+		
 		stream.println("\n\n\n---------------------------------------------------------------");
 		stream.println("*                                                             *");
 		stream.println("*          HIERARCHICAL LIKELIHOO RATIO TESTS (hLRT)          *");

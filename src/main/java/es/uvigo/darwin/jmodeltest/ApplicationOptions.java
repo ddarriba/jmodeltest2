@@ -271,6 +271,7 @@ public class ApplicationOptions implements Serializable {
 				break;
 			case 2:
 			case 3:
+			case 4:
 				testOrder.add("titv");
 				testOrder.add("2ti");
 				testOrder.add("2tv");

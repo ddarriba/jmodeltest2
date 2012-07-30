@@ -74,7 +74,7 @@ public class Frame_hLRT extends JModelTestFrame {
 		java.awt.Image img0 = Toolkit.getDefaultToolkit().getImage(currentDirectory + "/resources/icons/Up24.gif");
 		java.awt.Image img1 = Toolkit.getDefaultToolkit().getImage(currentDirectory + "/resources/icons/Down24.gif");
 
-		PanelSettings.setSize(new java.awt.Dimension(460, 270));
+		PanelSettings.setSize(new java.awt.Dimension(460, 370));
 		PanelSettings.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "hLRT Settings", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
 		PanelSettings.setLocation(new java.awt.Point(10, 10));
 		PanelSettings.setVisible(true);
@@ -91,7 +91,7 @@ public class Frame_hLRT extends JModelTestFrame {
 		HypothesisList.setToolTipText("Use the buttons to move up and down the different hypotheses");
 		HypothesisList.setBorder(new BorderUIResource.TitledBorderUIResource(new LineBorder(new java.awt.Color(153, 153, 153), 1, false), "Hypotheses order", 4, 2, new java.awt.Font("Application", 1, 10), new java.awt.Color(102, 102, 153)));
 		HypothesisList.setVisible(true);
-		HypothesisList.setSize(new java.awt.Dimension(130, 130));
+		HypothesisList.setSize(new java.awt.Dimension(130, 230));
 		HypothesisList.setVisibleRowCount(ModelTest.testingOrder.size());
 		HypothesisList.setFont(XManager.FONT_LABEL_BIG);
 		HypothesisList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -143,17 +143,17 @@ public class Frame_hLRT extends JModelTestFrame {
 		JButtonDefaulthLRT.setVisible(true);
 		JButtonDefaulthLRT.setSize(new java.awt.Dimension(141, 40));
 		JButtonDefaulthLRT.setText("Default Settings");
-		JButtonDefaulthLRT.setLocation(new java.awt.Point(10, 220));
+		JButtonDefaulthLRT.setLocation(new java.awt.Point(10, 320));
 
 		CancelButtonhLRT.setVisible(true);
 		CancelButtonhLRT.setSize(new java.awt.Dimension(140, 40));
 		CancelButtonhLRT.setText("Cancel");
-		CancelButtonhLRT.setLocation(new java.awt.Point(160, 220));
+		CancelButtonhLRT.setLocation(new java.awt.Point(160, 320));
 
 		RunButtonhLRT.setVisible(true);
 		RunButtonhLRT.setSize(new java.awt.Dimension(140, 40));
 		RunButtonhLRT.setText("Run");
-		RunButtonhLRT.setLocation(new java.awt.Point(310, 220));
+		RunButtonhLRT.setLocation(new java.awt.Point(310, 320));
 		RunButtonhLRT.setToolTipText("Click here to start the hLRT selection");
 		getRootPane().setDefaultButton(RunButtonhLRT);
 
@@ -180,7 +180,7 @@ public class Frame_hLRT extends JModelTestFrame {
 	
 		getContentPane().add(PanelSettings);
 
-		setSize(new java.awt.Dimension(482, 320));
+		setSize(new java.awt.Dimension(482, 420));
 		setResizable(false);
 
 
@@ -491,8 +491,10 @@ public class Frame_hLRT extends JModelTestFrame {
 		else
 			forward = false;
 	
-		for (i=0; i< listModel.getSize(); i++)
+		for (i=0; i< listModel.getSize(); i++) {
+			System.out.println( i + " / " + listModel.getSize() + " --> " + listModel.getElementAt(i));
 			ModelTest.testingOrder.setElementAt((String)listModel.getElementAt(i),i);
+		}
 	
 		/* check whether 2tv goes before 4tv */
 		if (forward && ModelTest.testingOrder.indexOf("2tv") > ModelTest.testingOrder.indexOf("4tv"))
