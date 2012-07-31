@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest.model;
 
 import java.io.PushbackReader;
@@ -30,21 +30,21 @@ import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 public class Model implements Serializable {
 
 	private static final long serialVersionUID = 4173257281316945987L;
-	
+
 	private String name, partition, treeString;
 	private Tree tree;
-	
+
 	private int id;
 	private int K;
 	private int numTi;
 	private int numTv;
 	private int numGammaCat;
-	
+
 	private boolean pF, pT, pR, pI, pG, pV;
-	
-	private boolean isInAICinterval, isInAICcinterval, 
-			isInBICinterval, isInDTinterval;
-	
+
+	private boolean isInAICinterval, isInAICcinterval, isInBICinterval,
+			isInDTinterval;
+
 	private double lnL;
 	/* Unconstrained LK */
 	private double unconstrainedLnL;
@@ -58,13 +58,13 @@ public class Model implements Serializable {
 
 	private double fA, fG, fC, fT, titv, kappa;
 	private double Ra, Rb, Rc, Rd, Re, Rf, pinv, shape;
-	
+
 	private long computationTime;
 
-	public Model(int mid, String mname, String mpartition,
-			int mparameters, boolean mpF, boolean mpT, boolean mpV,
-			boolean mpR, boolean mpI, boolean mpG, int mTi, int mTv) {
-		
+	public Model(int mid, String mname, String mpartition, int mparameters,
+			boolean mpF, boolean mpT, boolean mpV, boolean mpR, boolean mpI,
+			boolean mpG, int mTi, int mTv) {
+
 		id = mid;
 		name = mname;
 		partition = mpartition; // model substitution specification (e.g. GTR =
@@ -78,15 +78,14 @@ public class Model implements Serializable {
 		pG = mpG; // includes gamma
 		numTi = mTi; // number of transition rates
 		numTv = mTv; // number of transversion rates
-		
+
 		lnL = 0.0;
 		pinv = 0.0;
 		shape = ModelTest.INFINITY;
 	}
 
-	public Model(int mid, String mname, String mpartition,
-			int mparameters) {
-		
+	public Model(int mid, String mname, String mpartition, int mparameters) {
+
 		id = mid;
 		name = mname;
 		partition = mpartition; // model substitution specification (e.g. GTR =
@@ -100,12 +99,12 @@ public class Model implements Serializable {
 		pG = false; // includes gamma
 		numTi = 0; // number of transition rates
 		numTv = 0; // number of transversion rates
-		
+
 		lnL = 0.0;
 		pinv = 0.0;
 		shape = ModelTest.INFINITY;
 	}
-	
+
 	/****************************
 	 * print ************************************ * Print model components * *
 	 ************************************************************************/
@@ -157,34 +156,18 @@ public class Model implements Serializable {
 	public String printForTesting() {
 		StringBuilder str = new StringBuilder();
 		str.append(getName() + " ");
-		str.append(
-				ispF()?
-						(getfA() + " " + getfC() + " " + getfG() + " " + getfT() + " ")
-						:("NA NA NA NA ")
-				);
-		str.append(
-				ispT()?
-						(getKappa() + " " + getTitv() + " ")
-						:("NA NA ")
-				);
+		str.append(ispF() ? (getfA() + " " + getfC() + " " + getfG() + " "
+				+ getfT() + " ") : ("NA NA NA NA "));
+		str.append(ispT() ? (getKappa() + " " + getTitv() + " ") : ("NA NA "));
 
-		str.append(
-				ispR()?
-						(getRa() + " " + getRb() + " " + getRc() + " " + 
-						getRd() + " " + getRe() + " " + getRf() + " ")
-						:("NA NA NA NA NA NA ")
-				);
-		str.append(
-				ispI()?(getPinv() + " "):("NA ")
-				);
-		str.append(
-				ispG()?(getShape() + " "):("NA ")
-				);
+		str.append(ispR() ? (getRa() + " " + getRb() + " " + getRc() + " "
+				+ getRd() + " " + getRe() + " " + getRf() + " ")
+				: ("NA NA NA NA NA NA "));
+		str.append(ispI() ? (getPinv() + " ") : ("NA "));
+		str.append(ispG() ? (getShape() + " ") : ("NA "));
 		str.append(getPartition());
 		return str.toString();
 	}
-
-
 
 	public void setCumBICw(double cumBICw) {
 		this.cumBICw = cumBICw;
@@ -209,7 +192,7 @@ public class Model implements Serializable {
 	public double getLnLIgnoringGaps() {
 		return lnLIgnoringGaps;
 	}
-	
+
 	public double getUnconstrainedLnL() {
 		return unconstrainedLnL;
 	}
@@ -217,7 +200,7 @@ public class Model implements Serializable {
 	public void setUnconstrainedLnL(double unconstrainedLnL) {
 		this.unconstrainedLnL = unconstrainedLnL;
 	}
-	
+
 	public void setAIC(double aIC) {
 		AIC = aIC;
 	}
@@ -249,7 +232,7 @@ public class Model implements Serializable {
 	public double getUAICd() {
 		return uAICd;
 	}
-	
+
 	public void setCumAICw(double cumAICw) {
 		this.cumAICw = cumAICw;
 	}
@@ -293,7 +276,7 @@ public class Model implements Serializable {
 	public double getUAICcd() {
 		return uAICcd;
 	}
-	
+
 	public double getCumAICcw() {
 		return cumAICcw;
 	}
@@ -329,7 +312,7 @@ public class Model implements Serializable {
 	public double getUBICd() {
 		return uBICd;
 	}
-	
+
 	public void setDT(double dT) {
 		DT = dT;
 	}
@@ -377,7 +360,7 @@ public class Model implements Serializable {
 	public Tree getTree() {
 		return tree;
 	}
-	
+
 	public void setTreeString(String tree) throws TreeParseException {
 		this.treeString = tree;
 
@@ -625,7 +608,7 @@ public class Model implements Serializable {
 	public void setComputationTime(long computationTime) {
 		this.computationTime = computationTime;
 	}
-	
+
 	public void update(Model model) {
 		if (this.equals(model)) {
 			lnL = model.lnL;

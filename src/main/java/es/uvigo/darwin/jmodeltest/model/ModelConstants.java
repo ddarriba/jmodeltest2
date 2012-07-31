@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package es.uvigo.darwin.jmodeltest.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -64,8 +65,9 @@ public abstract class ModelConstants {
 			"012345", "012345", "012345", "012345", // SYM
 			"012345", "012345", "012345", "012345", // GTR
 	};
-	public static final List<String> codeList = Arrays.asList(ModelConstants.modelCode);
-	
+	public static final List<String> codeList = Arrays
+			.asList(ModelConstants.modelCode);
+
 	// custom String for substitution types
 	public static final Hashtable<Integer, String[]> fullModelSet;
 
@@ -186,6 +188,30 @@ public abstract class ModelConstants {
 			4, 4, 4, 4, // SYM
 			4, 4, 4, 4 // GTR
 	};
+
+	public static final int getNumberOfTransitions(String partition) {
+		System.out.println(" CHECKING " + partition);
+		Integer ti0 = Integer.parseInt(partition.substring(1, 2));
+		Integer ti1 = Integer.parseInt(partition.substring(4, 5));
+		System.out.println(" CHECKING " + ti0 + " and " +  ti1);
+		if (ti0 == ti1) {
+			return 1;
+		} else {
+			return 2;
+		}
+	}
+
+	public static final int getNumberOfTransversions(String partition) {
+		List<Integer> parts = new ArrayList<Integer>();
+		int[] transitions = { 0, 2, 3, 5 };
+		for (int i : transitions) {
+			Integer current_part = Integer.parseInt(partition.substring(i, i+1));
+			if (!parts.contains(current_part)) {
+				parts.add(current_part);
+			}
+		}
+		return parts.size();
+	}
 
 	// base frequencies restrictions
 	public static final boolean[] equalBaseFrequencies = { true, true, true,

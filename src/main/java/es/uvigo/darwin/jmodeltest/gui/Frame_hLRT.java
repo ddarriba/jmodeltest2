@@ -492,7 +492,6 @@ public class Frame_hLRT extends JModelTestFrame {
 			forward = false;
 	
 		for (i=0; i< listModel.getSize(); i++) {
-			System.out.println( i + " / " + listModel.getSize() + " --> " + listModel.getElementAt(i));
 			ModelTest.testingOrder.setElementAt((String)listModel.getElementAt(i),i);
 		}
 	

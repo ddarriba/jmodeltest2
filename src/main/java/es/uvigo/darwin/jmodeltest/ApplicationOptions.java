@@ -398,7 +398,8 @@ public class ApplicationOptions implements Serializable {
 		} else {
 			modelName = partition 
 					 + (pI?"+I":"") + (pG?"+G":"") + (pF?"+F":"");
-			nTi = nTv = 0;
+			nTi = ModelConstants.getNumberOfTransitions(partition);
+			nTv = ModelConstants.getNumberOfTransversions(partition);
 			pT = false;
 			pR = true;
 		}
