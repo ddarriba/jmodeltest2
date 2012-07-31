@@ -1040,7 +1040,15 @@ public class FrameMain extends JModelTestFrame {
 	private void menuAboutModelTestActionPerformed(java.awt.event.ActionEvent e) {
 		try {
 			String about = "jModelTest " + ModelTest.CURRENT_VERSION + "\n";
-			about += "Copyright Diego Darriba and David Posada 2011 onwards ";
+			about += "(c) 2001-onwards D.Darriba, G.L.Taboada, R.Doallo and D.Posada\n";
+			about += "Department of Biochemistry, Genetics and Immunology\n";
+			about += "University of Vigo, 36310 Vigo, Spain.\n";
+			about += "Department of Electronics and Systems\n";
+			about += "University of A Coruna, 15071 A Coruna, Spain.\n";
+			about += "e-mail: ddarriba@udc.es, dposada@uvigo.es\n\n";
+			about += "Citation: Darriba D, Taboada GL, Doallo R and Posada D. 2012.\n" +
+          "\"jModelTest 2: more models, new heuristics and parallel computing\".\n" +
+          "Nature Methods 9, 772.\n";
 			JOptionPane.showMessageDialog(new JFrame(), about,
 					"jModelTest", JOptionPane.INFORMATION_MESSAGE,
 					XManager.makeIcon("JMT48", "JMT2"));

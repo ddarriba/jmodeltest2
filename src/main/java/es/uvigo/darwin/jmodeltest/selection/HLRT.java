@@ -59,7 +59,7 @@ public class HLRT {
 		alphaLRT = alpha;
 		hypotheses = new String[ModelTest.testingOrder.size()];
 		i = 0;
-		
+
 		for (Enumeration<String> e = ModelTest.testingOrder.elements(); e
 				.hasMoreElements();)
 			hypotheses[i++] = e.nextElement();
@@ -72,12 +72,18 @@ public class HLRT {
 		else
 			currentModel = ModelTest.getCandidateModels()[options
 					.getNumModels() - 1];
-		
+
 		stream.println("\n\n\n---------------------------------------------------------------");
 		stream.println("*                                                             *");
 		stream.println("*          HIERARCHICAL LIKELIHOO RATIO TESTS (hLRT)          *");
 		stream.println("*                                                             *");
 		stream.println("---------------------------------------------------------------");
+
+		if (options.getSubstTypeCode() >= 4) {
+			stream.println("\nhLRT is not available for the 203 substitution scheme.");
+			stream.println("Please use one of the other available selection criteria (AIC, BIC, AICc or DT).");
+			return;
+		}
 
 		if (options.fixedTopology | options.userTopologyExists) {
 			stream.println("\nSettings: ");
