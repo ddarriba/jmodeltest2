@@ -7,7 +7,7 @@ import java.util.Properties;
 public abstract class ModelTestConfiguration {
 
 	 /** The application APPLICATION_PROPERTIES. */
-    private static final Properties APPLICATION_PROPERTIES;
+    private static final Properties APPLICATION_PROPERTIES = new Properties();;
     
     public static final String DEFAULT_EXE_DIR = "exe/phyml";
     public static final String DEFAULT_LOG_DIR = "log";
@@ -21,13 +21,15 @@ public abstract class ModelTestConfiguration {
     public static final String I_THREADS = "inv-threads";
     public static final String U_THREADS = "uniform-threads";
     
-    static {
-        APPLICATION_PROPERTIES = new Properties();
-        try {
-            FileInputStream prop = new FileInputStream(ModelTest.CONFIG_FILE);
+    //TODO unique config-file for each execution
+    public static void setConfigFile(String configFile) 
+    {
+        try 
+        {
+            FileInputStream prop = new FileInputStream(configFile);
             APPLICATION_PROPERTIES.load(prop);
         } catch (IOException e) {
-            System.err.println("Configuration file (conf/jmodeltest.conf) cannot be resolved");
+            System.err.println("Configuration file (" + configFile + " cannot be resolved");
             System.exit(-1);
         }
     }

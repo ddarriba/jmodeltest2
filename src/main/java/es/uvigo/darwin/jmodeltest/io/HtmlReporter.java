@@ -174,8 +174,22 @@ public abstract class HtmlReporter {
 
 	// Process a template using FreeMarker and print the results
 	static void freemarkerDo(Map<String, Object> datamodel, String template,
-			File mOutputFile, ModelTest modelTest) throws Exception {
-		File resourcesDir = new File("resources" + File.separator + "template");
+			File mOutputFile, ModelTest modelTest) throws Exception 
+	{
+		Class HtmlReporterClass = HtmlReporter.class;
+        ClassLoader classLoader = HtmlReporterClass.getClassLoader();
+        String path;
+        
+        try
+        {
+        	path = classLoader.getResource("template").getFile();
+        }
+        catch (Exception e)
+        {
+        	path = "resources" + File.separator + "template";
+        }
+		
+		File resourcesDir = new File(path);
 		File logDir;
 		
 		if (mOutputFile != null)
@@ -234,12 +248,16 @@ public abstract class HtmlReporter {
 		tpl.process(datamodel, output);
 	}
 
-	private static void fillInWithOptions(ModelTest modelTest) {
+	private static void fillInWithOptions(ModelTest modelTest) 
+	{
+		
 		ApplicationOptions options = modelTest.getApplicationOptions();
-
+		
 		StringBuffer arguments = new StringBuffer();
+
 		for (String argument : modelTest.arguments)
 			arguments.append(argument + " ");
+
 		datamodel.put("arguments", arguments);
 		datamodel.put("alignName", options.getInputFile());
 		datamodel.put("numTaxa", options.numTaxa);
@@ -247,6 +265,7 @@ public abstract class HtmlReporter {
 		datamodel.put("phymlVersion", RunPhyml.PHYML_VERSION);
 		datamodel.put("phymlBinary", Utilities.getBinaryVersion());
 		datamodel.put("candidateModels", modelTest.getCandidateModels().length);
+
 		if (options.getSubstTypeCode() == 0)
 			datamodel.put("substSchemes", "3");
 		else if (options.getSubstTypeCode() == 1)
@@ -306,6 +325,7 @@ public abstract class HtmlReporter {
 
 		datamodel.put("confidenceInterval",
 				String.format(Locale.ENGLISH, "%5.2f", options.confidenceInterval * 100));
+	
 	}
 
 	private static void fillInWithSortedModels(Model[] models) {

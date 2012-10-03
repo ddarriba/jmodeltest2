@@ -53,6 +53,7 @@ import es.uvigo.darwin.jmodeltest.selection.DT;
 import es.uvigo.darwin.jmodeltest.selection.HLRT;
 import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Simulation;
+import es.uvigo.darwin.prottest.util.exception.ProtTestInternalException;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 /**
@@ -87,10 +88,13 @@ public class ModelTest {
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
 	public static final String DISCUSSION_GROUP = "http://groups.google.com/group/jmodeltest";
-	public static final String CONFIG_FILE = "conf/jmodeltest.conf";
+	
 	public static final String UNKNOWN_HOSTNAME = "UNKNOWN";
 
-	private TextOutputStream MAIN_CONSOLE;
+	public static final String DEFAULT_CONFIG_FILE = "conf/jmodeltest.conf";
+	public String CONFIG_FILE;
+	
+	private TextOutputStream MAIN_CONSOLE = new TextOutputStream(System.out);
 	private TextOutputStream CURRENT_OUT_STREAM;
 
 	public String[] arguments;
@@ -129,31 +133,39 @@ public class ModelTest {
 	protected boolean runInQueue = false;
 	protected File outputFile = null;
 	protected Observer progressObserver = null;
+	protected Long jobId;
 	
-	static {
+	static 
+	{
 		InetAddress addr;
-		try {
+		try 
+		{
 			addr = InetAddress.getLocalHost();
 			// Get hostname
 			hostname = addr.getHostName();
-		} catch (UnknownHostException e) {
+		}
+		catch (UnknownHostException e) 
+		{
 			hostname = UNKNOWN_HOSTNAME;
 			System.err.println("WARNING: This host is unknown");
 			// WARN AND DO NOTHING
 		}
 	}
 
-	public ModelTest(boolean buildGUI, Observer progressObserver) 
+	public ModelTest(boolean buildGUI, Observer progressObserver, String configFile) 
 	{
 		this.buildGUI = buildGUI;
 		options = new ApplicationOptions(this);
+		CONFIG_FILE = configFile;
+		
+		ModelTestConfiguration.setConfigFile(CONFIG_FILE);
 
 		this.progressObserver = progressObserver;
 	}
 
-	public ModelTest(String[] args, boolean buildGUI) 
+	public ModelTest(String[] args, boolean buildGUI, String configFile) 
 	{
-		this(buildGUI, null);
+		this(buildGUI, null, configFile);
 		
 		if (buildGUI)
 		{
@@ -172,11 +184,13 @@ public class ModelTest {
 				} 
 				else
 				{
+					checkFilesAndBuildSetOfModels();
 					runCommandLine();	
 					endCommandLine();
 				}
-				
-			} catch (Exception e) {
+			}
+			catch (Exception e) 
+			{
 				e.printStackTrace();
 			}
 			finalize(0);
@@ -187,40 +201,50 @@ public class ModelTest {
 	 * main ************************************ * Starts the application * * *
 	 ***********************************************************************/
 
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 		// initializing MPJ environment (if available)
 		System.err.println("[MPI] Testing MPI environment... (" + hostname + ")");
-		try {
+		try 
+		{
 			args = MPI.Init(args);
 			System.err.println("[MPI] ... OK! ["+hostname+" ("+MPJ_ME+")]");
 			MPJ_ME = MPI.COMM_WORLD.Rank();
 			MPJ_SIZE = MPI.COMM_WORLD.Size();
 			MPJ_RUN = true;
-		} catch (MPIException e) {
+		}
+		catch (MPIException e) 
+		{
 			System.err.println("[MPI] Proceed without MPI");
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
-		} catch (Exception e) {
+		}
+		catch (Exception e) 
+		{
 			System.err.println("[MPI] Proceed without MPI");
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
-		} catch (ExceptionInInitializerError e) {
+		}
+		catch (ExceptionInInitializerError e) 
+		{
 			System.err.println("[MPI] Initializer error!");
 			System.err.println(e.getMessage());
 			System.exit(-1);
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
-		} catch (NoClassDefFoundError e) {
+		}
+		catch (NoClassDefFoundError e) 
+		{
 			System.err.println("[MPI] Proceed without MPI");
 			MPJ_ME = 0;
 			MPJ_SIZE = 1;
 			MPJ_RUN = false;
 		}
 
-		ModelTest modelTest = new ModelTest(args, (args.length < 1));
+		ModelTest modelTest = new ModelTest(args, (args.length < 1), DEFAULT_CONFIG_FILE);
 		
 		modelTest.getApplicationOptions().getLogFile().delete();
 	}
@@ -230,15 +254,10 @@ public class ModelTest {
 		return options;
 	}
 	
-	/****************************
-	 * runCommandLine ************************** * Organizes all the tasks that
-	 * the program needs to carry out * * *
-	 ***********************************************************************/
-	public void runCommandLine() {
-		// open mainConsole
-		MAIN_CONSOLE = new TextOutputStream(System.out);
-
-		if (MPJ_ME == 0) {
+	protected void checkFilesAndBuildSetOfModels()
+	{
+		if (MPJ_ME == 0) 
+		{
 			// print header information
 			printHeader(MAIN_CONSOLE);
 
@@ -254,10 +273,19 @@ public class ModelTest {
 			for (int i = 0; i < arguments.length; i++)
 				MAIN_CONSOLE.print(" " + arguments[i]);
 
-			try {
+			try 
+			{
 				checkInputFiles();
-			} catch (InvalidArgumentException.InvalidInputFileException e) {
+			} 
+			catch (InvalidArgumentException.InvalidInputFileException e) 
+			{
 				MAIN_CONSOLE.println(e.getMessage());
+				
+				if (runInQueue)
+				{
+					throw new ProtTestInternalException(e.getMessage());
+				}
+				
 				finalize(-1);
 			}
 
@@ -281,12 +309,19 @@ public class ModelTest {
 			options.setCandidateModels();
 		}
 		// build set of models
-
+	}
+	
+	/****************************
+	 * runCommandLine ************************** * Organizes all the tasks that
+	 * the program needs to carry out * * *
+	 ***********************************************************************/
+	public void runCommandLine() 
+	{
 		// calculate likelihoods with phyml in the command line
 		
 		if (runInQueue)
 		{
-			runPhyml = new RunPhymlQueue(progressObserver, this, getCandidateModels());
+			runPhyml = new RunPhymlQueue(progressObserver, this, getCandidateModels(), jobId);
 		}
 		else
 		{
@@ -294,18 +329,18 @@ public class ModelTest {
 			
 			if (MPJ_RUN) 
 			{		
-				if (options.threadScheduling && options.getNumberOfThreads() > 0) {
-					runPhyml = new RunPhymlHybrid(MPJ_ME, MPJ_SIZE,
-							progressObserver, this,
-							getCandidateModels(), options.getNumberOfThreads());
-				} else {
-					runPhyml = new RunPhymlMPJ(
-							progressObserver, this,
-							getCandidateModels());
+				if (options.threadScheduling && options.getNumberOfThreads() > 0) 
+				{
+					runPhyml = new RunPhymlHybrid(MPJ_ME, MPJ_SIZE,	progressObserver, this,	getCandidateModels(), options.getNumberOfThreads());
 				}
-			} else {
-				runPhyml = new RunPhymlThread(progressObserver,
-						this, getCandidateModels());
+				else 
+				{
+					runPhyml = new RunPhymlMPJ(progressObserver, this, getCandidateModels());
+				}
+			}
+			else 
+			{
+				runPhyml = new RunPhymlThread(progressObserver,	this, getCandidateModels());
 			}
 		}
 		runPhyml.execute();
@@ -313,82 +348,81 @@ public class ModelTest {
 	
 	public void endCommandLine() 
 	{
-		if (MPJ_ME == 0) {
-
+		if (MPJ_ME == 0) 
+		{
 			// do AIC if selected
-			if (options.doAIC) {
-				myAIC = new AIC(options.writePAUPblock, options.doImportances,
-						options.doModelAveraging, options.confidenceInterval, this);
+			if (options.doAIC) 
+			{
+				myAIC = new AIC(options.writePAUPblock, options.doImportances, options.doModelAveraging, options.confidenceInterval, this);
 				myAIC.compute();
 				minAIC = myAIC.getMinModel();
 				AICwasCalculated = true;
 				myAIC.print(MAIN_CONSOLE);
-				if (options.doAveragedPhylogeny) {
-					consensusAIC = new RunConsense(myAIC,
-							options.consensusType, options.confidenceInterval, this);
+				if (options.doAveragedPhylogeny) 
+				{
+					consensusAIC = new RunConsense(myAIC, options.consensusType, options.confidenceInterval, this);
 				}
 			}
 
 			// do AICc if selected
-			if (options.doAICc) {
-				myAICc = new AICc(options.writePAUPblock,
-						options.doImportances, options.doModelAveraging,
-						options.confidenceInterval, this);
+			if (options.doAICc) 
+			{
+				myAICc = new AICc(options.writePAUPblock, options.doImportances, options.doModelAveraging, options.confidenceInterval, this);
 				myAICc.compute();
 				minAICc = myAICc.getMinModel();
 				AICcwasCalculated = true;
 				myAICc.print(MAIN_CONSOLE);
-				if (options.doAveragedPhylogeny) {
-					consensusAICc = new RunConsense(myAICc,
-							options.consensusType, options.confidenceInterval, this);
+				if (options.doAveragedPhylogeny) 
+				{
+					consensusAICc = new RunConsense(myAICc,	options.consensusType, options.confidenceInterval, this);
 				}
 			}
 
 			// do BIC if selected
-			if (options.doBIC) {
-				myBIC = new BIC(options.writePAUPblock, options.doImportances,
-						options.doModelAveraging, options.confidenceInterval, this);
+			if (options.doBIC) 
+			{
+				myBIC = new BIC(options.writePAUPblock, options.doImportances, options.doModelAveraging, options.confidenceInterval, this);
 				myBIC.compute();
 				minBIC = myBIC.getMinModel();
 				BICwasCalculated = true;
 				myBIC.print(MAIN_CONSOLE);
-				if (options.doAveragedPhylogeny) {
-					consensusBIC = new RunConsense(myBIC,
-							options.consensusType, options.confidenceInterval, this);
+				if (options.doAveragedPhylogeny) 
+				{
+					consensusBIC = new RunConsense(myBIC, options.consensusType, options.confidenceInterval, this);
 				}
 			}
 
 			// do DT if selected
-			if (options.doDT) {
-				myDT = new DT(options.writePAUPblock, options.doImportances,
-						options.doModelAveraging, options.confidenceInterval, this);
+			if (options.doDT) 
+			{
+				myDT = new DT(options.writePAUPblock, options.doImportances, options.doModelAveraging, options.confidenceInterval, this);
 				myDT.compute();
 				minDT = myDT.getMinModel();
 				DTwasCalculated = true;
 				myDT.print(MAIN_CONSOLE);
-				if (options.doAveragedPhylogeny) {
-					consensusDT = new RunConsense(myDT, options.consensusType,
-							options.confidenceInterval, this);
+				if (options.doAveragedPhylogeny) 
+				{
+					consensusDT = new RunConsense(myDT, options.consensusType, options.confidenceInterval, this);
 				}
 			}
 
 			// do hLRT if selected
-			if (options.doHLRT) {
+			if (options.doHLRT) 
+			{
 				myHLRT = new HLRT(this);
-				myHLRT.compute(!options.backwardHLRTSelection,
-						options.confidenceLevelHLRT, options.writePAUPblock);
+				myHLRT.compute(!options.backwardHLRTSelection, options.confidenceLevelHLRT, options.writePAUPblock);
 			}
 
 			// do dLRT if selected
-			if (options.doDLRT) {
+			if (options.doDLRT) 
+			{
 				myHLRT = new HLRT(this);
-				myHLRT.computeDynamical(!options.backwardHLRTSelection,
-						options.confidenceLevelHLRT, options.writePAUPblock);
+				myHLRT.computeDynamical(!options.backwardHLRTSelection, options.confidenceLevelHLRT, options.writePAUPblock);
 			}
 
-			if (ModelTestConfiguration.isAutoLogEnabled()) {
-				HtmlReporter.buildReport(this,
-						getCandidateModels(), outputFile);
+			if (ModelTestConfiguration.isAutoLogEnabled()) 
+			{
+				HtmlReporter.buildReport(this, getCandidateModels(), outputFile);
 			}
 
 			MAIN_CONSOLE.println(" ");
@@ -396,15 +430,16 @@ public class ModelTest {
 			MAIN_CONSOLE.println(" ");MAIN_CONSOLE.println(" ");
 			MAIN_CONSOLE.println("::Selection Summary::");
 			MAIN_CONSOLE.println(" ");
-			if (myAIC == null && myAICc == null && 
-					myBIC == null && myDT == null) {
+			if (myAIC == null && myAICc == null && myBIC == null && myDT == null) 
+			{
 				MAIN_CONSOLE.println("No information criterion was selected.");
 			}
 			
 			MAIN_CONSOLE.println("\tModel \t\tf(a) \tf(c) \tf(g) \tf(t) \tkappa \ttitv " +
 			"\tRa \tRb \tRc \tRd \tRe \tRf \tpInv \tgamma");
 			MAIN_CONSOLE.println("----------------------------------------------------------------------------------------------------------------------------------------");
-			if (myAIC != null) {
+			if (myAIC != null) 
+			{
 //				MAIN_CONSOLE.println("BestAICmodelAVG "
 //						+ myAIC.getMinModel().getName() + " " + Utilities.RoundDoubleTo(myAIC.getAfA(),4)
 //						+ " " + myAIC.getAfC() + " " + myAIC.getAfG() + " "
@@ -417,9 +452,8 @@ public class ModelTest {
 //						+ myAIC.getAshapeIG() + " "
 //						+ myAIC.getMinModel().getPartition());
 				Model minModel = myAIC.getMinModel();
-				MAIN_CONSOLE.print("AIC \t" +
-						  minModel.getName() + "\t");
-				if (minModel.getName().length()<8)
+				MAIN_CONSOLE.print("AIC \t" + minModel.getName() + "\t");
+				if (minModel.getName().length() < 8)
 					System.err.print("\t");
 				MAIN_CONSOLE.print(minModel.getfA()
 						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
@@ -428,20 +462,28 @@ public class ModelTest {
 						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
 						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
 						+ minModel.getRf() + "\t");
-				if (minModel.ispI()) {
+				if (minModel.ispI()) 
+				{
 					MAIN_CONSOLE.print(minModel.getPinv());
-				} else {
+				}
+				else 
+				{
 					MAIN_CONSOLE.print("N/A");
 				}
 				MAIN_CONSOLE.print("\t");
-				if (minModel.ispG()) {
+				if (minModel.ispG()) 
+				{
 					MAIN_CONSOLE.print(minModel.getShape());
-				} else {
+				}
+				else 
+				{
 					MAIN_CONSOLE.print("N/A");
 				}
 				MAIN_CONSOLE.print("\n");
 			}
-			if (myBIC != null) {
+			
+			if (myBIC != null) 
+			{
 //				System.err.println("BestBICmodelAVG "
 //						+ myBIC.getMinModel().getName() + " " + myBIC.getAfA()
 //						+ " " + myBIC.getAfC() + " " + myBIC.getAfG() + " "
@@ -456,7 +498,7 @@ public class ModelTest {
 				Model minModel = myBIC.getMinModel();
 				MAIN_CONSOLE.print("BIC \t" +
 						  minModel.getName() + "\t");
-				if (minModel.getName().length()<8)
+				if (minModel.getName().length() < 8)
 					System.err.print("\t");
 				MAIN_CONSOLE.print(minModel.getfA()
 						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
@@ -465,20 +507,28 @@ public class ModelTest {
 						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
 						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
 						+ minModel.getRf() + "\t");
-				if (minModel.ispI()) {
+				if (minModel.ispI()) 
+				{
 					MAIN_CONSOLE.print(minModel.getPinv());
-				} else {
+				}
+				else 
+				{
 					MAIN_CONSOLE.print("N/A");
 				}
 				MAIN_CONSOLE.print("\t");
-				if (minModel.ispG()) {
+				if (minModel.ispG()) 
+				{
 					MAIN_CONSOLE.print(minModel.getShape());
-				} else {
+				}
+				else 
+				{
 					MAIN_CONSOLE.print("N/A");
 				}
 				MAIN_CONSOLE.print("\n");
 			}
-			if (myAICc != null) {
+			
+			if (myAICc != null) 
+			{
 //				System.err.println("BestAICcmodelAVG "
 //						+ myAICc.getMinModel().getName() + " "
 //						+ myAICc.getAfA() + " " + myAICc.getAfC() + " "
@@ -493,7 +543,7 @@ public class ModelTest {
 				Model minModel = myAICc.getMinModel();
 				MAIN_CONSOLE.print("AICc \t" +
 						  minModel.getName() + "\t");
-				if (minModel.getName().length()<8)
+				if (minModel.getName().length() < 8)
 					System.err.print("\t");
 				MAIN_CONSOLE.print(minModel.getfA()
 						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
@@ -502,20 +552,28 @@ public class ModelTest {
 						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
 						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
 						+ minModel.getRf() + "\t");
-				if (minModel.ispI()) {
+				if (minModel.ispI()) 
+				{
 					MAIN_CONSOLE.print(minModel.getPinv());
-				} else {
+				}
+				else 
+				{
 					MAIN_CONSOLE.print("N/A");
 				}
 				MAIN_CONSOLE.print("\t");
-				if (minModel.ispG()) {
+				if (minModel.ispG()) 
+				{
 					MAIN_CONSOLE.print(minModel.getShape());
-				} else {
+				}
+				else 
+				{
 					MAIN_CONSOLE.print("N/A");
 				}
 				MAIN_CONSOLE.print("\n");
 			}
-			if (myDT != null) {
+			
+			if (myDT != null) 
+			{
 //				System.err.println("BestDTmodelAVG "
 //						+ myDT.getMinModel().getName() + " " + myDT.getAfA()
 //						+ " " + myDT.getAfC() + " " + myDT.getAfG() + " "
@@ -530,7 +588,7 @@ public class ModelTest {
 				Model minModel = myDT.getMinModel();
 				MAIN_CONSOLE.print("DT \t" +
 						  minModel.getName() + "\t");
-				if (minModel.getName().length()<8)
+				if (minModel.getName().length() < 8)
 					System.err.print("\t");
 				MAIN_CONSOLE.print(minModel.getfA()
 						+ "\t" + minModel.getfC() + "\t" + minModel.getfG() + "\t"
@@ -539,15 +597,21 @@ public class ModelTest {
 						+ minModel.getRb() + "\t" + minModel.getRc() + "\t"
 						+ minModel.getRd() + "\t" + minModel.getRe() + "\t"
 						+ minModel.getRf() + "\t");
-				if (minModel.ispI()) {
+				if (minModel.ispI()) 
+				{
 					MAIN_CONSOLE.print(minModel.getPinv());
-				} else {
+				}
+				else 
+				{
 					MAIN_CONSOLE.print("N/A");
 				}
 				MAIN_CONSOLE.print("\t");
-				if (minModel.ispG()) {
+				if (minModel.ispG()) 
+				{
 					MAIN_CONSOLE.print(minModel.getShape());
-				} else {
+				}
+				else 
+				{
 					MAIN_CONSOLE.print("N/A");
 				}
 				MAIN_CONSOLE.print("\n");
@@ -561,21 +625,23 @@ public class ModelTest {
 	 * jModeltest * *
 	 ************************************************************************/
 
-	public void ParseArguments() {
+	public void ParseArguments() 
+	{
 		int i, j;
 		String arg = "";
 		String error = "\nCOMMAND LINE ERROR: ";
 		boolean isInputFile = false;
-		try {
+		try 
+		{
 			i = 0;
-			while (i < arguments.length) {
-				if (!arguments[i].startsWith("-")) {
-					System.err
-							.println(error
-									+ "Arguments must start with \"-\". The ofending argument was: "
-									+ arguments[i] + ".");
+			while (i < arguments.length) 
+			{
+				if (!arguments[i].startsWith("-")) 
+				{
+					System.err.println(error + "Arguments must start with \"-\". The ofending argument was: " + arguments[i] + ".");
 					System.err.print("      Arguments: ");
-					for (String argument : arguments) {
+					for (String argument : arguments) 
+					{
 						System.err.print(argument + " ");
 					}
 					System.err.println("");
@@ -586,269 +652,322 @@ public class ModelTest {
 
 				arg = arguments[i++];
 
-				if (arg.equals("-d")) {
-					if (i < arguments.length) {
+				if (arg.equals("-d")) 
+				{
+					if (i < arguments.length) 
+					{
 						options.setInputFile(new File(arguments[i++]));
 						isInputFile = true;
-					} else {
-						System.err.println(error
-								+ "-d option requires an input filename.");
+					}
+					else 
+					{
+						System.err.println(error + "-d option requires an input filename.");
 						PrintUsage();
 					}
 				}
-
-				else if (arg.equals("-s")) {
-					if (i < arguments.length) {
+				
+				else if (arg.equals("-s")) 
+				{
+					if (i < arguments.length) 
+					{
 						String type = arguments[i++];
-						try {
+						try 
+						{
 							int number = Integer.parseInt(type);
-							switch (number) {
-							case 3:
-								options.setSubstTypeCode(0);
-								break;
-							case 5:
-								options.setSubstTypeCode(1);
-								break;
-							case 7:
-								options.setSubstTypeCode(2);
-								break;
-							case 11:
-								options.setSubstTypeCode(3);
-								break;
-							default:
-								System.err
-										.println(error
-												+ "-s substitution types have to be 3,5,7,11 only.");
-								PrintUsage();
+							switch (number) 
+							{
+								case 3:
+									options.setSubstTypeCode(0);
+									break;
+								case 5:
+									options.setSubstTypeCode(1);
+									break;
+								case 7:
+									options.setSubstTypeCode(2);
+									break;
+								case 11:
+									options.setSubstTypeCode(3);
+									break;
+								default:
+									System.err.println(error + "-s substitution types have to be 3,5,7,11 only.");
+									PrintUsage();
 							}
-						} catch (NumberFormatException e) {
-							System.err
-									.println(error
-											+ "-s option requires a number for the substitution types: 3,5,7,11.");
+						} 
+						catch (NumberFormatException e) 
+						{
+							System.err.println(error + "-s option requires a number for the substitution types: 3,5,7,11.");
 							PrintUsage();
 						}
-					} else {
-						System.err
-								.println(error
-										+ "-s option requires a number for the substitution types: 3,5,7,11.");
+					} 
+					else 
+					{
+						System.err.println(error + "-s option requires a number for the substitution types: 3,5,7,11.");
 						PrintUsage();
 					}
 				}
 
-				else if (arg.equals("-f")) {
+				else if (arg.equals("-f")) 
+				{
 					options.doF = true;
 				}
 
-				else if (arg.equals("-i")) {
+				else if (arg.equals("-i")) 
+				{
 					options.doI = true;
 				}
 
-				else if (arg.equals("-g")) {
-					if (i < arguments.length) {
-						try {
+				else if (arg.equals("-g")) 
+				{
+					if (i < arguments.length) 
+					{
+						try 
+						{
 							options.doG = true;
 							String type = arguments[i++];
 							options.numGammaCat = Integer.parseInt(type);
-						} catch (NumberFormatException e) {
-							System.err
-									.println(error
-											+ "-g option requires a number of gamma categories.");
+						}
+						catch (NumberFormatException e) 
+						{
+							System.err.println(error + "-g option requires a number of gamma categories.");
 							PrintUsage();
 						}
-					} else {
-						System.err
-								.println(error
-										+ "-g option requires a number of gamma categories.");
+					}
+					else 
+					{
+						System.err.println(error + "-g option requires a number of gamma categories.");
 						PrintUsage();
 					}
 				}
 
-				else if (arg.equals("-n")) {
-					if (i < arguments.length) {
-						try {
+				else if (arg.equals("-n")) 
+				{
+					if (i < arguments.length) 
+					{
+						try 
+						{
 							String sampleSize = arguments[i++];
 							options.sampleSize = Integer.parseInt(sampleSize);
-						} catch (NumberFormatException e) {
-							System.err.println(error
-									+ "-n option requires a sample size.");
+						}
+						catch (NumberFormatException e) 
+						{
+							System.err.println(error + "-n option requires a sample size.");
 							PrintUsage();
 						}
-					} else {
-						System.err.println(error
-								+ "-n option requires a sample size.");
+					} 
+					else 
+					{
+						System.err.println(error + "-n option requires a sample size.");
 						PrintUsage();
 					}
-				} else if (arg.equals("-t")) {
-					if (i < arguments.length) {
+				} 
+				else if (arg.equals("-t")) 
+				{
+					if (i < arguments.length) 
+					{
 						String type = arguments[i++];
 
-						if (type.equalsIgnoreCase("fixed")) {
+						if (type.equalsIgnoreCase("fixed")) 
+						{
 							options.fixedTopology = true;
 							options.optimizeMLTopology = false;
 							options.userTopologyExists = false;
-						} else if (type.equalsIgnoreCase("BIONJ")) {
+						}
+						else if (type.equalsIgnoreCase("BIONJ")) 
+						{
 							options.fixedTopology = false;
 							options.optimizeMLTopology = false;
 							options.userTopologyExists = false;
-						} else if (type.equalsIgnoreCase("ML")) {
+						}
+						else if (type.equalsIgnoreCase("ML")) 
+						{
 							options.fixedTopology = false;
 							options.optimizeMLTopology = true;
 							options.userTopologyExists = false;
-						} else {
-							System.err
-									.println(error
-											+ "-t option requires a type of base tree for likelihod calculations: "
-											+ "\"fixed\", \"BIONJ\" or \"ML\" only");
+						}
+						else 
+						{
+							System.err.println(error + "-t option requires a type of base tree for likelihod calculations: " + "\"fixed\", \"BIONJ\" or \"ML\" only");
 							PrintUsage();
 						}
-					} else {
-						System.err
-								.println(error
-										+ "-t option requires a type of base tree for likelihod calculations: "
-										+ "fixed, BIONJ or ML");
+					}
+					else 
+					{
+						System.err.println(error + "-t option requires a type of base tree for likelihod calculations: " + "fixed, BIONJ or ML");
 						PrintUsage();
 					}
 				}
 
-				else if (arg.equals("-u")) {
-					if (i < arguments.length) {
+				else if (arg.equals("-u")) 
+				{
+					if (i < arguments.length) 
+					{
 						options.setInputTreeFile(new File(arguments[i++]));
 						options.fixedTopology = false;
 						options.optimizeMLTopology = false;
 						options.userTopologyExists = true;
-					} else {
-						System.err
-								.println(error
-										+ "-u option requires an file name for the tree file");
+					}
+					else 
+					{
+						System.err.println(error + "-u option requires an file name for the tree file");
 						PrintUsage();
 					}
 				}
 
-				else if (arg.equals("-S")) {
-					if (i < arguments.length) {
+				else if (arg.equals("-S")) 
+				{
+					if (i < arguments.length) 
+					{
 						String type = arguments[i++];
 
-						if (type.equalsIgnoreCase("NNI")) {
+						if (type.equalsIgnoreCase("NNI")) 
+						{
 							options.treeSearchOperations = ApplicationOptions.TreeSearch.NNI;
-						} else if (type.equalsIgnoreCase("SPR")) {
+						}
+						else if (type.equalsIgnoreCase("SPR")) 
+						{
 							options.treeSearchOperations = ApplicationOptions.TreeSearch.SPR;
-						} else if (type.equalsIgnoreCase("BEST")) {
+						}
+						else if (type.equalsIgnoreCase("BEST")) 
+						{
 							options.treeSearchOperations = ApplicationOptions.TreeSearch.BEST;
-						} else {
-							System.err
-									.println(error
-											+ "-S option requires a type of tree topology search operation: "
-											+ "\"NNI\", \"SPR\" or \"BEST\" only");
+						}
+						else 
+						{
+							System.err.println(error + "-S option requires a type of tree topology search operation: " + "\"NNI\", \"SPR\" or \"BEST\" only");
 							PrintUsage();
 						}
-					} else {
-						System.err
-								.println(error
-										+ "-S option requires a type of tree topology search operation: "
-										+ "\"NNI\", \"SPR\", \"BEST\"");
+					}
+					else 
+					{
+						System.err.println(error + "-S option requires a type of tree topology search operation: " + "\"NNI\", \"SPR\", \"BEST\"");
 						PrintUsage();
 					}
 				}
 
-				else if (arg.equals("-AIC")) {
+				else if (arg.equals("-AIC")) 
+				{
 					options.doAIC = true;
 				}
 
-				else if (arg.equals("-AICc")) {
+				else if (arg.equals("-AICc")) 
+				{
 					options.doAICc = true;
 				}
 
-				else if (arg.equals("-BIC")) {
+				else if (arg.equals("-BIC")) 
+				{
 					options.doBIC = true;
 				}
 
-				else if (arg.equals("-DT")) {
+				else if (arg.equals("-DT")) 
+				{
 					options.doDT = true;
 				}
 
-				else if (arg.equals("-p")) {
+				else if (arg.equals("-p")) 
+				{
 					options.doImportances = true;
 				}
 
-				else if (arg.equals("-v")) {
+				else if (arg.equals("-v")) 
+				{
 					options.doImportances = true;
 					options.doModelAveraging = true;
 				}
 
-				else if (arg.equals("-w")) {
+				else if (arg.equals("-w")) 
+				{
 					options.writePAUPblock = true;
 				}
 
-				else if (arg.equals("-c")) {
-					if (i < arguments.length) {
-						try {
+				else if (arg.equals("-c")) 
+				{
+					if (i < arguments.length) 
+					{
+						try 
+						{
 							String type = arguments[i++];
-							options.confidenceInterval = Double
-									.parseDouble(type);
-						} catch (NumberFormatException e) {
-							System.err
-									.println(error
-											+ "-c option requires a number (0-1) for the model selection confidence interval.");
+							options.confidenceInterval = Double.parseDouble(type);
+						}
+						catch (NumberFormatException e) 
+						{
+							System.err.println(error + "-c option requires a number (0-1) for the model selection confidence interval.");
 							PrintUsage();
 						}
-					} else {
-						System.err
-								.println(error
-										+ "-c option requires a number (0-1) for the model selection confidence interval.");
+					}
+					else 
+					{
+						System.err.println(error + "-c option requires a number (0-1) for the model selection confidence interval.");
 						PrintUsage();
 					}
 				}
 
-				else if (arg.equals("-hLRT")) {
+				else if (arg.equals("-hLRT")) 
+				{
 					options.doHLRT = true;
 				}
 
-				else if (arg.equals("-o")) {
-					if (i < arguments.length) {
+				else if (arg.equals("-o")) 
+				{
+					if (i < arguments.length) 
+					{
 						String type = arguments[i++];
 						char[] array = type.toCharArray();
 						Arrays.sort(array);
 
 						String validString = "";
 
-						if (type.length() == 5) {
+						if (type.length() == 5) 
+						{
 							validString = "ftvgp";
-						} else if (type.length() == 6) {
+						}
+						else if (type.length() == 6) 
+						{
 							validString = "ftvwgp";
-						} else if (type.length() == 7) {
+						}
+						else if (type.length() == 7) 
+						{
 							validString = "ftvwxgp";
-						} else {
-							System.err
-									.println(error
-											+ "-o option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
+						}
+						else 
+						{
+							System.err.println(error + "-o option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
 							PrintUsage();
 						}
 
 						char[] valid = validString.toCharArray();
-						if (!Arrays.equals(array, valid)) {
-							System.err
-									.println(error
-											+ "-o option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
+						if (!Arrays.equals(array, valid)) 
+						{
+							System.err.println(error + "-o option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
 							PrintUsage();
-						} else {
+						} 
+						else 
+						{
 							testingOrder = new Vector<String>();
-							for (j = 0; j < type.length(); j++) {
+							for (j = 0; j < type.length(); j++) 
+							{
 								if (type.charAt(j) == 'f')
 									testingOrder.addElement("freq");
 								else if (type.charAt(j) == 't')
 									testingOrder.addElement("titv");
-								else if (type.charAt(j) == 'v') {
+								else if (type.charAt(j) == 'v') 
+								{
 									if (options.getSubstTypeCode() == 0)
 										testingOrder.addElement("2ti4tv");
 									else if (options.getSubstTypeCode() >= 1)
 										testingOrder.addElement("2ti");
-								} else if (type.charAt(j) == 'w') {
+								} 
+								else if (type.charAt(j) == 'w') 
+								{
 									if (options.getSubstTypeCode() >= 1)
 										testingOrder.addElement("2tv");
-								} else if (type.charAt(j) == 'x') {
+								}
+								else if (type.charAt(j) == 'x') 
+								{
 									if (options.getSubstTypeCode() > 1)
 										testingOrder.addElement("4tv");
-								} else if (type.charAt(j) == 'g')
+								}
+								else if (type.charAt(j) == 'g')
 									testingOrder.addElement("gamma");
 								else if (type.charAt(j) == 'p')
 									testingOrder.addElement("pinv");
@@ -857,104 +976,116 @@ public class ModelTest {
 					}
 				}
 
-				else if (arg.equals("-dLRT")) {
+				else if (arg.equals("-dLRT")) 
+				{
 					options.doDLRT = true;
 				}
 
-				else if (arg.equals("-r")) {
+				else if (arg.equals("-r")) 
+				{
 					options.backwardHLRTSelection = true;
 				}
 
-				else if (arg.equals("-h")) {
-					if (i < arguments.length) {
-						try {
+				else if (arg.equals("-h")) 
+				{
+					if (i < arguments.length) 
+					{
+						try 
+						{
 							String type = arguments[i++];
 							options.confidenceLevelHLRT = Double
 									.parseDouble(type);
-						} catch (NumberFormatException e) {
-							System.err
-									.println(error
-											+ "-h option requires a number (0-1) for the hLRT confidence interval.");
+						}
+						catch (NumberFormatException e) 
+						{
+							System.err.println(error + "-h option requires a number (0-1) for the hLRT confidence interval.");
 							PrintUsage();
 						}
-					} else {
-						System.err
-								.println(error
-										+ "-h option requires a number (0-1) for the hLRT confidence interval.");
+					}
+					else 
+					{
+						System.err.println(error + "-h option requires a number (0-1) for the hLRT confidence interval.");
 						PrintUsage();
 					}
 				}
 
-				else if (arg.equals("-a")) {
+				else if (arg.equals("-a")) 
+				{
 					options.doAveragedPhylogeny = true;
 				}
 
-				else if (arg.equals("-z")) {
+				else if (arg.equals("-z")) 
+				{
 					options.consensusType = "strict";
 				}
 
-				else if (arg.equals("-sims")) {
-					if (i < arguments.length) {
+				else if (arg.equals("-sims")) 
+				{
+					if (i < arguments.length) 
+					{
 						options.simulationsName = arguments[i++];
 						options.doingSimulations = true;
-					} else {
-						System.err
-								.println(error
-										+ "-sims option requires a name for the simulations files");
+					}
+					else 
+					{
+						System.err.println(error + "-sims option requires a name for the simulations files");
 						PrintUsage();
 					}
 
-				} else if (arg.equals("-machinesfile")) {
-					if (i < arguments.length) {
-
+				}
+				else if (arg.equals("-machinesfile")) 
+				{
+					if (i < arguments.length) 
+					{
 						File machinesFile = new File(arguments[i++]);
-						if (!(machinesFile.exists() && machinesFile.canRead())) {
-							if (MPJ_ME == 0) {
-								System.err
-										.println(error
-												+ "Machines file does not exists or it is not readable");
+						if (!(machinesFile.exists() && machinesFile.canRead())) 
+						{
+							if (MPJ_ME == 0) 
+							{
+								System.err.println(error + "Machines file does not exists or it is not readable");
 							}
 							PrintUsage();
 						}
 
 						boolean hostsError = false;
-						try {
-							TextInputStream machinesInputStream = new TextInputStream(
-									machinesFile.getAbsolutePath());
+						try 
+						{
+							TextInputStream machinesInputStream = new TextInputStream(machinesFile.getAbsolutePath());
 							String line;
 
 							HOSTS_TABLE = new Hashtable<String, Integer>();
-							while ((line = machinesInputStream.readLine()) != null) {
+							while ((line = machinesInputStream.readLine()) != null) 
+							{
 								String hostProcs[] = line.split(":");
-								if (hostProcs.length == 2) {
-									try {
+								if (hostProcs.length == 2) 
+								{
+									try 
+									{
+										int numberOfThreads = Integer.parseInt(hostProcs[1]);
 
-										int numberOfThreads = Integer
-												.parseInt(hostProcs[1]);
-
-										HOSTS_TABLE.put(hostProcs[0],
-												new Integer(numberOfThreads));
-
-									} catch (NumberFormatException e) {
+										HOSTS_TABLE.put(hostProcs[0], new Integer(numberOfThreads));
+									}
+									catch (NumberFormatException e) 
+									{
 										hostsError = true;
 										break;
 										// Warn and continue with 1 processor
 									}
-								} else {
+								}
+								else 
+								{
 									hostsError = true;
 								}
 
-								if (hostsError) {
-									if (MPJ_ME == 0) {
+								if (hostsError) 
+								{
+									if (MPJ_ME == 0) 
+									{
 										System.err.println("");
-										System.err
-												.println("WARNING: Machines File format is wrong.");
-										System.err
-												.println("         Each line should have the following format:");
-										System.err
-												.println("         HOSTNAME:NUMBER_OF_PROCESORS");
-										System.err
-												.println("Using a single thread");
+										System.err.println("WARNING: Machines File format is wrong.");
+										System.err.println("         Each line should have the following format:");
+										System.err.println("         HOSTNAME:NUMBER_OF_PROCESORS");
+										System.err.println("Using a single thread");
 										System.err.println("");
 									}
 									HOSTS_TABLE = null;
@@ -963,44 +1094,51 @@ public class ModelTest {
 							}
 							options.setMachinesFile(machinesFile);
 
-						} catch (FileNotFoundException e) {
-							System.err
-									.println(error
-											+ "Machines file does not exists or it is not readable");
+						}
+						catch (FileNotFoundException e) 
+						{
+							System.err.println(error + "Machines file does not exists or it is not readable");
 							PrintUsage();
 						}
-					} else {
-						System.err.println(error
-								+ "-machinesfile option requires a filename");
+					} 
+					else 
+					{
+						System.err.println(error + "-machinesfile option requires a filename");
 						PrintUsage();
 					}
-				} else if (arg.equals("-tr")) {
-					if (HOSTS_TABLE != null) {
+				}
+				
+				else if (arg.equals("-tr")) 
+				{
+					if (HOSTS_TABLE != null) 
+					{
 						String type = arguments[i++];
-						System.err
-								.println("WARNING: Machines File has been specified. -tr "
-										+ type + " argument will be ignored.");
-					} else {
-						if (i < arguments.length) {
-							try {
+						System.err.println("WARNING: Machines File has been specified. -tr " + type + " argument will be ignored.");
+					}
+					else 
+					{
+						if (i < arguments.length) 
+						{
+							try 
+							{
 								String type = arguments[i++];
-								options.setNumberOfThreads(Integer
-										.parseInt(type));
+								options.setNumberOfThreads(Integer.parseInt(type));
 								options.threadScheduling = true;
-							} catch (NumberFormatException e) {
-								System.err
-										.println(error
-												+ "-tr option requires the number of processors to compute.");
+							}
+							catch (NumberFormatException e) 
+							{
+								System.err.println(error + "-tr option requires the number of processors to compute.");
 								PrintUsage();
 							}
-						} else {
-							System.err
-									.println(error
-											+ "-tr option requires the number of processors to compute.");
+						}
+						else 
+						{
+							System.err.println(error + "-tr option requires the number of processors to compute.");
 							PrintUsage();
 						}
 					}
 				} 
+				
 				else if (arg.equals("-output"))
 				{
 					if (i < arguments.length) 
@@ -1010,25 +1148,27 @@ public class ModelTest {
 					}
 					else
 					{
-						System.err
-							.println(error
-								+ "-output option requires output filename.");
+						System.err.println(error + "-output option requires output filename.");
 						PrintUsage();
 					}
 				} 
-				else {
-					System.err.println(error + "the argument \" " + arg
-							+ "\" is unknown. Check its syntax.");
+				
+				else 
+				{
+					System.err.println(error + "the argument \" " + arg	+ "\" is unknown. Check its syntax.");
 					PrintUsage();
 				}
 
 			} // while
-			if (!isInputFile) {
-				System.err.println(error
-						+ "Input File is required (-d argument)");
+			
+			if (!isInputFile) 
+			{
+				System.err.println(error + "Input File is required (-d argument)");
 				PrintUsage();
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) 
+		{
 			e.printStackTrace();
 		}
 	}
@@ -1036,8 +1176,10 @@ public class ModelTest {
 	/****************************
 	 * PrintUsage **************************** * Prints command line usage * *
 	 ************************************************************************/
-	static public void PrintUsage() {
-		if (MPJ_ME == 0) {
+	static public void PrintUsage() 
+	{
+		if (MPJ_ME == 0) 
+		{
 			String usage = "\njModelTest command usage"
 					+ "\n -d: input data file (e.g., -d data.phy)"
 					+ "\n -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11; default is 3)"
@@ -1081,7 +1223,8 @@ public class ModelTest {
 	 * start * * *
 	 ***********************************************************************/
 
-	static public void printHeader(TextOutputStream stream) {
+	static public void printHeader(TextOutputStream stream) 
+	{
 		// we can set styles using the editor pane
 		// I am using doc to stream ....
 		stream.print("----------------------------- ");
@@ -1107,7 +1250,8 @@ public class ModelTest {
 	 * start up * * *
 	 ***********************************************************************/
 
-	static public void printNotice(TextOutputStream stream) {
+	static public void printNotice(TextOutputStream stream) 
+	{
 		// stream.println("\n******************************* NOTICE ************************************");
 		stream.println("jModelTest " + CURRENT_VERSION
 				+ "  Copyright (C) 2011 Diego Darriba, David Posada");
@@ -1126,7 +1270,8 @@ public class ModelTest {
 	 * information at start up * * *
 	 ***********************************************************************/
 
-	static public void printCitation(TextOutputStream stream) {
+	static public void printCitation(TextOutputStream stream) 
+	{
 		// stream.println("\n******************************* CITATION *********************************");
 		stream.println("Citation: Posada D. 2008. jModelTest: Phylogenetic Model Averaging.");
 		stream.println("          Molecular Biology and Evolution 25: 1253-1256.");
@@ -1139,9 +1284,10 @@ public class ModelTest {
 	 * writePaupBlockk *************************** * Prints a block of PAUP
 	 * commands for the best model * *
 	 ************************************************************************/
-	static public void WritePaupBlock(TextOutputStream stream,
-			String criterion, Model model) {
-		try {
+	static public void WritePaupBlock(TextOutputStream stream, String criterion, Model model) 
+	{
+		try 
+		{
 			stream.println("\n--\nPAUP* Commands Block:");
 			stream.println(" If you want to load the selected model and associated estimates in PAUP*,");
 			stream.println(" attach the next block of commands after the data in your PAUP file:");
@@ -1163,23 +1309,28 @@ public class ModelTest {
 
 			/* base frequencies */
 			stream.print(" base=");
-			if (model.ispF()) {
+			if (model.ispF()) 
+			{
 				stream.print("(");
 				stream.printf("%.4f ", model.getfA());
 				stream.printf("%.4f ", model.getfC());
 				stream.printf("%.4f ", model.getfG());
 				/* stream.printf("%.4f",model.fT); */
 				stream.print(")");
-			} else
+			} 
+			else
 				stream.print("equal");
 
 			/* substitution rates */
 			if (!model.ispT() && !model.ispR())
 				stream.print(" nst=1");
-			else if (model.ispT()) {
+			else if (model.ispT()) 
+			{
 				stream.print(" nst=2 tratio=");
 				stream.printf("%.4f", model.getTitv());
-			} else if (model.ispR()) {
+			}
+			else if (model.ispR()) 
+			{
 				stream.print(" nst=6  rmat=(");
 				stream.printf("%.4f ", model.getRa());
 				stream.printf("%.4f ", model.getRb());
@@ -1191,12 +1342,14 @@ public class ModelTest {
 
 			/* site rate variation */
 			stream.print(" rates=");
-			if (model.ispG()) {
+			if (model.ispG()) 
+			{
 				stream.print("gamma shape=");
 				stream.printf("%.4f", model.getShape());
 				stream.print(" ncat=");
 				stream.printf("%d", model.getNumGammaCat());
-			} else
+			}
+			else
 				stream.print("equal");
 
 			/* invariable sites */
@@ -1209,208 +1362,224 @@ public class ModelTest {
 			stream.print(";\nEND;");
 			stream.print("\n--");
 		}
-
-		catch (Exception e) {
+		catch (Exception e) 
+		{
 			e.printStackTrace();
 		}
 	}
 
-	private void checkInputFiles() {
+	private void checkInputFiles() 
+	{
 		// open data file
 		File inputFile = options.getInputFile();
-		MAIN_CONSOLE.print("\n\nReading data file \"" + inputFile.getName()
-				+ "\"...");
+		MAIN_CONSOLE.print("\n\nReading data file \"" + inputFile.getName()	+ "\"...");
 
-		if (inputFile.exists()) {
+		if (inputFile.exists()) 
+		{
+			try 
+			{
+				ModelTestService.readAlignment(inputFile, options.getAlignmentFile());
 
-			try {
-
-				ModelTestService.readAlignment(inputFile,
-						options.getAlignmentFile());
-
-				Alignment alignment = AlignmentReader.readAlignment(
-						new PrintWriter(System.err), options.getAlignmentFile()
-								.getAbsolutePath(), true); // file
+				Alignment alignment = AlignmentReader.readAlignment(new PrintWriter(System.err), options.getAlignmentFile().getAbsolutePath(), true); // file
 				options.numTaxa = alignment.getSequenceCount();
 				options.numSites = alignment.getSiteCount();
 				options.numBranches = 2 * options.numTaxa - 3;
 
 				MAIN_CONSOLE.println(" OK.");
-				MAIN_CONSOLE.println("  number of sequences: "
-						+ options.numTaxa);
+				MAIN_CONSOLE.println("  number of sequences: " + options.numTaxa);
 				MAIN_CONSOLE.println("  number of sites: " + options.numSites);
 				options.sampleSize = options.numSites;
-			} catch (Exception e)// file cannot be read correctly
+			} 
+			catch (Exception e)// file cannot be read correctly
 			{
-				System.err.println("\nThe specified file \""
-						+ inputFile.getAbsolutePath()
-						+ "\" cannot be read as an alignment");
+				System.err.println("\nThe specified file \"" + inputFile.getAbsolutePath() + "\" cannot be read as an alignment");
 				MAIN_CONSOLE.println(" failed.\n");
-				throw new InvalidArgumentException.InvalidAlignmentFileException(
-						inputFile);
+				throw new InvalidArgumentException.InvalidAlignmentFileException(inputFile);
 			}
-		} else // file does not exist
+		} 
+		else // file does not exist
 		{
-			System.err.println("\nThe specified file \""
-					+ inputFile.getAbsolutePath() + "\" cannot be found");
+			System.err.println("\nThe specified file \"" + inputFile.getAbsolutePath() + "\" cannot be found");
 			MAIN_CONSOLE.println(" failed.\n");
-			throw new InvalidArgumentException.UnexistentAlignmentFileException(
-					inputFile);
+			throw new InvalidArgumentException.UnexistentAlignmentFileException(inputFile);
 		}
 
 		// open tree file if necessary
-		if (options.userTopologyExists) {
+		if (options.userTopologyExists) 
+		{
 			File treefile = options.getInputTreeFile();
-			MAIN_CONSOLE.print("Reading tree file \"" + treefile.getName()
-					+ "\"...");
+			MAIN_CONSOLE.print("Reading tree file \"" + treefile.getName() + "\"...");
 
 			// read the tree in
 			Tree tree = null;
-			try {
+			try 
+			{
 				tree = TreeUtilities.readTree(treefile.getAbsolutePath());
-			} catch (IOException e) {
-				System.err.println("\nThe specified tree file \""
-						+ treefile.getName() + "\" cannot be found");
-				MAIN_CONSOLE.println(" failed.\n");
-				throw new InvalidArgumentException.UnexistentTreeFileException(
-						treefile.getAbsolutePath());
-			} catch (TreeParseException e) {
-				System.err.println("\nCannot parse tree file \""
-						+ treefile.getName() + "\"");
-				MAIN_CONSOLE.println(" failed.\n");
-				throw new InvalidArgumentException.InvalidTreeFileException(
-						treefile.getAbsolutePath());
 			}
-			if (tree != null) {
-				options.setUserTree(TreeUtilities.toNewick(tree, true, false,
-						false));
-				TextOutputStream out = new TextOutputStream(options
-						.getTreeFile().getAbsolutePath());
+			catch (IOException e) 
+			{
+				System.err.println("\nThe specified tree file \"" + treefile.getName() + "\" cannot be found");
+				MAIN_CONSOLE.println(" failed.\n");
+				throw new InvalidArgumentException.UnexistentTreeFileException(treefile.getAbsolutePath());
+			}
+			catch (TreeParseException e) 
+			{
+				System.err.println("\nCannot parse tree file \"" + treefile.getName() + "\"");
+				MAIN_CONSOLE.println(" failed.\n");
+				throw new InvalidArgumentException.InvalidTreeFileException(treefile.getAbsolutePath());
+			}
+			
+			if (tree != null) 
+			{
+				options.setUserTree(TreeUtilities.toNewick(tree, true, false, false));
+				TextOutputStream out = new TextOutputStream(options.getTreeFile().getAbsolutePath());
 				out.print(options.getUserTree());
 				out.close();
 				MAIN_CONSOLE.println(" OK.");
-			} else // tree is not valid
-			{
-				System.err.println("\nUnexpected error parsing \""
-						+ treefile.getName() + "\"");
-				MAIN_CONSOLE.println(" failed.\n");
-				throw new InvalidArgumentException.InvalidTreeFileException(
-						treefile.getAbsolutePath());
 			}
-
+			else // tree is not valid
+			{
+				System.err.println("\nUnexpected error parsing \"" + treefile.getName() + "\"");
+				MAIN_CONSOLE.println(" failed.\n");
+				throw new InvalidArgumentException.InvalidTreeFileException(treefile.getAbsolutePath());
+			}
 		}
 	}
 
-	public TextOutputStream setMainConsole(TextOutputStream mainConsole) {
+	public TextOutputStream setMainConsole(TextOutputStream mainConsole) 
+	{
 		this.MAIN_CONSOLE = mainConsole;
 		return mainConsole;
 	}
 
-	public TextOutputStream getMainConsole() {
+	public TextOutputStream getMainConsole() 
+	{
 		return MAIN_CONSOLE;
 	}
 
-	public TextOutputStream getCurrentOutStream() {
+	public TextOutputStream getCurrentOutStream() 
+	{
 		return CURRENT_OUT_STREAM;
 	}
 
-	public void setCurrentOutStream(TextOutputStream currentOutStream) {
+	public void setCurrentOutStream(TextOutputStream currentOutStream) 
+	{
 		CURRENT_OUT_STREAM = currentOutStream;
 	}
 
-	public AIC getMyAIC() {
+	public AIC getMyAIC() 
+	{
 		if (!AICwasCalculated)
 			throw new WeakStateException.UninitializedCriterionException("AIC");
 		return myAIC;
 	}
 
-	public void setMyAIC(AIC myAIC) {
+	public void setMyAIC(AIC myAIC) 
+	{
 		this.myAIC = myAIC;
 		this.minAIC = myAIC != null ? myAIC.getMinModel() : null;
 		AICwasCalculated = (myAIC != null);
 	}
 
-	public boolean testAIC() {
+	public boolean testAIC() 
+	{
 		return AICwasCalculated;
 	}
 
-	public AICc getMyAICc() {
+	public AICc getMyAICc() 
+	{
 		if (!AICcwasCalculated)
 			throw new WeakStateException.UninitializedCriterionException("AICc");
 		return myAICc;
 	}
 
-	public void setMyAICc(AICc myAICc) {
+	public void setMyAICc(AICc myAICc) 
+	{
 		this.myAICc = myAICc;
 		this.minAICc = myAICc != null ? myAICc.getMinModel() : null;
 		AICcwasCalculated = (myAICc != null);
 	}
 
-	public boolean testAICc() {
+	public boolean testAICc() 
+	{
 		return AICcwasCalculated;
 	}
 
-	public BIC getMyBIC() {
+	public BIC getMyBIC() 
+	{
 		if (!BICwasCalculated)
 			throw new WeakStateException.UninitializedCriterionException("BIC");
 		return myBIC;
 	}
 
-	public void setMyBIC(BIC myBIC) {
+	public void setMyBIC(BIC myBIC) 
+	{
 		this.myBIC = myBIC;
 		this.minBIC = myBIC != null ? myBIC.getMinModel() : null;
 		BICwasCalculated = (myBIC != null);
 	}
 
-	public boolean testBIC() {
+	public boolean testBIC() 
+	{
 		return BICwasCalculated;
 	}
 
-	public DT getMyDT() {
+	public DT getMyDT() 
+	{
 		if (!DTwasCalculated)
 			throw new WeakStateException.UninitializedCriterionException("DT");
 		return myDT;
 	}
 
-	public void setMyDT(DT myDT) {
+	public void setMyDT(DT myDT) 
+	{
 		this.myDT = myDT;
 		this.minDT = myDT != null ? myDT.getMinModel() : null;
 		DTwasCalculated = (myDT != null);
 	}
 
-	public boolean testDT() {
+	public boolean testDT() 
+	{
 		return DTwasCalculated;
 	}
 
-	public RunConsense getConsensusAIC() {
+	public RunConsense getConsensusAIC() 
+	{
 		return consensusAIC;
 	}
 
-	public RunConsense getConsensusAICc() {
+	public RunConsense getConsensusAICc() 
+	{
 		return consensusAICc;
 	}
 
-	public RunConsense getConsensusBIC() {
+	public RunConsense getConsensusBIC() 
+	{
 		return consensusBIC;
 	}
 
-	public RunConsense getConsensusDT() {
+	public RunConsense getConsensusDT() 
+	{
 		return consensusDT;
 	}
 
-	public void setConsensusAIC(RunConsense pConsensusAIC) {
+	public void setConsensusAIC(RunConsense pConsensusAIC) 
+	{
 		consensusAIC = pConsensusAIC;
 	}
 
-	public void setConsensusAICc(RunConsense pConsensusAICc) {
+	public void setConsensusAICc(RunConsense pConsensusAICc) 
+	{
 		consensusAICc = pConsensusAICc;
 	}
 
-	public void setConsensusBIC(RunConsense pConsensusBIC) {
+	public void setConsensusBIC(RunConsense pConsensusBIC) 
+	{
 		consensusBIC = pConsensusBIC;
 	}
 
-	public void setConsensusDT(RunConsense pConsensusDT) {
+	public void setConsensusDT(RunConsense pConsensusDT) 
+	{
 		consensusDT = pConsensusDT;
 	}
 
@@ -1421,34 +1590,38 @@ public class ModelTest {
 	 * @param status
 	 *            the finalization status
 	 */
-	public static void finalize(int status) {
-
-		if (status != 0) {
-			if (MPJ_RUN) {
+	public static void finalize(int status) 
+	{
+		if (status != 0) 
+		{
+			if (MPJ_RUN) 
+			{
 				MPI.COMM_WORLD.Abort(status);
 			}
 		}
 
-		if (MPJ_RUN) {
+		if (MPJ_RUN) 
+		{
 			MPI.Finalize();
 		}
 
 		System.exit(status);
-
 	}
 
 	/**
 	 * @param minDLRT
 	 *            the minDLRT to set
 	 */
-	public void setMinDLRT(Model minDLRT) {
+	public void setMinDLRT(Model minDLRT) 
+	{
 		this.minDLRT = minDLRT;
 	}
 
 	/**
 	 * @return the minDLRT
 	 */
-	public Model getMinDLRT() {
+	public Model getMinDLRT() 
+	{
 		return minDLRT;
 	}
 
@@ -1456,42 +1629,48 @@ public class ModelTest {
 	 * @param minHLRT
 	 *            the minHLRT to set
 	 */
-	public void setMinHLRT(Model minHLRT) {
+	public void setMinHLRT(Model minHLRT) 
+	{
 		this.minHLRT = minHLRT;
 	}
 
 	/**
 	 * @return the minHLRT
 	 */
-	public Model getMinHLRT() {
+	public Model getMinHLRT() 
+	{
 		return minHLRT;
 	}
 
 	/**
 	 * @return the minDT
 	 */
-	public Model getMinDT() {
+	public Model getMinDT() 
+	{
 		return minDT;
 	}
 
 	/**
 	 * @return the minBIC
 	 */
-	public Model getMinBIC() {
+	public Model getMinBIC() 
+	{
 		return minBIC;
 	}
 
 	/**
 	 * @return the minAICc
 	 */
-	public Model getMinAICc() {
+	public Model getMinAICc() 
+	{
 		return minAICc;
 	}
 
 	/**
 	 * @return the minAIC
 	 */
-	public Model getMinAIC() {
+	public Model getMinAIC() 
+	{
 		return minAIC;
 	}
 
@@ -1499,34 +1678,38 @@ public class ModelTest {
 	 * @param candidateModels
 	 *            the candidateModels to set
 	 */
-	public void setCandidateModels(Model[] candidateModels) {
+	public void setCandidateModels(Model[] candidateModels) 
+	{
 		this.candidateModels = candidateModels;
 	}
 
 	/**
 	 * @return the candidateModels
 	 */
-	public Model[] getCandidateModels() {
+	public Model[] getCandidateModels() 
+	{
 		return candidateModels;
 	}
 
 	/**
 	 * @return a single candidate model
 	 */
-	public Model getCandidateModel(int index) {
+	public Model getCandidateModel(int index)
+	{
 		return candidateModels[index];
 	}
 
-	public static String getHostname() {
+	public static String getHostname()
+	{
 		return hostname;
 	}
 
-	public class NullPrinter extends OutputStream {
-
+	public class NullPrinter extends OutputStream
+	{
 		@Override
-		public void write(int arg0) throws IOException {
+		public void write(int arg0) throws IOException 
+		{
 			// DO NOTHING
-
 		}
 
 	}

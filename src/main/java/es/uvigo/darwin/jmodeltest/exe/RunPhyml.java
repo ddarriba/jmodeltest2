@@ -40,8 +40,8 @@ import es.uvigo.darwin.jmodeltest.utilities.Utilities;
  *         darwin.uvigo.es
  * @version 2.0.2 (Feb 2012)
  */
-public abstract class RunPhyml extends Observable implements Observer {
-
+public abstract class RunPhyml extends Observable implements Observer 
+{
 	protected ApplicationOptions options;
 	protected Model[] models;
 
@@ -52,9 +52,10 @@ public abstract class RunPhyml extends Observable implements Observer {
 
 	protected Observer progress;
 	protected ModelTest modelTest;
+	protected Model jcModel = null;
 
-	public RunPhyml(Observer progress, ModelTest modelTest,
-			Model[] models) {
+	public RunPhyml(Observer progress, ModelTest modelTest, Model[] models) 
+	{
 		if (models != null)
 			this.models = new Model[models.length];
 		else
@@ -68,56 +69,60 @@ public abstract class RunPhyml extends Observable implements Observer {
 		Arrays.sort(this.models, new ModelComparator());
 	}
 
-	public void execute() {
+	public void execute() 
+	{
 		// remove stuff from exe directories before starting
 		deleteFiles();
 		printSettings(modelTest.getMainConsole());
 
 		// estimate a NJ-JC tree if needed
-		if (options.fixedTopology) {
-			Model jcModel = null;
-			for (Model model : models) {
-				if (model.getName().equals("JC")) {
+		if (options.fixedTopology) 
+		{
+			for (Model model : models) 
+			{
+				if (model.getName().equals("JC")) 
+				{
 					jcModel = model;
 					break;
 				}
 			}
 
-			if (jcModel != null) {
+			if (jcModel != null) 
+			{
 				notifyObservers(ProgressInfo.BASE_TREE_INIT, 0, jcModel, null);
 
-				PhymlSingleModel jcModelPhyml = new PhymlSingleModel(jcModel,
-						0, true, options);
-				jcModelPhyml.run();
-
-				// create JCtree file
-				TextOutputStream JCtreeFile = new TextOutputStream(options
-						.getTreeFile().getAbsolutePath(), false);
-				JCtreeFile.print(jcModel.getTreeString() + "\n");
-				JCtreeFile.close();
-
-				notifyObservers(ProgressInfo.BASE_TREE_COMPUTED, 0, jcModel,
-						null);
+				estimateTree();
 			}
-
 		}
-
-		// compute likelihood scores for all models
-		// System.out.print("computing likelihood scores for "
-		// + models.length + " models with Phyml " + PHYML_VERSION);
-
-		notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0, models[0], null);
 
 		doPhyml();
 	}
 
+	protected void estimateTree()
+	{
+		PhymlSingleModel jcModelPhyml = new PhymlSingleModel(jcModel, 0, true, options);
+		jcModelPhyml.run();
+
+		createTree();
+	}
+	
+	protected void createTree()
+	{
+		// create JCtree file
+		TextOutputStream JCtreeFile = new TextOutputStream(options.getTreeFile().getAbsolutePath(), false);
+		JCtreeFile.print(jcModel.getTreeString() + "\n");
+		JCtreeFile.close();
+
+		notifyObservers(ProgressInfo.BASE_TREE_COMPUTED, 0, jcModel, null);
+	}
+	
 	/***************************
 	 * printSettings ***************************** * Prints the settings for the
 	 * likelihood calculation * * *
 	 ***********************************************************************/
 
-	protected void printSettings(TextOutputStream stream) {
-
+	protected void printSettings(TextOutputStream stream) 
+	{
 		stream.println(" ");
 		stream.println(" ");
 		stream.println("---------------------------------------------------------------");
@@ -153,8 +158,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 			stream.println("  including only models without a proportion of invariable sites");
 
 		if (options.doG)
-			stream.println("  including models with/without rate variation among sites (+G)"
-					+ " (nCat = " + options.numGammaCat + ")");
+			stream.println("  including models with/without rate variation among sites (+G)" + " (nCat = " + options.numGammaCat + ")");
 		else
 			stream.println("  including only models without rate variation among sites");
 
@@ -167,11 +171,11 @@ public abstract class RunPhyml extends Observable implements Observer {
 		stream.println(" ");
 
 		stream.print(" Base tree for likelihood calculations = ");
-		if (options.userTopologyExists) {
+		if (options.userTopologyExists) 
+		{
 			stream.println("fixed user tree topology.");
 			stream.println(" ");
-			stream.print("User tree " + "("
-					+ options.getInputTreeFile().getName() + ") = ");
+			stream.print("User tree " + "(" + options.getInputTreeFile().getName() + ") = ");
 			stream.println(options.getUserTree());
 			stream.println(" ");
 		}
@@ -186,18 +190,20 @@ public abstract class RunPhyml extends Observable implements Observer {
 		else
 			stream.println("BIONJ tree");
 
-		if (options.optimizeMLTopology) {
+		if (options.optimizeMLTopology) 
+		{
 			stream.print(" Tree topology search operation = ");
-			switch (options.treeSearchOperations) {
-			case NNI:
-				stream.println("NNI");
-				break;
-			case SPR:
-				stream.println("SPR");
-				break;
-			case BEST:
-				stream.println("BEST");
-				break;
+			switch (options.treeSearchOperations) 
+			{
+				case NNI:
+					stream.println("NNI");
+					break;
+				case SPR:
+					stream.println("SPR");
+					break;
+				case BEST:
+					stream.println("BEST");
+					break;
 			}
 		}
 	}
@@ -209,26 +215,28 @@ public abstract class RunPhyml extends Observable implements Observer {
 	 * 
 	 * Interrupts the calculation of likelihood scores
 	 ***********************************************************************/
-	public void interruptThread() {
-		notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_INTERRUPTED, 0,
-				null, null);
+	public void interruptThread() 
+	{
+		notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_INTERRUPTED, 0, null, null);
 		// workerPhyml.interrupt();
 		// IS_INTERRUPTED = true;
 	}
 
-	protected void deleteFiles() {
+	protected void deleteFiles() 
+	{
 		/* phymlFolder */
 		options.getLogFile().delete();
 	}
 
-	protected void notifyObservers(int type, int value, Model model,
-			String message) {
+	protected void notifyObservers(int type, int value, Model model, String message) 
+	{
 		setChanged();
 		notifyObservers(new ProgressInfo(type, value, model, message));
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
+	public void update(Observable o, Object arg) 
+	{
 		setChanged();
 		notifyObservers(arg);
 	}

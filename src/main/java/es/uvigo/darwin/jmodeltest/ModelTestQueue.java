@@ -3,9 +3,9 @@ package es.uvigo.darwin.jmodeltest;
 import java.util.List;
 import java.util.Observer;
 
-import es.udc.gac.hpcmanager.webapp.worker.RunWorkerManager;
-import es.udc.gac.hpcmanager.webapp.worker.util.exception.NotAvailableResourceException;
+import es.udc.gac.nebulator.manager.worker.RunWorkerManager;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlQueue;
+import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.utilities.Simulation;
 
 /**
@@ -17,7 +17,6 @@ import es.uvigo.darwin.jmodeltest.utilities.Simulation;
 
 public class ModelTestQueue extends ModelTest
 {
-
 	private static RunWorkerManager runWorkerManager;
 	
 	public static RunWorkerManager getRunWorkerManager()
@@ -30,12 +29,28 @@ public class ModelTestQueue extends ModelTest
 		ModelTestQueue.runWorkerManager = runWorkerManager;
 	}
 	
-	public ModelTestQueue(String[] args, Observer progressObserver)
+	public ModelTestQueue(List<String> args, Observer progressObserver, String configFile, TextOutputStream mainConsole, Long jobId)
 	{
-		super(false, progressObserver);
-		runInQueue = true;
-		arguments = args;
+		super(false, progressObserver, configFile);
+		this.runInQueue = true;
+		this.jobId = jobId;
+
+		if (mainConsole != null)
+			this.setMainConsole(mainConsole);
+		
+		arguments = new String[args.size()];
+		for(int i=0; i < args.size(); i++)
+		{
+			arguments[i] = args.get(i);
+		}
+
 		ParseArguments();
+		
+		checkFilesAndBuildSetOfModels();
+	}
+	
+	public void startAnalysis()
+	{
 		if (options.doingSimulations) 
 		{
 			Simulation sim = new Simulation(this);
@@ -43,43 +58,24 @@ public class ModelTestQueue extends ModelTest
 		} 
 		else
 		{
-			runCommandLine();	
+			runCommandLine();
 		}
 	}
 	
-	public boolean continueAnalysis(int jobId)
+	public boolean continueAnalysis(List<Long> identifiers)
     {
-   		try 
-   		{
-   			if (((RunPhymlQueue) runPhyml).continueExecute(jobId))
-   			{
-   				endCommandLine();
-   				return true;
-   			}
+		if (((RunPhymlQueue) runPhyml).continueExecute(identifiers))
+		{
+			endCommandLine();
+			return true;
 		}
-   		catch (NotAvailableResourceException e) 
-   		{
-			e.printStackTrace();
-		}
-   		
+		
    		return false;
     }
 
 	public void cancelAnalysis()
     {
-   		try 
-   		{
-   			((RunPhymlQueue) runPhyml).cancelExecute();
-		}
-   		catch (NotAvailableResourceException e) 
-   		{
-			e.printStackTrace();
-		}
+		((RunPhymlQueue) runPhyml).cancelExecute();
     }
-	
-	public List<Integer> pendingJobs() 
-	{
-		return ((RunPhymlQueue) runPhyml).pendingJobs();
-	}
 	
 }

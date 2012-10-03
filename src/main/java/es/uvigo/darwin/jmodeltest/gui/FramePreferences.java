@@ -8,10 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.Properties;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -47,18 +45,14 @@ public class FramePreferences extends JModelTestFrame {
 	private static final int BUTTONS_HLOC = (COMPONENTS_WIDTH - BUTTONS_PANEL_WIDTH)/2;
 	private static final int WINDOW_HEIGHT = 250;
 	private static final long serialVersionUID = 1L;
-	private static final String BACKUP_FILE = ModelTest.CONFIG_FILE + ".bk";
+	
+	private String BACKUP_FILE;
 
 	private static final String BINARIES_COMMENT = "Set the phyml binary directory. The selected directory "
 			+ "should exist and contain a valid phyml binary (\"phyml\" or \""+ Utilities.getBinaryVersion()+"\"). If Global "
 			+ "Phyml checkbox is selected, \"phyml\" should exist in the path.";
 
-	private static final String PROPERTIES_COMMENT = "This properties file was modified from "
-			+ "jModelTest 2 GUI. A backup of the original configuration file has been "
-			+ "stored in "
-			+ BACKUP_FILE
-			+ ". Replace this file with the backup for "
-			+ "restoring the original format.";
+	private String PROPERTIES_COMMENT;
 
 	private JTextArea tfBinaryDescription = new JTextArea();
 	private JCheckBox cbGlobalPhyml = new JCheckBox();
@@ -72,8 +66,19 @@ public class FramePreferences extends JModelTestFrame {
 	private JButton btnCancel = new JButton();
 	private JButton btnOpen;
 
-	public FramePreferences(ModelTest modelTest) {
+	public FramePreferences(ModelTest modelTest) 
+	{
 		super(modelTest);
+		
+		BACKUP_FILE = modelTest.CONFIG_FILE + ".bk";
+		
+		PROPERTIES_COMMENT = "This properties file was modified from "
+			+ "jModelTest 2 GUI. A backup of the original configuration file has been "
+			+ "stored in "
+			+ BACKUP_FILE
+			+ ". Replace this file with the backup for "
+			+ "restoring the original format.";
+		
 		initComponents();
 	}
 
@@ -300,7 +305,7 @@ public class FramePreferences extends JModelTestFrame {
 		try {
 			File bkFile = new File(BACKUP_FILE);
 			if (!bkFile.exists()) {
-				File propertiesFile = new File(ModelTest.CONFIG_FILE);
+				File propertiesFile = new File(modelTest.CONFIG_FILE);
 				InputStream in = new FileInputStream(propertiesFile);
 				OutputStream out = new FileOutputStream(bkFile);
 				byte[] buf = new byte[1024];
@@ -313,7 +318,7 @@ public class FramePreferences extends JModelTestFrame {
 			}
 			// Escribier en el archivo los cambios
 			FileOutputStream fos = new FileOutputStream(
-					ModelTest.CONFIG_FILE.replace("\\", "/"));
+					modelTest.CONFIG_FILE.replace("\\", "/"));
 
 			properties.store(fos, PROPERTIES_COMMENT);
 

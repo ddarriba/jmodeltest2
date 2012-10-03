@@ -17,7 +17,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 package es.uvigo.darwin.jmodeltest.exe;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,21 +25,12 @@ import java.util.Observer;
 
 import mpi.MPI;
 import mpi.Request;
-import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
-import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 
-public class RunPhymlHybrid extends RunPhyml {
-
-	private List<Model> myModels;
-
-	// Synchronization package variables.
-	// Thread safe under current operation. Keep in mind.
-	volatile Model rootModel = null;
-	volatile boolean rootModelRequest = false;
-
+public class RunPhymlHybrid extends RunPhymlMPJ 
+{
 	int mpjMe, mpjSize;
 	int maxPEs;
 	/** The number of available PEs. */
@@ -51,16 +41,15 @@ public class RunPhymlHybrid extends RunPhyml {
 	int[] itemsPerProc;
 	int[] displs;
 
-	public RunPhymlHybrid(Observer progress, ModelTest modelTest,
-			Model[] models) {
+	public RunPhymlHybrid(Observer progress, ModelTest modelTest, Model[] models) 
+	{
 		super(progress, modelTest, models);
 		// this.deleteObserver(progress);
 		myModels = new ArrayList<Model>();
-
 	}
 
-	public RunPhymlHybrid(int mpjMe, int mpjSize, Observer progress,
-			ModelTest modelTest, Model[] models, int numberOfThreads) {
+	public RunPhymlHybrid(int mpjMe, int mpjSize, Observer progress, ModelTest modelTest, Model[] models, int numberOfThreads) 
+	{
 		super(progress, modelTest, models);
 		// this.deleteObserver(progress);
 		myModels = new ArrayList<Model>();
@@ -75,78 +64,80 @@ public class RunPhymlHybrid extends RunPhyml {
 		availablePEs = maxPEs;
 		pme = new PhymlParallelModel(maxPEs);
 		pme.addObserver(this);
-
 	}
 
-	public void distribute() {
-
+	public void distribute() 
+	{
 		List<Model> modelList = Arrays.asList(models);
-		distributor = new MultipleDistributor(modelList, this,
-				ModelTest.MPJ_ME, ModelTest.MPJ_SIZE, modelTest);
+		distributor = new MultipleDistributor(modelList, this, ModelTest.MPJ_ME, ModelTest.MPJ_SIZE, modelTest);
 		distributor.addObserver(progress);
 		
-		notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0,
-				models[0], null);
+		notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0, models[0], null);
 		
 		Thread distributorThread = new Thread(distributor);
 		distributorThread.start();
 		request();
 		
 		modelList = Arrays.asList(computedModels);
-		for (Model model : models) {
+		for (Model model : models) 
+		{
 			model.update(modelList.get(modelList.indexOf(model)));
 		}
 
-		notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_OK, models.length,
-				null, null);
-
+		notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_OK, models.length, null, null);
 	}
 
-	public void request() {
-
+	public void request() 
+	{
 //		List<PhymlSingleModel> phymlEstimatorList = new ArrayList<PhymlSingleModel>();
 
 		Model[] lastComputedModel = new Model[1];
-		while (true) {
+		while (true) 
+		{
 			// send request to root
 			Model[] modelToReceive = null;
 			Model model = null;
-			if (ModelTest.MPJ_ME > 0) {
+			if (ModelTest.MPJ_ME > 0) 
+			{
 				int[] sendMessage = { availablePEs, maxPEs };
-				Request modelRequest = MPI.COMM_WORLD.Isend(sendMessage, 0, 2,
-						MPI.INT, 0, MultipleDistributor.TAG_SEND_REQUEST);
+				Request modelRequest = MPI.COMM_WORLD.Isend(sendMessage, 0, 2, MPI.INT, 0, MultipleDistributor.TAG_SEND_REQUEST);
 				// prepare reception
 				modelToReceive = new Model[1];
 				boolean[] notification = new boolean[1];
 				// wait for request
 				modelRequest.Wait();
 
-				Request notifyRecv = MPI.COMM_WORLD.Irecv(notification, 0, 1,
-						MPI.BOOLEAN, 0,
-						MultipleDistributor.TAG_EXIST_MORE_MODELS);
+				Request notifyRecv = MPI.COMM_WORLD.Irecv(notification, 0, 1, MPI.BOOLEAN, 0, MultipleDistributor.TAG_EXIST_MORE_MODELS);
 				notifyRecv.Wait();
 
-				if (notification[0]) {
+				if (notification[0]) 
+				{
 					// receive model
-					Request modelReceive = MPI.COMM_WORLD.Irecv(modelToReceive,
-							0, 1, MPI.OBJECT, 0,
-							MultipleDistributor.TAG_SEND_MODEL);
+					Request modelReceive = MPI.COMM_WORLD.Irecv(modelToReceive, 0, 1, MPI.OBJECT, 0, MultipleDistributor.TAG_SEND_MODEL);
 					modelReceive.Wait();
 					model = modelToReceive[0];
-				} else {
+				} 
+				else 
+				{
 					break;
 				}
-			} else {
+			}
+			else 
+			{
 				// This strategy is an easy way to avoid the problem of
 				// thread-safety in MPJ-Express. It works correctly, but
 				// it also causes to introduce coupling between this class
 				// and Distributor having to define two volatile attributes:
 				// rootModelRequest and rootModel.
 				rootModelRequest = true;
-				while (rootModelRequest) {
-					try {
+				while (rootModelRequest) 
+				{
+					try 
+					{
 						Thread.sleep(200);
-					} catch (InterruptedException e) {
+					}
+					catch (InterruptedException e) 
+					{
 						throw new RuntimeException("Thread interrupted");
 					}
 				}
@@ -154,17 +145,21 @@ public class RunPhymlHybrid extends RunPhyml {
 				if (model == null)
 					break;
 			}
-			if (model != null) {
+			if (model != null) 
+			{
 				// compute
 				myModels.add(model);
 				availablePEs -= MultipleDistributor.getPEs(model, maxPEs);
-				PhymlSingleModel runenv = new PhymlSingleModel(model, 0, false,
-						options, MultipleDistributor.getPEs(model, maxPEs));
+				PhymlSingleModel runenv = new PhymlSingleModel(model, 0, false, options, MultipleDistributor.getPEs(model, maxPEs));
 				pme.execute(runenv);
-				while (availablePEs <= 0) {
-					try {
+				while (availablePEs <= 0) 
+				{
+					try 
+					{
 						Thread.sleep(200);
-					} catch (InterruptedException e) {
+					}
+					catch (InterruptedException e) 
+					{
 						throw new RuntimeException("Thread interrupted");
 					}
 				}
@@ -182,25 +177,27 @@ public class RunPhymlHybrid extends RunPhyml {
 
 		// endTime = System.currentTimeMillis();
 
-		while (pme.hasMoreTasks()) {
-			try {
+		while (pme.hasMoreTasks()) 
+		{
+			try 
+			{
 				Thread.sleep(400);
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e) 
+			{
 				throw new RuntimeException("Thread interrupted");
 			}
 		}
 
-		if (mpjMe > 0) {
+		if (mpjMe > 0) 
+		{
 			gather();
-		} else {
+		}
+		else 
+		{
 			computedModels = gather();
 		}
-		
 	}
-
-	protected Object doPhyml() {
-		return null;
-	} // doPhyml
 
 	/**
 	 * Gathers the models of all processors into the root one. This method
@@ -212,12 +209,13 @@ public class RunPhymlHybrid extends RunPhyml {
 	 * 
 	 * @return the array of gathered models
 	 */
-	private Model[] gather() {
-
+	private Model[] gather() 
+	{
 		int numberOfModels = models != null?models.length:1;
 		Model[] allModels = new Model[numberOfModels];
 		
-		if (distributor != null) {
+		if (distributor != null) 
+		{
 			itemsPerProc = distributor.getItemsPerProc();
 			displs = distributor.getDispls();
 		}
@@ -225,71 +223,20 @@ public class RunPhymlHybrid extends RunPhyml {
 		MPI.COMM_WORLD.Bcast(itemsPerProc, 0, mpjSize, MPI.INT, 0);
 		
 		// gathering optimized models
-		MPI.COMM_WORLD.Gatherv(myModels.toArray(new Model[0]), 0,
-				myModels.size(), MPI.OBJECT, allModels, 0, itemsPerProc,
-				displs, MPI.OBJECT, 0);
+		MPI.COMM_WORLD.Gatherv(myModels.toArray(new Model[0]), 0, myModels.size(), MPI.OBJECT, allModels, 0, itemsPerProc, displs, MPI.OBJECT, 0);
 
 		return allModels;
 	}
 
-	public void execute() {
-
-		if (ModelTest.MPJ_ME == 0) {
-			printSettings(modelTest.getMainConsole());
-
-			// TODO: Send topology to each processor
-			// estimate a NJ-JC tree if needed
-			if (options.fixedTopology) {
-				notifyObservers(ProgressInfo.BASE_TREE_INIT, 0, models[0], null);
-
-				PhymlSingleModel jcModel = new PhymlSingleModel(models[0], 0,
-						true, options);
-				jcModel.run();
-
-				// create JCtree file
-				TextOutputStream JCtreeFile = new TextOutputStream(options
-						.getTreeFile().getAbsolutePath(), false);
-				JCtreeFile.print(models[0].getTreeString() + "\n");
-				JCtreeFile.close();
-
-				options.setUserTree(models[0].getTreeString());
-
-				notifyObservers(ProgressInfo.BASE_TREE_COMPUTED, 0, models[0],
-						null);
-
-			}
-
-			// compute likelihood scores for all models
-			System.out.println("computing likelihood scores for "
-					+ models.length + " models with Phyml " + PHYML_VERSION);
-		}
-
-		// sincronize ApplicationOptions from root
-		ApplicationOptions[] optionsBCast = new ApplicationOptions[1];
-		optionsBCast[0] = options;
-		MPI.COMM_WORLD.Bcast(optionsBCast, 0, 1, MPI.OBJECT, 0);
-		this.options = optionsBCast[0];
-
-		if (ModelTest.MPJ_ME == 0) {
-			distribute();
-		} else {
-			try {
-				this.options.buildWorkFiles();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			request();
-		}
-	}
-
 	@Override
-	public void update(Observable o, Object arg) {
-		if (arg != null) {
+	public void update(Observable o, Object arg) 
+	{
+		if (arg != null) 
+		{
 			ProgressInfo info = (ProgressInfo) arg;
-			if (info.getType() == ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED) {
-				availablePEs += MultipleDistributor.getPEs(info.getModel(),
-						maxPEs);
+			if (info.getType() == ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED) 
+			{
+				availablePEs += MultipleDistributor.getPEs(info.getModel(), maxPEs);
 			}
 		}
 		// Ignore runtime messages

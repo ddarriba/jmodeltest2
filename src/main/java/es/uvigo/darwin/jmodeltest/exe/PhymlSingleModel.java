@@ -31,18 +31,17 @@ import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
-public class PhymlSingleModel extends Observable implements Runnable {
-
+public class PhymlSingleModel extends Observable implements Runnable 
+{
 	protected int verbose = 0;
-	private static final String CURRENT_DIRECTORY = System
-			.getProperty("user.dir");
+	private static final String CURRENT_DIRECTORY = System.getProperty("user.dir");
 
 	public String PHYML_PATH = CURRENT_DIRECTORY + "/exe/phyml/";
 
 	protected String phymlStatFileName;
 	protected String phymlTreeFileName;
 
-	protected boolean PHYML_GLOBAL = false;
+	private boolean PHYML_GLOBAL = false;
 
 	protected Model model;
 	protected long startTime;
@@ -54,55 +53,73 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	protected ApplicationOptions options;
 	protected int numberOfThreads = -1;
 
-	public Model getModel() {
+	public Model getModel() 
+	{
 		return model;
 	}
 
-	public PhymlSingleModel(Model model, int index, boolean justGetJCTree,
-			ApplicationOptions options) {
+	public PhymlSingleModel(Model model, int index, boolean justGetJCTree, ApplicationOptions options) 
+	{
 		this.options = options;
 		this.model = model;
 		this.index = index;
 		this.justGetJCTree = justGetJCTree;
 
 		PHYML_GLOBAL = ModelTestConfiguration.isGlobalPhymlBinary();
-		if (PHYML_GLOBAL) {
+		if (PHYML_GLOBAL) 
+		{
 			PHYML_PATH = "";
-		} else {
+		}
+		else 
+		{
 			String path = ModelTestConfiguration.getExeDir();
-			if (!path.startsWith(File.separator)) {
+			if (!path.startsWith(File.separator)) 
+			{
 				PHYML_PATH = CURRENT_DIRECTORY + File.separator + path;
-			} else {
+			}
+			else 
+			{
 				PHYML_PATH = path;
 			}
-			if (!PHYML_PATH.endsWith(File.separator)) {
+			
+			if (!PHYML_PATH.endsWith(File.separator)) 
+			{
 				PHYML_PATH += File.separator;
 			}
 		}
 
-		this.phymlStatFileName = options.getAlignmentFile().getAbsolutePath()
-				+ RunPhyml.PHYML_STATS_SUFFIX + model.getName() + ".txt";
-		this.phymlTreeFileName = options.getAlignmentFile().getAbsolutePath()
-				+ RunPhyml.PHYML_TREE_SUFFIX + model.getName() + ".txt";
+		this.phymlStatFileName = options.getAlignmentFile().getAbsolutePath() + RunPhyml.PHYML_STATS_SUFFIX + model.getName() + ".txt";
+		this.phymlTreeFileName = options.getAlignmentFile().getAbsolutePath() + RunPhyml.PHYML_TREE_SUFFIX + model.getName() + ".txt";
 	}
 
-	public PhymlSingleModel(Model model, int index, boolean justGetJCTree,
-			ApplicationOptions options, int numberOfThreads) {
+	public PhymlSingleModel(Model model, int index, boolean justGetJCTree, ApplicationOptions options, int numberOfThreads) 
+	{
 		this(model, index, justGetJCTree, options);
 		this.numberOfThreads = numberOfThreads;
 	}
 
-	public boolean compute() {
+	public boolean compute() 
+	{
 		// run phyml
-		notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index, model,
-				null);
+		notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index, model, null);
 
 		startTime = System.currentTimeMillis();
 
 		writePhyml3CommandLine(model, justGetJCTree);
 		executeCommandLine();
-		if (!interrupted) {
+		
+		endCompute();
+		
+		return !interrupted;
+	}
+
+	protected void endCompute()
+	{
+		if (!interrupted) 
+		{
 			parsePhyml3Files(model);
+			Utilities.deleteFile(phymlStatFileName);
+			Utilities.deleteFile(phymlTreeFileName);
 		}
 
 		endTime = System.currentTimeMillis();
@@ -110,16 +127,15 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		model.setComputationTime(endTime - startTime);
 
 		// completed
-		if (!interrupted) {
-			notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, index,
-					model, Utilities.calculateRuntime(startTime, endTime));
-
+		if (!interrupted) 
+		{
+			notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, index, model, Utilities.calculateRuntime(startTime, endTime));
 		}
-		return !interrupted;
 	}
-
+	
 	@Override
-	public void run() {
+	public void run() 
+	{
 		compute();
 	}
 
@@ -128,11 +144,10 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	 * line for Phyml3 * * *
 	 ***********************************************************************/
 
-	protected void writePhyml3CommandLine(Model currentModel,
-			boolean justGetJCtree) {
-
+	protected void writePhyml3CommandLine(Model currentModel, boolean justGetJCtree) 
+	{
 		// input file
-		commandLine = " -i " + options.getAlignmentFile().getAbsolutePath();
+		commandLine = " -i " + inputFileNameCommandLine();
 
 		// data type is nucleotide
 		commandLine += " -d " + "nt";
@@ -164,26 +179,30 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		// commandLine += rateParameters;
 
 		// optimize alpha if needed
-		if (currentModel.ispG()) {
+		if (currentModel.ispG()) 
+		{
 			commandLine += " -c " + options.numGammaCat;
 			commandLine += " -a e";
-		} else
+		}
+		else
 			commandLine += " -c " + 1;
 
 		// search strategy
-		switch (options.treeSearchOperations) {
-		case SPR:
-			commandLine += " -s " + "SPR";
-			break;
-		case BEST:
-			commandLine += " -s " + "BEST";
-			break;
-		default:
-			commandLine += " -s " + "NNI";
+		switch (options.treeSearchOperations) 
+		{
+			case SPR:
+				commandLine += " -s " + "SPR";
+				break;
+			case BEST:
+				commandLine += " -s " + "BEST";
+				break;
+			default:
+				commandLine += " -s " + "NNI";
 		}
 
 		// threaded version
-		if (numberOfThreads > 0) {
+		if (numberOfThreads > 0) 
+		{
 			commandLine += " --num_threads " + numberOfThreads;
 		}
 
@@ -198,7 +217,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		 * optimize branch lengths; params = r or none: both tree topology and
 		 * branch lengths are fixed.
 		 */
-		if (justGetJCtree) {
+		if (justGetJCtree) 
+		{
 			commandLine += " -o " + "r"; // both tree topology and branch
 											// lengths are fixed.
 		}
@@ -208,45 +228,65 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		 * "r"; // both tree topology and branch lengths are fixed. }
 		 */
 		// use a single tree for all models
-		else if (options.userTopologyExists || options.fixedTopology) {
-			commandLine += " -u " + options.getTreeFile().getAbsolutePath();
+		else if (options.userTopologyExists || options.fixedTopology) 
+		{
+			commandLine += " -u " + treeFileNameCommandLine();
 			commandLine += " -o " + "lr"; // tree topology fixed; optimize
 											// branch lengths
-		} else if (!options.optimizeMLTopology) // use BIONJ tree for
+		}
+		else if (!options.optimizeMLTopology) // use BIONJ tree for
 												// each model
 		{
 			commandLine += " -o " + "lr"; // tree topology fixed; optimize
 											// branch lengths
-		} else {
+		}
+		else 
+		{
 			commandLine += " -o " + "tlr"; // optimize tree topology and branch
 											// lengthss
 		} // use ML optimized tree for each model
-
 	}
 
+	protected String inputFileNameCommandLine()
+	{
+		return options.getAlignmentFile().getAbsolutePath();
+	}
+	
+	protected String treeFileNameCommandLine()
+	{
+		return options.getTreeFile().getAbsolutePath();
+	}
+	
 	/***************************
 	 * executeCommandLine ************************ * Executes a set of command
 	 * line in the system * * *
 	 ***********************************************************************/
 
-	protected void executeCommandLine() {
+	protected void executeCommandLine() 
+	{
 		String[] executable = new String[1];
-		try {
+		try 
+		{
 			File dir = new File(PHYML_PATH);
 
-			if (PHYML_GLOBAL) {
+			if (PHYML_GLOBAL) 
+			{
 				executable[0] = "phyml";
-			} else {
+			}
+			else 
+			{
 				File phymlBinary = new File(PHYML_PATH + "phyml");
-				if (phymlBinary.exists() && phymlBinary.canExecute()) {
+				if (phymlBinary.exists() && phymlBinary.canExecute()) 
+				{
 					executable[0] = phymlBinary.getAbsolutePath();
-				} else {
+				}
+				else 
+				{
 					executable[0] = PHYML_PATH + Utilities.getBinaryVersion();
 				}
 			}
 			String[] tokenizedCommandLine = commandLine.split(" ");
-			String[] cmd = Utilities.specialConcatStringArrays(executable,
-					tokenizedCommandLine);
+			String[] cmd = Utilities.specialConcatStringArrays(executable, tokenizedCommandLine);
 
 			// get process and execute command line
 			Runtime rt = Runtime.getRuntime();
@@ -254,13 +294,10 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			ProcessManager.getInstance().registerProcess(proc);
 
 			// any error message?
-			StreamGobbler errorGobbler = new StreamGobbler(
-					proc.getErrorStream(), "ERROR", System.err);
+			StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream(), "ERROR", System.err);
 			// any output?
-			FileOutputStream logFile = new FileOutputStream(
-					options.getLogFile(), true);
-			StreamGobbler outputGobbler = new StreamGobbler(
-					proc.getInputStream(), "OUTPUT", logFile);
+			FileOutputStream logFile = new FileOutputStream(options.getLogFile(), true);
+			StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream(), "OUTPUT", logFile);
 
 			// kick them off
 			errorGobbler.start();
@@ -275,21 +312,21 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 			// print command line to phmyl logfile
 			PrintWriter printout = new PrintWriter(logFile);
-			printout.println("Command line used for settings above = "
-					+ commandLine);
+			printout.println("Command line used for settings above = " + commandLine);
 			printout.flush();
 			printout.close();
 
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) 
+		{
 			notifyObservers(ProgressInfo.INTERRUPTED, index, model, null);
 			interrupted = true;
-		} catch (Throwable t) {
-			notifyObservers(ProgressInfo.ERROR, index, model,
-					"Cannot run the Phyml command line for some reason: "
-							+ t.getMessage());
+		}
+		catch (Throwable t) 
+		{
+			notifyObservers(ProgressInfo.ERROR, index, model, "Cannot run the Phyml command line for some reason: " + t.getMessage());
 			interrupted = true;
 		}
-
 	}
 
 	/***************************
@@ -297,7 +334,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	 * output files and loads * models parameter estimates * * *
 	 ***********************************************************************/
 
-	protected void parsePhyml3Files(Model currentModel) {
+	protected void parsePhyml3Files(Model currentModel) 
+	{
 		String line;
 
 		boolean showParsing = false;
@@ -308,168 +346,141 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		// phymlLkFile.close();
 
 		// Get model likelihood and parameter estimates
-		try {
-			TextInputStream phymlStatFile = new TextInputStream(
-					phymlStatFileName);
-			while ((line = phymlStatFile.readLine()) != null) {
-				if (line.length() > 0 && line.startsWith(". Log-likelihood")) {
-					currentModel.setLnL((-1.0)
-							* Double.parseDouble(Utilities.lastToken(line)));
+		try 
+		{
+			TextInputStream phymlStatFile = new TextInputStream(phymlStatFileName);
+			while ((line = phymlStatFile.readLine()) != null) 
+			{
+				if (line.length() > 0 && line.startsWith(". Log-likelihood")) 
+				{
+					currentModel.setLnL((-1.0) * Double.parseDouble(Utilities.lastToken(line)));
 					if (showParsing)
-						System.err.println("Reading lnL = "
-								+ currentModel.getLnL());
-				} else if (line.length() > 0
-						&& line.startsWith(". Discrete gamma model")) {
-					if (Utilities.lastToken(line).equals("Yes")) {
+						System.err.println("Reading lnL = " + currentModel.getLnL());
+				}
+				else if ((line.length() > 0) && line.startsWith(". Discrete gamma model")) 
+				{
+					if (Utilities.lastToken(line).equals("Yes")) 
+					{
 						// currentModel.pG = true;
 						line = phymlStatFile.readLine();
-						currentModel.setNumGammaCat(Integer.parseInt(Utilities
-								.lastToken(line)));
+						currentModel.setNumGammaCat(Integer.parseInt(Utilities.lastToken(line)));
 						if (showParsing)
-							System.err.println("Reading numGammaCat = "
-									+ currentModel.getNumGammaCat());
+							System.err.println("Reading numGammaCat = " + currentModel.getNumGammaCat());
 						line = phymlStatFile.readLine();
-						currentModel.setShape(Double.parseDouble(Utilities
-								.lastToken(line)));
+						currentModel.setShape(Double.parseDouble(Utilities.lastToken(line)));
 						if (showParsing)
-							System.err.println("Reading shape = "
-									+ currentModel.getShape());
+							System.err.println("Reading shape = " + currentModel.getShape());
 					}
-				} else if (line.length() > 0
-						&& line.startsWith(". Nucleotides frequencies")) {
+				}
+				else if ((line.length() > 0) && line.startsWith(". Nucleotides frequencies")) 
+				{
 					// currentModel.pF = true; ??
 					line = phymlStatFile.readLine();
 					while (line.trim().length() == 0)
 						// get rid of any number of returns
 						line = phymlStatFile.readLine();
-					currentModel.setfA(Double.parseDouble(Utilities
-							.lastToken(line)));
+					currentModel.setfA(Double.parseDouble(Utilities.lastToken(line)));
 					line = phymlStatFile.readLine();
-					currentModel.setfC(Double.parseDouble(Utilities
-							.lastToken(line)));
+					currentModel.setfC(Double.parseDouble(Utilities.lastToken(line)));
 					line = phymlStatFile.readLine();
-					currentModel.setfG(Double.parseDouble(Utilities
-							.lastToken(line)));
+					currentModel.setfG(Double.parseDouble(Utilities.lastToken(line)));
 					line = phymlStatFile.readLine();
-					currentModel.setfT(Double.parseDouble(Utilities
-							.lastToken(line)));
-					if (showParsing) {
-						System.err.println("Reading fA = "
-								+ currentModel.getfA());
-						System.err.println("Reading fC = "
-								+ currentModel.getfC());
-						System.err.println("Reading fG = "
-								+ currentModel.getfG());
-						System.err.println("Reading fT = "
-								+ currentModel.getfT());
+					currentModel.setfT(Double.parseDouble(Utilities.lastToken(line)));
+					if (showParsing) 
+					{
+						System.err.println("Reading fA = " + currentModel.getfA());
+						System.err.println("Reading fC = " + currentModel.getfC());
+						System.err.println("Reading fG = " + currentModel.getfG());
+						System.err.println("Reading fT = " + currentModel.getfT());
 					}
-				} else if (line.length() > 0
-						&& line.startsWith(". Proportion of invariant")) {
+				}
+				else if ((line.length() > 0) && line.startsWith(". Proportion of invariant")) 
+				{
 					// currentModel.pI = true;
-					currentModel.setPinv(Double.parseDouble(Utilities
-							.lastToken(line)));
+					currentModel.setPinv(Double.parseDouble(Utilities.lastToken(line)));
 					if (showParsing)
-						System.err.println("Reading pinv = "
-								+ currentModel.getPinv());
+						System.err.println("Reading pinv = " + currentModel.getPinv());
 				}
 				// with custom models phyml does not provide a ti/tv. We have to
 				// calculate it from the rate parameters
 
-				else if (line.length() > 0
-						&& line.startsWith(". GTR relative rate parameters")) {
+				else if ((line.length() > 0) && line.startsWith(". GTR relative rate parameters")) 
+				{
 					line = phymlStatFile.readLine();
 					while (line.trim().length() == 0)
 						// get rid of any number of returns
 						line = phymlStatFile.readLine();
-					currentModel.setRa(Double.parseDouble(Utilities
-							.lastToken(line)));
+					currentModel.setRa(Double.parseDouble(Utilities.lastToken(line)));
 					line = phymlStatFile.readLine();
-					currentModel.setRb(Double.parseDouble(Utilities
-							.lastToken(line)));
+					currentModel.setRb(Double.parseDouble(Utilities.lastToken(line)));
 					line = phymlStatFile.readLine();
-					currentModel.setRc(Double.parseDouble(Utilities
-							.lastToken(line)));
+					currentModel.setRc(Double.parseDouble(Utilities.lastToken(line)));
 					line = phymlStatFile.readLine();
-					currentModel.setRd(Double.parseDouble(Utilities
-							.lastToken(line)));
+					currentModel.setRd(Double.parseDouble(Utilities.lastToken(line)));
 					line = phymlStatFile.readLine();
-					currentModel.setRe(Double.parseDouble(Utilities
-							.lastToken(line)));
+					currentModel.setRe(Double.parseDouble(Utilities.lastToken(line)));
 					line = phymlStatFile.readLine();
-					currentModel.setRf(Double.parseDouble(Utilities
-							.lastToken(line))); // for
-												// latest
-												// phyml3
-												// feb08
-					if (showParsing) {
-						System.err.println("Reading Ra = "
-								+ currentModel.getRa());
-						System.err.println("Reading Rb = "
-								+ currentModel.getRb());
-						System.err.println("Reading Rc = "
-								+ currentModel.getRc());
-						System.err.println("Reading Rd = "
-								+ currentModel.getRd());
-						System.err.println("Reading Re = "
-								+ currentModel.getRe());
-						System.err.println("Reading Rf = "
-								+ currentModel.getRf());
+					currentModel.setRf(Double.parseDouble(Utilities.lastToken(line)));	// for
+																						// latest
+																						// phyml3
+																						// feb08
+					if (showParsing) 
+					{
+						System.err.println("Reading Ra = " + currentModel.getRa());
+						System.err.println("Reading Rb = " + currentModel.getRb());
+						System.err.println("Reading Rc = " + currentModel.getRc());
+						System.err.println("Reading Rd = " + currentModel.getRd());
+						System.err.println("Reading Re = " + currentModel.getRe());
+						System.err.println("Reading Rf = " + currentModel.getRf());
 					}
 					// with custom models phyml does not provide a ti/tv, so we
 					// calculate it from the rate parameters
 					// note this is kappa and we need to transform it to ti/tv
-					if (currentModel.ispT()) {
+					if (currentModel.ispT()) 
+					{
 						currentModel.setKappa(currentModel.getRb());
-						currentModel
-								.setTitv(currentModel.getKappa()
-										* (currentModel.getfA()
-												* currentModel.getfG() + currentModel
-												.getfC() * currentModel.getfT())
-										/ ((currentModel.getfA() + currentModel
-												.getfG()) * (currentModel
-												.getfC() + currentModel.getfT())));
+						currentModel.setTitv(
+								currentModel.getKappa() * (currentModel.getfA() * currentModel.getfG() + currentModel.getfC() * currentModel.getfT())
+								/ ((currentModel.getfA() + currentModel.getfG()) * (currentModel.getfC() + currentModel.getfT())));
 					}
 				}
 			}
 			phymlStatFile.close();
-		} catch (FileNotFoundException e) {
-			notifyObservers(ProgressInfo.ERROR, index, model,
-					"Optimization results file does not exist: "
-							+ phymlStatFileName);
+		}
+		catch (FileNotFoundException e) 
+		{
+			notifyObservers(ProgressInfo.ERROR, index, model, "Optimization results file does not exist: " + phymlStatFileName);
+			interrupted=true;
 
-		} catch (NullPointerException e) {
-			notifyObservers(
-					ProgressInfo.ERROR,
-					index,
-					model,
-					"Error while parsing result data from "
-							+ currentModel.getName());
+		}
+		catch (NullPointerException e) 
+		{
+			notifyObservers(ProgressInfo.ERROR, index, model, "Error while parsing result data from " + currentModel.getName());
+			interrupted=true;
 		}
 
-		try {
+		try 
+		{
 			// Get ML tree
-			TextInputStream phymlTreeFile = new TextInputStream(
-					phymlTreeFileName);
+			TextInputStream phymlTreeFile = new TextInputStream(phymlTreeFileName);
 			String treestr = phymlTreeFile.readLine();
 			currentModel.setTreeString(treestr);
 			phymlTreeFile.close();
-		} catch (FileNotFoundException e) {
-			notifyObservers(ProgressInfo.ERROR, index, model, null);
-			System.err.println("Optimized tree file does not exist: "
-					+ phymlTreeFileName);
-
-		} catch (TreeParseException e) {
-			notifyObservers(ProgressInfo.ERROR, index, model, "ML tree for "
-					+ currentModel.getName() + " is invalid.");
 		}
-
-		Utilities.deleteFile(phymlStatFileName);
-		Utilities.deleteFile(phymlTreeFileName);
-
+		catch (FileNotFoundException e) 
+		{
+			notifyObservers(ProgressInfo.ERROR, index, model, "Optimized tree file does not exist: " + phymlTreeFileName);
+			interrupted=true;
+		}
+		catch (TreeParseException e) 
+		{
+			notifyObservers(ProgressInfo.ERROR, index, model, "ML tree for " + currentModel.getName() + " is invalid.");
+			interrupted=true;
+		}
 	}
 
-	protected void notifyObservers(int type, int value, Model model,
-			String message) {
+	protected void notifyObservers(int type, int value, Model model, String message) 
+	{
 		setChanged();
 		notifyObservers(new ProgressInfo(type, value, model, message));
 	}

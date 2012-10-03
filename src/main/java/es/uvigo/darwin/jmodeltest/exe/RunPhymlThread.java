@@ -27,21 +27,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 
-public class RunPhymlThread extends RunPhyml {
+public class RunPhymlThread extends RunPhyml 
+{
 
 	private ExecutorService threadPool;
 
-	public RunPhymlThread(Observer progress, ModelTest modelTest,
-			Model[] models) {
+	public RunPhymlThread(Observer progress, ModelTest modelTest, Model[] models) 
+	{
 		super(progress, modelTest, models);
 
-		this.threadPool = Executors.newFixedThreadPool(options
-				.getNumberOfThreads());
+		this.threadPool = Executors.newFixedThreadPool(options.getNumberOfThreads());
 	}
 
 	/*******************************
@@ -49,41 +48,55 @@ public class RunPhymlThread extends RunPhyml {
 	 * separate thread * * *
 	 ***********************************************************************/
 
-	protected Object doPhyml() {
+	protected Object doPhyml() 
+	{
+		// compute likelihood scores for all models
+		// System.out.print("computing likelihood scores for "
+		// + models.length + " models with Phyml " + PHYML_VERSION);
 
+		notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0, models[0], null);
+		
 		Collection<Callable<Object>> c = new ArrayList<Callable<Object>>();
 
 		int current = 0;
-		for (Model model : models) {
-
-			PhymlSingleModel psm = new PhymlSingleModel(model, current, false,
-					options);
+		for (Model model : models) 
+		{
+			PhymlSingleModel psm = new PhymlSingleModel(model, current, false, options);
 			psm.addObserver(this);
 			c.add(Executors.callable(psm));
 
 			current++;
-
 		}
 
 		boolean errorsFound = false;
 
 		Collection<Future<Object>> futures = null;
-		try {
+		try 
+		{
 			futures = threadPool.invokeAll(c);
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) 
+		{
 			notifyObservers(ProgressInfo.INTERRUPTED, 0, null, null);
 		}
 
-		if (futures != null) {
-			for (Future<Object> f : futures) {
-				try {
+		if (futures != null) 
+		{
+			for (Future<Object> f : futures) 
+			{
+				try 
+				{
 					f.get();
-				} catch (InterruptedException ex) {
+				}
+				catch (InterruptedException ex) 
+				{
 					errorsFound = true;
 					notifyObservers(ProgressInfo.INTERRUPTED, 0, null, null);
 					ex.printStackTrace();
 					return "Interrupted";
-				} catch (ExecutionException ex) {
+				}
+				catch (ExecutionException ex) 
+				{
 					// Internal exception while computing model.
 					// Let's continue with errors
 					errorsFound = true;
@@ -93,28 +106,33 @@ public class RunPhymlThread extends RunPhyml {
 			}
 		}
 
-		if (!errorsFound) {
-			notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_OK, models.length,
-				null, null);
-		} else {
-			notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_INTERRUPTED, models.length,
-				null, null);
+		if (!errorsFound) 
+		{
+			notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_OK, models.length, null, null);
+		}
+		else 
+		{
+			notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_INTERRUPTED, models.length,	null, null);
 		}
 
 		return "All Done";
 	} // doPhyml
 
-	public void interruptThread() {
+	public void interruptThread() 
+	{
 		super.interruptThread();
 		ProcessManager.getInstance().killAll();
 		threadPool.shutdownNow();// shutdown();
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		if (arg != null) {
+	public void update(Observable o, Object arg) 
+	{
+		if (arg != null) 
+		{
 			ProgressInfo info = (ProgressInfo) arg;
-			if (info.getType() == ProgressInfo.ERROR) {
+			if (info.getType() == ProgressInfo.ERROR) 
+			{
 				interruptThread();
 			}
 		}

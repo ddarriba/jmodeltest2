@@ -22,13 +22,15 @@ import java.util.Random;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
-import es.uvigo.darwin.prottest.tree.TreeDistancesCache;
-import es.uvigo.darwin.prottest.tree.TreeEuclideanDistancesCache;
+import es.uvigo.darwin.jmodeltest.tree.TreeDistancesCache;
+//import es.uvigo.darwin.prottest.tree.TreeDistancesCache;
+//import es.uvigo.darwin.prottest.tree.TreeEuclideanDistancesCache;
+import es.uvigo.darwin.jmodeltest.tree.TreeEuclideanDistancesCache;
 
 //DP check: DT might keep running even with bad likelihoods ?
 public class DT extends InformationCriterion {
 
-	private TreeDistancesCache distances = TreeEuclideanDistancesCache.getInstance();
+	private TreeDistancesCache distances = new TreeEuclideanDistancesCache();
 	
 	// constructor
 	public DT(boolean mwritePAUPblock, boolean mdoImportances,
@@ -43,7 +45,7 @@ public class DT extends InformationCriterion {
 	 ************************************************************************/
 
 	public void compute() {
-
+		
 		boolean sorted;
 		int i, j, temp2, pass;
 		double min, sumExp, sum, sumReciprocal, cum, temp1;

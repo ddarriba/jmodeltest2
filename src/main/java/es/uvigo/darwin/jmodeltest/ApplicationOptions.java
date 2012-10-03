@@ -32,18 +32,18 @@ import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 /**
- * This class gathers the parameters of a single execution of jModelTest 2. It
- * is a singleton class.
+ * This class gathers the parameters of a single execution of jModelTest 2.
  * 
  * @author Diego Darriba
  * 
  */
-public class ApplicationOptions implements Serializable {
-
+public class ApplicationOptions implements Serializable 
+{
 	private static final long serialVersionUID = -3961572952922591321L;
 
 	/** Tree topology search algorithms */
-	public static enum TreeSearch {
+	public static enum TreeSearch 
+	{
 		NNI, SPR, BEST
 	};
 
@@ -130,33 +130,38 @@ public class ApplicationOptions implements Serializable {
 
 	// This method copies the input files into the scratch.
 	// It is important to speed up the I/O in distributed memory.
-	public void buildWorkFiles() throws IOException {
+	public void buildWorkFiles() throws IOException 
+	{
 		File workDataFile = getAlignmentFile();
-		if (!workDataFile.exists()) {
+		if (!workDataFile.exists()) 
+		{
 			workDataFile.createNewFile();
 			workDataFile.deleteOnExit();
 		}
-		try {
+		
+		try 
+		{
 			ModelTestService.readAlignment(inputDataFile, alignmentFile);
 
-			Alignment alignment = AlignmentReader.readAlignment(
-					new PrintWriter(System.err),
-					alignmentFile.getAbsolutePath(), true);
+			Alignment alignment = AlignmentReader.readAlignment(new PrintWriter(System.err), alignmentFile.getAbsolutePath(), true);
 			numTaxa = alignment.getSequenceCount();
 			numSites = alignment.getSiteCount();
 			numBranches = 2 * numTaxa - 3;
-		} catch (AlignmentParseException e) {
+		}
+		catch (AlignmentParseException e) 
+		{
 			e.printStackTrace();
 		}
 
-		if (userTree != null) {
+		if (userTree != null) 
+		{
 			File workTreeFile = getTreeFile();
-			if (!workTreeFile.exists()) {
+			if (!workTreeFile.exists()) 
+			{
 				workTreeFile.createNewFile();
 				workTreeFile.deleteOnExit();
 			}
-			TextOutputStream out = new TextOutputStream(getTreeFile()
-					.getAbsolutePath());
+			TextOutputStream out = new TextOutputStream(getTreeFile().getAbsolutePath());
 			out.print(getUserTree());
 			out.close();
 		}
@@ -319,24 +324,39 @@ public class ApplicationOptions implements Serializable {
 		this.inputTreeFile = file;
 	}
 
-	public File getAlignmentFile() {
-		if (alignmentFile == null) {
-			try {
-				alignmentFile = File.createTempFile("jmodeltest", ".phy");
+	/* Probando nombres no aleatorios */
+	public File getAlignmentFile() 
+	{
+		if (alignmentFile == null) 
+		{
+			try 
+			{
+				alignmentFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "jmodeltest" + inputDataFile.getName().hashCode() + ".phy");
+				alignmentFile.createNewFile();
+//				alignmentFile = File.createTempFile("jmodeltest", ".phy");
 				alignmentFile.deleteOnExit();
-			} catch (IOException e) {
+			}
+			catch (IOException e) 
+			{
 				alignmentFile = inputDataFile;
 			}
 		}
 		return alignmentFile;
 	}
 
-	public File getTreeFile() {
-		if (treeFile == null) {
-			try {
-				treeFile = File.createTempFile("jmodeltest", ".tree");
+	public File getTreeFile() 
+	{
+		if (treeFile == null) 
+		{
+			try 
+			{
+				treeFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "jmodeltest" + inputDataFile.getName().hashCode() + ".tree");
+				treeFile.createNewFile();
+//				treeFile = File.createTempFile("jmodeltest", ".tree");
 				treeFile.deleteOnExit();
-			} catch (IOException e) {
+			}
+			catch (IOException e) 
+			{
 				treeFile = inputTreeFile;
 			}
 
@@ -344,15 +364,18 @@ public class ApplicationOptions implements Serializable {
 		return treeFile;
 	}
 
-	public File getLogFile() {
+	public File getLogFile() 
+	{
 		return logFile;
 	}
 
-	public String getUserTree() {
+	public String getUserTree() 
+	{
 		return userTree;
 	}
 
-	public void setUserTree(String tree) {
+	public void setUserTree(String tree) 
+	{
 		this.userTree = tree;
 	}
 
@@ -360,32 +383,40 @@ public class ApplicationOptions implements Serializable {
 	 * @param substTypeCode
 	 *            the substTypeCode to set
 	 */
-	public void setSubstTypeCode(int substTypeCode) {
+	public void setSubstTypeCode(int substTypeCode) 
+	{
 		this.substTypeCode = substTypeCode;
 	}
 
 	/**
 	 * @return the substTypeCode
 	 */
-	public int getSubstTypeCode() {
+	public int getSubstTypeCode() 
+	{
 		return substTypeCode;
 	}
 
-	public int getNumberOfThreads() {
+	public int getNumberOfThreads() 
+	{
 		return numberOfThreads;
 	}
 
-	public void setNumberOfThreads(int numberOfThreads) {
+	public void setNumberOfThreads(int numberOfThreads) 
+	{
 		this.numberOfThreads = numberOfThreads;
 	}
 
-	public void setMachinesFile(File machinesFile) throws FileNotFoundException {
-		if (modelTest.HOSTS_TABLE.containsKey(ModelTest.getHostname())) {
+	public void setMachinesFile(File machinesFile) throws FileNotFoundException 
+	{
+		if (modelTest.HOSTS_TABLE.containsKey(ModelTest.getHostname())) 
+		{
 
 			setNumberOfThreads((Integer) modelTest.HOSTS_TABLE.get(ModelTest
 					.getHostname()));
 
-		} else {
+		}
+		else 
+		{
 			System.err.println("");
 			System.err.println("WARNING: Machines File format is wrong.");
 			System.err.println("         This host: " + ModelTest.getHostname()
@@ -396,7 +427,8 @@ public class ApplicationOptions implements Serializable {
 		}
 	}
 	
-	public File getMachinesFile() {
+	public File getMachinesFile() 
+	{
 		return machinesFile;
 	}
 }
