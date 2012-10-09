@@ -55,6 +55,7 @@ import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Simulation;
 import es.uvigo.darwin.prottest.util.exception.ProtTestInternalException;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
+import es.uvigo.darwin.prottest.util.logging.ProtTestLogger;
 
 /**
  * ModelTest.java
@@ -134,6 +135,7 @@ public class ModelTest {
 	protected File outputFile = null;
 	protected Observer progressObserver = null;
 	protected Long jobId;
+	public ProtTestLogger logger = new ProtTestLogger(String.valueOf(System.currentTimeMillis()));
 	
 	static 
 	{
@@ -1380,7 +1382,7 @@ public class ModelTest {
 			{
 				ModelTestService.readAlignment(inputFile, options.getAlignmentFile());
 
-				Alignment alignment = AlignmentReader.readAlignment(new PrintWriter(System.err), options.getAlignmentFile().getAbsolutePath(), true); // file
+				Alignment alignment = AlignmentReader.readAlignment(new PrintWriter(System.err), options.getAlignmentFile().getAbsolutePath(), true, logger); // file
 				options.numTaxa = alignment.getSequenceCount();
 				options.numSites = alignment.getSiteCount();
 				options.numBranches = 2 * options.numTaxa - 3;

@@ -714,7 +714,7 @@ public class FrameMain extends JModelTestFrame {
 
 					Alignment alignment = AlignmentReader
 							.readAlignment(new PrintWriter(System.err), options
-									.getAlignmentFile().getAbsolutePath(), true);
+									.getAlignmentFile().getAbsolutePath(), true, modelTest.logger);
 					options.numTaxa = alignment.getSequenceCount();
 					options.numSites = alignment.getSiteCount();
 					options.numBranches = 2 * options.numTaxa - 3;

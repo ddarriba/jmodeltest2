@@ -44,7 +44,8 @@ import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
 import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
-public class Simulation {
+public class Simulation 
+{
 	private ApplicationOptions options;
 	private ModelTest modelTest;
 	
@@ -56,7 +57,8 @@ public class Simulation {
 	private static final String DT = "DT";
 	private static final String[] IC_TYPES = { AIC, AICc, BIC, DT };
 
-	public Simulation(ModelTest modelTest) {
+	public Simulation(ModelTest modelTest) 
+	{
 		this.modelTest = modelTest;
 		this.options = modelTest.getApplicationOptions();
 	}
@@ -65,7 +67,8 @@ public class Simulation {
 	 * runSimulations ****************************** * Organizes all the tasks
 	 * that the program needs to carry out * * *
 	 ***********************************************************************/
-	public void run() {
+	public void run() 
+	{
 		int i;
 		boolean append;
 		/*
@@ -139,7 +142,9 @@ public class Simulation {
 
 				Alignment alignment = AlignmentReader.readAlignment(
 						new PrintWriter(System.err),
-						options.getAlignmentFile().getAbsolutePath(), true); // file
+						options.getAlignmentFile().getAbsolutePath(),
+						true,
+						modelTest.logger); // file
 				options.numTaxa = alignment.getSequenceCount();
 				options.numSites = alignment.getSiteCount();
 				options.numBranches = 2 * options.numTaxa - 3;

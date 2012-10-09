@@ -30,6 +30,7 @@ import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.model.ModelConstants;
 import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
 import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
+import es.uvigo.darwin.prottest.util.logging.ProtTestLogger;
 
 /**
  * This class gathers the parameters of a single execution of jModelTest 2.
@@ -118,12 +119,16 @@ public class ApplicationOptions implements Serializable
 	private ModelTest modelTest;
 									// consider
 
-	public ApplicationOptions(ModelTest modelTest) {
+	public ApplicationOptions(ModelTest modelTest) 
+	{
 		this.modelTest = modelTest;
-		try {
+		try 
+		{
 			logFile = File.createTempFile("jmodeltest-phyml", ".log");
 			logFile.deleteOnExit();
-		} catch (IOException e) {
+		}
+		catch (IOException e) 
+		{
 			e.printStackTrace();
 		}
 	}
@@ -143,7 +148,11 @@ public class ApplicationOptions implements Serializable
 		{
 			ModelTestService.readAlignment(inputDataFile, alignmentFile);
 
-			Alignment alignment = AlignmentReader.readAlignment(new PrintWriter(System.err), alignmentFile.getAbsolutePath(), true);
+			Alignment alignment = AlignmentReader.readAlignment(
+					new PrintWriter(System.err), 
+					alignmentFile.getAbsolutePath(),
+					true,
+					modelTest.logger);
 			numTaxa = alignment.getSequenceCount();
 			numSites = alignment.getSiteCount();
 			numBranches = 2 * numTaxa - 3;
@@ -174,7 +183,8 @@ public class ApplicationOptions implements Serializable
 	 * @param modelTest *
 	 ************************************************************************/
 
-	public void setCandidateModels() {
+	public void setCandidateModels() 
+	{
 		int i, j;
 		boolean includeModel;
 
@@ -202,7 +212,8 @@ public class ApplicationOptions implements Serializable
 			}
 		}
 
-		if (modelTest.buildGUI || modelTest.testingOrder == null) {
+		if (modelTest.buildGUI || modelTest.testingOrder == null) 
+		{
 			// set set of hypotheses for hLRTs in default order
 			testOrder = new Vector<String>();
 			// we need to reinitialize the hypotheses list in case it existed
@@ -247,7 +258,8 @@ public class ApplicationOptions implements Serializable
 	 * of models * * *
 	 ***********************************************************************/
 
-	public void loadModelConstraints(Model currentModel, int order, int modelNo) {
+	public void loadModelConstraints(Model currentModel, int order, int modelNo) 
+	{
 		int modelParameters, BL;
 		boolean pF, pT, pV, pR, pI, pG;
 		double lk, fA, fC, fG, fT, titv, kappa, Ra, Rb, Rc, Rd, Re, Rf, pinv, shape;
