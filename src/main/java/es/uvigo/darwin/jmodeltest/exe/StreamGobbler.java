@@ -24,19 +24,28 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-class StreamGobbler extends Thread {
+import es.uvigo.darwin.jmodeltest.ApplicationOptions;
+import es.uvigo.darwin.jmodeltest.utilities.Utilities;
+
+class StreamGobbler extends Thread 
+{
 	private InputStream is;
 	private String type;
 	private OutputStream os;
+	private ApplicationOptions options;
 
-	StreamGobbler(InputStream is, String type, OutputStream redirect) {
+	StreamGobbler(InputStream is, String type, OutputStream redirect, ApplicationOptions options) 
+	{
 		this.is = is;
 		this.type = type;
 		this.os = redirect;
+		this.options = options;
 	}
 
-	public void run() {
-		try {
+	public void run() 
+	{
+		try 
+		{
 			PrintWriter pw = null;
 			if (os != null)
 				pw = new PrintWriter(os);
@@ -44,15 +53,45 @@ class StreamGobbler extends Thread {
 			InputStreamReader isr = new InputStreamReader(is);
 			BufferedReader br = new BufferedReader(isr);
 			String line = null;
-			while ((line = br.readLine()) != null) {
-				if (pw != null)
-					pw.println(line);
-				else
-					System.out.println(type + ">" + line);
+			while ((line = br.readLine()) != null) 
+			{
+				if (line.contains("patterns found")) 
+				{
+					try 
+					{
+						int numPatterns = Integer.parseInt(Utilities.firstNumericToken(line));
+						
+						if (Math.abs(options.getNumPatterns()) == 0) 
+						{
+							options.setNumPatterns(numPatterns);
+						}
+						else 
+						{
+							if (Math.abs(options.getNumPatterns() - numPatterns) > 0) 
+							{
+								// number of patterns has changed!!!
+								// temporary number of patterns is updated
+								options.setNumPatterns(numPatterns);
+							}
+						}
+					} catch (NumberFormatException nfe) 
+					{
+						// ignore
+					}
+						
+				}
+				
+				if (pw != null) 
+				{
+					pw.println(type + ">" + line);
+				}
 			}
+			
 			if (pw != null)
 				pw.flush();
-		} catch (IOException ioe) {
+		}
+		catch (IOException ioe) 
+		{
 			System.err.println("INFO: [StreamGobbler] The stream was closed!");
 		}
 	}

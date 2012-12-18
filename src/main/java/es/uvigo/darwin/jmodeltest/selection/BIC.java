@@ -19,6 +19,7 @@ package es.uvigo.darwin.jmodeltest.selection;
 
 import java.util.Random;
 
+import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
@@ -37,38 +38,34 @@ public class BIC extends InformationCriterion {
 	 * with the minimum BIC * *
 	 ************************************************************************/
 
-	public void compute() {
-
+	public void compute() 
+	{
 		boolean sorted;
 		int i, temp2, pass;
-		double[] tempw = new double[options.numModels];
+		double[] tempw = new double[numModels];
 		double min, sumExp, cum, temp1;
 
 		// Calculate BIC and minBIC
-		if (options.countBLasParameters)
-			min = 2 * models[0].getLnL() + models[0].getK()
-					* Math.log(options.sampleSize);
-		else
-			min = 2 * models[0].getLnL()
-					+ (models[0].getK() - options.numBranches)
-					* Math.log(options.sampleSize);
+		min = computeBic(models[0], options);
 
 		minModel = models[0];
-		for (i = 0; i < numModels; i++) {
-			if (options.countBLasParameters)
-				models[i].setBIC(2 * models[i].getLnL() + models[i].getK()
-						* Math.log(options.sampleSize));
-			else
-				models[i].setBIC(2 * models[i].getLnL()
-						+ (models[i].getK() - options.numBranches)
-						* Math.log(options.sampleSize));
-
-			if (models[i].getBIC() < min) {
-				min = models[i].getBIC();
-				minModel = models[i];
+		
+		if (doCheckAgainstULK) {
+			unconstrainedModel.setBIC(computeSingle(unconstrainedModel));
+		}
+		for (Model model : models) {
+			model.setBIC(computeBic(model, options));
+			
+			if (model.getBIC() < min) {
+				min = model.getBIC();
+				minModel = model;
+			}
+			
+			if (doCheckAgainstULK) {
+				model.setUBICd(model.getBIC() - unconstrainedModel.getBIC());
 			}
 		}
-
+		
 		// Calculate BIC differences
 		sumExp = 0;
 		for (i = 0; i < numModels; i++) {
@@ -91,7 +88,7 @@ public class BIC extends InformationCriterion {
 		pass = 1;
 		while (!sorted) {
 			sorted = true;
-			for (i = 0; i < (options.numModels - pass); i++)
+			for (i = 0; i < (numModels - pass); i++)
 				if (tempw[i] > tempw[i + 1]) {
 					temp1 = tempw[i + 1];
 					tempw[i + 1] = tempw[i];
@@ -107,7 +104,7 @@ public class BIC extends InformationCriterion {
 		}
 
 		cum = 0;
-		for (i = 0; i < options.numModels; i++) {
+		for (i = 0; i < numModels; i++) {
 			cum += models[order[i]].getBICw();
 			models[order[i]].setCumBICw(cum);
 		}
@@ -125,6 +122,29 @@ public class BIC extends InformationCriterion {
 
 	}
 
+	public double computeSingle(Model model) {
+		return computeBic(model, options);
+	}
+		
+	public static double computeBic(Model model, ApplicationOptions options) {
+		if (options.countBLasParameters)
+			return 2 * model.getLnL()
+					+ model.getK()
+					* Math.log(options.getSampleSize());
+		else
+			return 2 * model.getLnL()
+					+ (model.getK() - options.getNumBranches())
+					* Math.log(options.getSampleSize());
+	}
+	
+	public static double computeBic(double lnL, int k, ApplicationOptions options) {
+		if (options.countBLasParameters)
+			return 2 * lnL + k * Math.log(options.getSampleSize());
+		else
+			return 2 * lnL + (k - options.getNumBranches())
+					* Math.log(options.getSampleSize());
+	}
+	
 	protected void printHeader(TextOutputStream stream) {
 		stream.println("\n\n\n---------------------------------------------------------------");
 		stream.println("*                                                             *");
@@ -134,7 +154,6 @@ public class BIC extends InformationCriterion {
 	}
 	
 	protected void printFooter(TextOutputStream stream) {
-		stream.println("\n------------------------------------------------------------------------");
 		stream.println("-lnL:\tnegative log likelihod");
 		stream.println("K:\tnumber of estimated parameters");
 		stream.println("BIC:\tBayesian Information Criterion");
@@ -233,13 +252,26 @@ public class BIC extends InformationCriterion {
 	}
 	
 	@Override
+	public double getUDelta(Model m) {
+		return m.getUBICd();
+	}
+		
+	@Override
+	public double setUDelta(Model m) {
+		m.setUBICd(computeBic(m.getLnLIgnoringGaps(), m.getK(), options)
+				- computeBic(unconstrainedModel.getLnL(),
+						unconstrainedModel.getK(), options));
+		return m.getUBICd();
+	}
+	
+	@Override
 	public double getCumWeight(Model m) {
 		return m.getCumBICw();
 	}
 
 	@Override
 	public int getType() {
-		return BIC;
+		return IC_BIC;
 	}
 } // class BIC
 

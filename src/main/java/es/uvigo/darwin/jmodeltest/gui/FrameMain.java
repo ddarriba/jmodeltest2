@@ -47,12 +47,13 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.plaf.BorderUIResource;
 
-import pal.alignment.Alignment;
+import pal.tree.Tree;
 import edu.stanford.ejalbert.BrowserLauncher;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.ModelTestService;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
+import es.uvigo.darwin.jmodeltest.tree.TreeSummary;
 import es.uvigo.darwin.jmodeltest.utilities.InitialFocusSetter;
 import es.uvigo.darwin.jmodeltest.utilities.PrintUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
@@ -122,12 +123,14 @@ public class FrameMain extends JModelTestFrame {
 	private JMenuItem menuShowModelTable;
 	private JMenuItem menuAveraging;
 
-	static {
-		String os = System.getProperty("os.name");
-
-		if (os.startsWith("Mac")) {
+	static 
+	{
+		if (Utilities.findCurrentOS() == Utilities.OS_OSX) 
+		{
 			HOTKEY_MODIFIER = ActionEvent.META_MASK;
-		} else {
+		}
+		else 
+		{
 			HOTKEY_MODIFIER = ActionEvent.CTRL_MASK;
 		}
 	}
@@ -708,16 +711,11 @@ public class FrameMain extends JModelTestFrame {
 			if (inputFile.exists()) // file exists
 			{
 				options.setInputFile(inputFile);
-				try {
-					ModelTestService.readAlignment(inputFile,
-							options.getAlignmentFile());
+				try 
+				{
+					ModelTestService.readAlignment(inputFile, options.getAlignmentFile());
 
-					Alignment alignment = AlignmentReader
-							.readAlignment(new PrintWriter(System.err), options
-									.getAlignmentFile().getAbsolutePath(), true, modelTest.logger);
-					options.numTaxa = alignment.getSequenceCount();
-					options.numSites = alignment.getSiteCount();
-					options.numBranches = 2 * options.numTaxa - 3;
+					options.setAlignment(AlignmentReader.readAlignment(new PrintWriter(System.err), options.getAlignmentFile().getAbsolutePath(), true));
 
 					LabelStatusData.setText(dataFileName + "  ");
 					LabelStatusData.setForeground(new java.awt.Color(102, 102,
@@ -727,10 +725,10 @@ public class FrameMain extends JModelTestFrame {
 					enableMenuHtmlOutput(false);
 					modelTest.getMainConsole().println(" OK.");
 					modelTest.getMainConsole().println(
-							"  number of sequences: " + options.numTaxa);
+							"  number of sequences: " + options.getNumTaxa());
 					modelTest.getMainConsole().println(
-							"  number of sites: " + options.numSites);
-					options.sampleSize = options.numSites;
+							"  number of sites: " + options.getNumSites());
+					options.checkSampleSize();
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(this, "The specified file \""
 							+ dataFileName
@@ -799,7 +797,7 @@ public class FrameMain extends JModelTestFrame {
 	public void menuEditClearActionPerformed(java.awt.event.ActionEvent e) {
 		try {
 			mainEditorPane.setText("");
-			ModelTest.printHeader(modelTest.getMainConsole());
+			ModelTest.printHeader(modelTest.getMainConsole(), false);
 			ModelTest.printCitation(modelTest.getMainConsole());
 		} catch (Exception f) {
 			f.printStackTrace();
@@ -879,9 +877,14 @@ public class FrameMain extends JModelTestFrame {
 																 * selected
 																 */
 			{
-				HtmlReporter.buildReport(modelTest,
-						modelTest.getCandidateModels(),
-						new File(dialog.getDirectory() + dialog.getFile()));
+				Tree bestAIC = modelTest.getMinAIC() != null? modelTest.getMinAIC().getTree() : null;
+				Tree bestAICc = modelTest.getMinAICc() != null? modelTest.getMinAICc().getTree() : null;
+				Tree bestBIC = modelTest.getMinBIC() != null? modelTest.getMinBIC().getTree() : null;
+				Tree bestDT = modelTest.getMinDT() != null? modelTest.getMinDT().getTree() : null;
+					
+				TreeSummary treeSummary = new TreeSummary(bestAIC, bestAICc, bestBIC, bestDT, modelTest.getCandidateModels());
+				HtmlReporter htmlReporter = new HtmlReporter(new File(dialog.getDirectory() + dialog.getFile()));
+				htmlReporter.buildReport(modelTest, modelTest.getCandidateModels(), treeSummary);
 			}
 		} catch (Exception f) {
 			f.printStackTrace();
@@ -1037,7 +1040,15 @@ public class FrameMain extends JModelTestFrame {
 	private void menuAboutModelTestActionPerformed(java.awt.event.ActionEvent e) {
 		try {
 			String about = "jModelTest " + ModelTest.CURRENT_VERSION + "\n";
-			about += "Copyright Diego Darriba and David Posada 2011 onwards ";
+			about += "(c) 2001-onwards D.Darriba, G.L.Taboada, R.Doallo and D.Posada\n";
+			about += "Department of Biochemistry, Genetics and Immunology\n";
+			about += "University of Vigo, 36310 Vigo, Spain.\n";
+			about += "Department of Electronics and Systems\n";
+			about += "University of A Coruna, 15071 A Coruna, Spain.\n";
+			about += "e-mail: ddarriba@udc.es, dposada@uvigo.es\n\n";
+			about += "Citation: Darriba D, Taboada GL, Doallo R and Posada D. 2012.\n" +
+				"\"jModelTest 2: more models, new heuristics and parallel computing\".\n" +
+				"Nature Methods 9, 772.\n";
 			JOptionPane.showMessageDialog(new JFrame(), about,
 					"jModelTest", JOptionPane.INFORMATION_MESSAGE,
 					XManager.makeIcon("JMT48", "JMT2"));

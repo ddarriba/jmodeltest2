@@ -21,51 +21,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import pal.io.FormattedOutput;
+import pal.misc.IdGroup;
 import pal.tree.Node;
 import pal.tree.ReadTree;
+import pal.tree.SplitSystem;
+import pal.tree.SplitUtils;
 import pal.tree.Tree;
 import pal.tree.TreeParseException;
-import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 
 public class TreeUtilities {
 
-	public static final int DEFAULT_COLUMN_WIDTH = 70;
-	public static final String TREE_WEIGHT_ATTRIBUTE = "weight";
 	public static final String TREE_CLADE_SUPPORT_ATTRIBUTE = "support";
-	public static final String TREE_NAME_ATTRIBUTE = "treeName";
-
-	public static int intNodeNum, tipNodeNum;
-	public static TextOutputStream stream;
 
 	public TreeUtilities() {
 	}
-
-	/****************************
-	 * treeToSplits ****************************** * Converts a tree in Newick
-	 * format in a system of splits * * * *
-	 ************************************************************************/
-
-	public static void treeToSplits(String treefilename) {
-
-	}
-
-	/*
-	 * DP 161107: in progress
-	 * 
-	 * NOTAS: usar Vector, Enumeration or List ?
-	 * 
-	 * 
-	 * 
-	 * ((A,B),(C,D))
-	 * 
-	 * root A B C D node 1 1 0 0 1 1 node 2 0 0 1 1 node 3 0 1 1 1
-	 * 
-	 * COMPlETAR!!!
-	 */
 
 	/****************************
 	 * readTree ********************************** * Reads a tree in Newick
@@ -144,119 +114,63 @@ public class TreeUtilities {
 		return sw.toString();
 	}
 
-	/******************
-	 * FinishTree **************************
-	 * 
-	 * Reindex nodes, count nodes to tips, and initialize components
-	 *********************************************************/
-
-	// public static void finishTree(Node p) {
-	// int i;
-	//
-	// if (p != null) {
-	// for (i = 0; i < p.numChildren; i++)
-	// finishTree(p.child[i]);
-	// if (p.numChildren == 0)
-	// p.index = tipNodeNum++;
-	// else
-	// p.index = intNodeNum++;
-	// }
-	// }
-
-	/*****************
-	 * treeStringIsFine *******************
-	 * 
-	 * Checks for an error in the input tree string Prints message when there is
-	 * an error in the tree and prints correct part of the tree
-	 *********************************************************/
-
-	public static boolean treeStringIsFine(String treeString) {
-		int i, k;
-		int numLeftPar, numRightPar;
-		char previous_ch, current_ch, next_ch;
-		boolean thereIsError;
-
-		thereIsError = false;
-		numLeftPar = 1;
-		numRightPar = 0;
-		i = 1;
-
-		// make some general checks
-		if (treeString.length() < 8) {
-			System.err.println(" ");
-			System.err.println("ERROR: Tree string seems to short: "
-					+ treeString);
-			return false;
-		} else if (treeString.lastIndexOf('(') == -1) {
-			JOptionPane
-					.showMessageDialog(
-							new JFrame(),
-							"No parentheses found. It does not seem to be a valid Newick tree",
-							"jModeltest error", JOptionPane.ERROR_MESSAGE);
-			return false;
+	public static double getEuclideanTreeDistance(Tree t1, Tree t2) 
+	{
+		double sum = 0.0;
+		int numberOfInternalNodes = t1.getInternalNodeCount();
+		if (numberOfInternalNodes != t2.getInternalNodeCount()) 
+		{
+			throw new RuntimeException("Different number of internal nodes: " +
+				t1.getInternalNodeCount() + " vs " + t2.getInternalNodeCount());
 		}
-
-		while (treeString.charAt(i) != ';') {
-			current_ch = treeString.charAt(i);
-			previous_ch = treeString.charAt(i - 1);
-			next_ch = treeString.charAt(i + 1);
-
-			if (current_ch == '(') {
-				if (previous_ch != '(' && previous_ch != ',')
-					thereIsError = true;
-				if (next_ch != '('
-						&& !Character.isLetterOrDigit(next_ch))
-					thereIsError = true;
-				numLeftPar++;
-			} else if (current_ch == ')') {
-				if (previous_ch != ')'
-						&& !Character.isLetterOrDigit(previous_ch))
-					thereIsError = true;
-				if (next_ch != ')' && next_ch != ',' && next_ch != ':')
-					thereIsError = true;
-				if (next_ch == ';' && i == treeString.length() - 2)
-					thereIsError = false;
-				numRightPar++;
-			} else if (current_ch == ',') {
-				if (previous_ch != ')'
-						&& !Character.isLetterOrDigit(previous_ch))
-					thereIsError = true;
-				if (next_ch != '('
-						&& !Character.isLetterOrDigit(next_ch))
-					thereIsError = true;
-			} else if (current_ch == ':') {
-				if (previous_ch != ')'
-						&& !Character.isLetterOrDigit(previous_ch))
-					thereIsError = true;
-				if (!Character.isDigit(next_ch))
-					thereIsError = true;
-			}
-
-			if (thereIsError) {
-				System.err.println(" ");
-				System.err
-						.println("ERROR: There is something wrong in the tree:");
-				for (k = 0; k <= i; k++)
-					System.err.print(treeString.charAt(k));
-				System.err.println(" <- HERE");
-
-				return false;
-			}
-
-			i++;
+		int numberOfExternalNodes = t1.getExternalNodeCount();
+		if (numberOfExternalNodes != t2.getExternalNodeCount()) 
+		{
+			throw new RuntimeException("Different number of external nodes: " +
+				t1.getInternalNodeCount() + " vs " + t2.getInternalNodeCount());
 		}
-
-		if (numLeftPar != numRightPar) {
-			JOptionPane.showMessageDialog(new JFrame(),
-					"Tree seems unbalanced (" + numLeftPar + " left and "
-							+ numRightPar + " right parentheses)"
-							+ "\nIt has to be in Newick format",
-					"jModeltest error", JOptionPane.ERROR_MESSAGE);
-			return false;
+		for (int i = 0; i < numberOfInternalNodes; i++) 
+		{
+			double bl1 = t1.getInternalNode(i).getBranchLength();
+			double bl2 = t2.getInternalNode(i).getBranchLength();
+			sum += (bl1 - bl2) * (bl1 - bl2);
 		}
+		for (int i = 0; i < numberOfExternalNodes; i++) 
+		{
+			double bl1 = t1.getExternalNode(i).getBranchLength();
+			double bl2 = t2.getExternalNode(i).getBranchLength();
+			sum += (bl1 - bl2) * (bl1 - bl2);
+		}
+		
+		return Math.sqrt(sum);
+	}
+	
+	public static double getRobinsonFouldsTreeDistance(Tree t1, Tree t2) 
+	{
+		SplitSystem s1 = SplitUtils.getSplits(t1);
+		IdGroup idGroup = s1.getIdGroup();
+		SplitSystem s2 = SplitUtils.getSplits(idGroup, t2);
+		if (s1.getLabelCount() != s2.getLabelCount())
+			throw new IllegalArgumentException("Number of labels must be the same!");
 
-		return true;
-
+		int ns1 = s1.getSplitCount();
+		int ns2 = s2.getSplitCount();
+		
+		// number of splits in t1 missing in t2
+		int fn = 0;
+		for (int i = 0; i < ns1; i++)
+		{
+			if (!s2.hasSplit(s1.getSplit(i))) fn++;
+		}
+		
+		// number of splits in t2 missing in t1
+		int fp = 0;
+		for (int i = 0; i < ns2; i++)
+		{
+			if (!s1.hasSplit(s2.getSplit(i))) fp++;
+		}
+		
+		return ((double) fp + (double) fn);
 	}
 
 } // end of class

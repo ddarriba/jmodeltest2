@@ -96,26 +96,26 @@ public class FrameResults extends JModelTestFrame {
 	public FrameResults(ModelTest modelTest)
 	{
 		super(modelTest);
-		modelModels = new MyTableModel("Model", options.numModels, modelTest);
+		modelModels = new MyTableModel("Model", options.getNumModels(), modelTest);
 		sorterModels = new TableSorter(modelModels);
 		tempTableModels = new JTable(sorterModels);
 
-		modelAIC = new MyTableModel("AIC", options.numModels, modelTest);
+		modelAIC = new MyTableModel("AIC", options.getNumModels(), modelTest);
 		sorterAIC = new TableSorter(modelAIC);
 		tempTableAIC = new JTable(sorterAIC);
 		AICRenderer = new MyTableCellRenderer(tempTableAIC,"AIC", modelTest); 
 
-		modelAICc = new MyTableModel("AICc", options.numModels, modelTest);
+		modelAICc = new MyTableModel("AICc", options.getNumModels(), modelTest);
 		sorterAICc = new TableSorter(modelAICc);
 		tempTableAICc = new JTable(sorterAICc);
 		AICcRenderer = new MyTableCellRenderer(tempTableAICc,"AICc", modelTest); 
 
-		modelBIC = new MyTableModel("BIC", options.numModels, modelTest);
+		modelBIC = new MyTableModel("BIC", options.getNumModels(), modelTest);
 		sorterBIC = new TableSorter(modelBIC);
 		tempTableBIC = new JTable(sorterBIC);
 		BICRenderer = new MyTableCellRenderer(tempTableBIC,"BIC", modelTest); 
 		
-		modelDT = new MyTableModel("DT", options.numModels, modelTest);
+		modelDT = new MyTableModel("DT", options.getNumModels(), modelTest);
 		sorterDT = new TableSorter(modelDT);
 		tempTableDT = new JTable(sorterDT);
 		DTRenderer = new MyTableCellRenderer(tempTableDT,"DT", modelTest); 

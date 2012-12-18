@@ -17,11 +17,15 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 package es.uvigo.darwin.jmodeltest.model;
 
-public interface ModelConstants {
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
+
+public abstract class ModelConstants {
 	// Model names
-	public static final String[] modelName = { "JC", "JC+I", "JC+G", "JC+I+G", "F81",
-			"F81+I", "F81+G", "F81+I+G", "K80", "K80+I", "K80+G", "K80+I+G",
-			"HKY", "HKY+I", "HKY+G", "HKY+I+G", "TrNef", "TrNef+I", "TrNef+G",
+	public static final String[] modelName = { "JC", "JC+I", "JC+G", "JC+I+G", 
+			"F81", "F81+I", "F81+G", "F81+I+G", "K80", "K80+I", "K80+G", 
+			"K80+I+G", "HKY", "HKY+I", "HKY+G", "HKY+I+G", "TrNef", "TrNef+I", "TrNef+G",
 			"TrNef+I+G", "TrN", "TrN+I", "TrN+G", "TrN+I+G", "TPM1", "TPM1+I",
 			"TPM1+G", "TPM1+I+G", "TPM1uf", "TPM1uf+I", "TPM1uf+G",
 			"TPM1uf+I+G", "TPM2", "TPM2+I", "TPM2+G", "TPM2+I+G", "TPM2uf",
@@ -36,8 +40,7 @@ public interface ModelConstants {
 			"GTR", "GTR+I", "GTR+G", "GTR+I+G" };
 
 	// custom String for substitution types
-	public static final String[] modelCode = { "000000", "000000", "000000",
-			"000000", // JC
+	public static final String[] modelCode = { "000000", "000000", "000000", "000000", // JC
 			"000000", "000000", "000000", "000000", // F81
 			"010010", "010010", "010010", "010010", // K80
 			"010010", "010010", "010010", "010010", // HKY
@@ -61,6 +64,55 @@ public interface ModelConstants {
 			"012345", "012345", "012345", "012345", // GTR
 	};
 
+	public static final List<String> codeList = Arrays.asList(ModelConstants.modelCode);
+    
+    // custom String for substitution types
+    public static final Hashtable<Integer, String[]> fullModelSet;
+
+    static {
+            fullModelSet = new Hashtable<Integer, String[]>();
+            fullModelSet.put(6, new String[] { "012345" });
+            fullModelSet.put(5, new String[] { "001234", "010234", "011234",
+                            "012034", "012134", "012234", "012304", "012314", "012324",
+                            "012334", "012340", "012341", "012342", "012343", "012344" });
+            fullModelSet.put(4, new String[] { "000123", "001023", "001123",
+                            "001203", "001213", "001223", "001230", "001231", "001232",
+                            "001233", "010023", "010123", "010203", "010213", "010223",
+                            "010230", "010231", "010232", "010233", "011023", "011123",
+                            "011203", "011213", "011223", "011230", "011231", "011232",
+                            "011233", "012003", "012013", "012023", "012030", "012031",
+                            "012032", "012033", "012103", "012113", "012123", "012130",
+                            "012131", "012132", "012133", "012203", "012213", "012223",
+                            "012230", "012231", "012232", "012233", "012300", "012301",
+                            "012302", "012303", "012310", "012311", "012312", "012313",
+                            "012320", "012321", "012322", "012323", "012330", "012331",
+                            "012332", "012333" });
+            fullModelSet.put(3, new String[] { "000012", "000102", "000112",
+                            "000120", "000121", "000122", "001002", "001012", "001020",
+                            "001021", "001022", "001102", "001112", "001120", "001121",
+                            "001122", "001200", "001201", "001202", "001210", "001211",
+                            "001212", "001220", "001221", "001222", "010002", "010012",
+                            "010020", "010021", "010022", "010102", "010112", "010120",
+                            "010121", "010122", "010200", "010201", "010202", "010210",
+                            "010211", "010212", "010220", "010221", "010222", "011002",
+                            "011012", "011020", "011021", "011022", "011102", "011112",
+                            "011120", "011121", "011122", "011200", "011201", "011202",
+                            "011210", "011211", "011212", "011220", "011221", "011222",
+                            "012000", "012001", "012002", "012010", "012011", "012012",
+                            "012020", "012021", "012022", "012100", "012101", "012102",
+                            "012110", "012111", "012112", "012120", "012121", "012122",
+                            "012200", "012201", "012202", "012210", "012211", "012212",
+                            "012220", "012221", "012222" });
+            fullModelSet.put(2, new String[] { "000001", "000010", "000011",
+                            "000100", "000101", "000110", "000111", "001000", "001001",
+                            "001010", "001011", "001100", "001101", "001110", "001111",
+                            "010000", "010001", "010010", "010011", "010100", "010101",
+                            "010110", "010111", "011000", "011001", "011010", "011011",
+                            "011100", "011101", "011110", "011111" });
+            fullModelSet.put(1, new String[] { "000000" });
+    }
+
+	
 	// number of free parameters for each model
 	public static final int[] freeParameters = { 0, 1, 1, 2, // JC
 			3, 4, 4, 5, // F81
@@ -136,6 +188,34 @@ public interface ModelConstants {
 			4, 4, 4, 4 // GTR
 	};
 
+//	public static final int getNumberOfTransitions(String partition) 
+//	{
+//		System.out.println(" CHECKING " + partition);
+//		Integer ti0 = Integer.parseInt(partition.substring(1, 2));
+//		Integer ti1 = Integer.parseInt(partition.substring(4, 5));
+//		System.out.println(" CHECKING " + ti0 + " and " +  ti1);
+//		if (ti0 == ti1) {
+//			return 1;
+//		} else {
+//			return 2;
+//		}
+//	}
+//		
+//	public static final int getNumberOfTransversions(String partition) 
+//	{
+//		List<Integer> parts = new ArrayList<Integer>();
+//		int[] transitions = { 0, 2, 3, 5 };
+//		for (int i : transitions) 
+//		{
+//			Integer current_part = Integer.parseInt(partition.substring(i, i+1));
+//			if (!parts.contains(current_part)) 
+//			{
+//				parts.add(current_part);
+//			}
+//		}
+//		return parts.size();
+//	}
+	
 	// base frequencies restrictions
 	public static final boolean[] equalBaseFrequencies = { true, true, true, true, // JC
 			false, false, false, false, // F81

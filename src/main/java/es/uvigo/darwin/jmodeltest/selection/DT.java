@@ -30,7 +30,7 @@ import es.uvigo.darwin.jmodeltest.tree.TreeEuclideanDistancesCache;
 //DP check: DT might keep running even with bad likelihoods ?
 public class DT extends InformationCriterion {
 
-	private TreeDistancesCache distances = new TreeEuclideanDistancesCache();
+	private TreeDistancesCache distances = TreeEuclideanDistancesCache.getInstance();
 	
 	// constructor
 	public DT(boolean mwritePAUPblock, boolean mdoImportances,
@@ -48,9 +48,9 @@ public class DT extends InformationCriterion {
 		
 		boolean sorted;
 		int i, j, temp2, pass;
-		double min, sumExp, sum, sumReciprocal, cum, temp1;
+		double min, sum, sumReciprocal, cum, temp1;
 		double[] tempw = new double[numModels];
-		double[] BIC = new double[numModels];
+		double[] bicValues = new double[numModels];
 
 		/*
 		 * // Calculate BICs and BIC exponentials sumBICexp = 0; for (i=0;
@@ -71,15 +71,9 @@ public class DT extends InformationCriterion {
 		// get BICs and min BIC
 		double minBIC = min = Double.MAX_VALUE;
 		for (i = 0; i < numModels; i++) {
-			if (options.countBLasParameters)
-				BIC[i] = models[i].getLnL() + models[i].getK() / 2.0
-						* Math.log(options.sampleSize);
-			else
-				BIC[i] = models[i].getLnL()
-						+ (models[i].getK() - options.numBranches) / 2.0
-						* Math.log(options.sampleSize);
-			if (BIC[i] < minBIC)
-				minBIC = BIC[i];
+			bicValues[i] = BIC.computeBic(models[i], options);
+			if (bicValues[i] < minBIC)
+				minBIC = bicValues[i];
 		}
 
 		for (Model model1 : models) {
@@ -88,7 +82,7 @@ public class DT extends InformationCriterion {
 			for (Model model2 : models) {
 				double distance = distances.getDistance(model1.getTree(), model2.getTree());
 				if (distance > 0) {
-					double power = Math.log(distance) - BIC[j]
+					double power = Math.log(distance) - bicValues[j]
 							+ minBIC;
 					if (power > -30) {
 						sum += Math.exp(power);
@@ -104,10 +98,10 @@ public class DT extends InformationCriterion {
 		}
 
 		// Calculate DT differences
-		sumReciprocal = sumExp = sum = 0;
+		sumReciprocal = sum = 0;
 		for (i = 0; i < numModels; i++) {
 			models[i].setDTd(models[i].getDT() - minModel.getDT());
-			sumExp += Math.exp(-0.5 * models[i].getDTd());
+//			sumExp += Math.exp(-0.5 * models[i].getDTd());
 			sumReciprocal += 1.0 / models[i].getDT();
 		}
 
@@ -170,6 +164,10 @@ public class DT extends InformationCriterion {
 
 	}
 	
+	public double computeSingle(Model model) {
+		throw new RuntimeException("Cannot compute a single criterion value for DT");
+	}
+	
 	protected void printHeader(TextOutputStream stream) {
 		stream.println("\n\n\n---------------------------------------------------------------");
 		stream.println("*                                                             *");
@@ -179,7 +177,6 @@ public class DT extends InformationCriterion {
 	}
 	
 	protected void printFooter(TextOutputStream stream) {
-		stream.println("\n------------------------------------------------------------------------");
 		stream.println("-lnL:t\tnegative log likelihod");
 		stream.println("K:\tnumber of estimated parameters");
 		stream.println("DT:\tdecision theory performance-based score");
@@ -278,12 +275,22 @@ public class DT extends InformationCriterion {
 	}
 	
 	@Override
+	public double getUDelta(Model m) {
+		return Double.NaN;
+	}
+		
+	@Override
+	public double setUDelta(Model m) {
+		return Double.NaN;
+	}
+	
+	@Override
 	public double getCumWeight(Model m) {
 		return m.getCumDTw();
 	}
 	
 	@Override
 	public int getType() {
-		return DT;
+		return IC_DT;
 	}
 } // class DT

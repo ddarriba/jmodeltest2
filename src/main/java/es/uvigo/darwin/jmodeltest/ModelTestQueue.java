@@ -28,6 +28,8 @@ public class ModelTestQueue extends ModelTest
 	{
 		ModelTestQueue.runWorkerManager = runWorkerManager;
 	}
+
+	private boolean doEndCommandLine = false;
 	
 	public ModelTestQueue(List<String> args, Observer progressObserver, String configFile, TextOutputStream mainConsole, Long jobId)
 	{
@@ -64,10 +66,22 @@ public class ModelTestQueue extends ModelTest
 	
 	public boolean continueAnalysis(List<Long> identifiers)
     {
-		if (((RunPhymlQueue) runPhyml).continueExecute(identifiers))
+		((RunPhymlQueue) runPhyml).continueExecute(identifiers);
+
+		if (!((RunPhymlQueue) runPhyml).moreJobs())
 		{
-			endCommandLine();
-			return true;
+			if (!doEndCommandLine)
+			{
+				prepareEndCommandLine();
+				
+				doEndCommandLine = true;
+			}
+			
+			if (doEndCommandLine && !((RunPhymlQueue) runPhyml).moreJobs())
+			{
+				endCommandLine();
+				return true;
+			}
 		}
 		
    		return false;
@@ -77,5 +91,4 @@ public class ModelTestQueue extends ModelTest
     {
 		((RunPhymlQueue) runPhyml).cancelExecute();
     }
-	
 }

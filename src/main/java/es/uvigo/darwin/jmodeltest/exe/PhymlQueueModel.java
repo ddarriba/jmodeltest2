@@ -3,7 +3,6 @@ package es.uvigo.darwin.jmodeltest.exe;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.udc.gac.nebulator.manager.worker.util.exception.NotAvailableResourceException;
 import es.uvigo.darwin.jmodeltest.ModelTestQueue;
 import es.uvigo.darwin.prottest.util.exception.ProtTestInternalException;
 
@@ -19,9 +18,8 @@ public class PhymlQueueModel
 {
 	private List<PhymlSingleQueueModel> initPsqms	= new ArrayList<PhymlSingleQueueModel>();
 	private List<PhymlSingleQueueModel> runPsqms	= new ArrayList<PhymlSingleQueueModel>();
-	private List<PhymlSingleQueueModel> preEndPsqms	= new ArrayList<PhymlSingleQueueModel>();
 	private List<PhymlSingleQueueModel> endPsqms	= new ArrayList<PhymlSingleQueueModel>();
-	private boolean cancel = false;
+	private boolean stop = false;
 	private Long jobId;
 	
 	public PhymlQueueModel(Long jobId)
@@ -36,9 +34,11 @@ public class PhymlQueueModel
 
 	public synchronized void execute() 
 	{
+		List<Long> identifiers = new ArrayList<Long>();
+		
 		for (PhymlSingleQueueModelIterator i = new PhymlSingleQueueModelIterator(initPsqms); i.hasNext(); )
 		{
-			if (cancel) break;
+			if (stop) return;
 			
 			PhymlSingleQueueModel psqm = i.next();
 			
@@ -46,53 +46,24 @@ public class PhymlQueueModel
 			{
 				throw new ProtTestInternalException("PreComputeError");
 			}
+		
+			identifiers.add(psqm.getIdentifier());
 			
 			i.remove(); /* -> */ runPsqms.add(psqm);
 		}
 		
-		try
-		{
-			ModelTestQueue.getRunWorkerManager().assignResource(jobId);
-		}
-		catch (NotAvailableResourceException e)
-		{
-			throw new ProtTestInternalException("NotAvailableResourceException");
-		}
-		
-		ModelTestQueue.getRunWorkerManager().processJobFiles(jobId, true);
-		ModelTestQueue.getRunWorkerManager().processJobCommands(jobId);
-		
+		ModelTestQueue.getRunWorkerManager().processJobs(identifiers);
 	}
 	
-	public synchronized boolean continueExecute(List<Long> identifiers)
+	public synchronized void continueExecute(List<Long> identifiers)
 	{			
 		for (PhymlSingleQueueModelIterator i = new PhymlSingleQueueModelIterator(runPsqms); i.hasNext(); )
 		{
-			if (cancel) break;
+			if (stop) return;
 			
 			PhymlSingleQueueModel psqm = i.next();
-			
+
 			if (identifiers.contains(psqm.getIdentifier()))
-			{				
-				if (!psqm.preContinueCompute(jobId))
-				{
-					throw new ProtTestInternalException("PreContinueComputeException");
-				}
-				
-				i.remove(); /* -> */ preEndPsqms.add(psqm);
-			}
-		}
-
-		ModelTestQueue.getRunWorkerManager().processJobFiles(jobId, false);
-
-		for (PhymlSingleQueueModelIterator i = new PhymlSingleQueueModelIterator(preEndPsqms); i.hasNext(); )
-		{
-			if (cancel) break;
-			
-			PhymlSingleQueueModel psqm = i.next();
-
-			if (	identifiers.contains(psqm.getIdentifier()) 
-				&&	ModelTestQueue.getRunWorkerManager().filesCopied(psqm.getIdentifier(), false))
 			{		
 				if (!psqm.continueCompute())
 				{
@@ -102,39 +73,49 @@ public class PhymlQueueModel
 				i.remove(); /* -> */ endPsqms.add(psqm);
 			}
 		}
-
-		return ((runPsqms.size() == 0) && (preEndPsqms.size() == 0));
 	}
 
+	public boolean moreJobs()
+	{				
+		return ((initPsqms.size()	!= 0) ||
+				(runPsqms.size()	!= 0)); 
+	}
+	
 	public void optimizationCompleted()
 	{
+		List<Long> identifiers = new ArrayList<Long>();
+		
 		for (PhymlSingleQueueModelIterator i = new PhymlSingleQueueModelIterator(endPsqms); i.hasNext(); )
 		{
 			PhymlSingleQueueModel psqm = i.next();
 			
 			psqm.optimizationCompleted();
 			
+			identifiers.add(psqm.getIdentifier());
+			
 			i.remove();
 		}
+		
+		ModelTestQueue.getRunWorkerManager().removeJobs(identifiers);
 	}
 	
 	public void cancelExecute() 
 	{
-		cancel = true;
+		stop = true;
 		
-		List<PhymlSingleQueueModel> psqms = new ArrayList<PhymlSingleQueueModel>();
+		List<Long> identifiers = new ArrayList<Long>();
 		
-		psqms.addAll(runPsqms);
-		psqms.addAll(preEndPsqms);
-		
-		for (PhymlSingleQueueModelIterator i = new PhymlSingleQueueModelIterator(psqms); i.hasNext(); )
+		for (PhymlSingleQueueModelIterator i = new PhymlSingleQueueModelIterator(runPsqms); i.hasNext(); )
 		{
 			PhymlSingleQueueModel psqm = i.next();
 			
 			psqm.cancelCompute();
 			
+			identifiers.add(psqm.getIdentifier());
+			
 			i.remove();
 		}
+		
+		ModelTestQueue.getRunWorkerManager().cancelJobs(identifiers);
 	}
-
 }

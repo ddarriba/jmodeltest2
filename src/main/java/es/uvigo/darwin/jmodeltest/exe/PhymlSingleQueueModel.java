@@ -1,12 +1,10 @@
 package es.uvigo.darwin.jmodeltest.exe;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTestQueue;
-import es.uvigo.darwin.jmodeltest.io.TextInputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
@@ -20,15 +18,17 @@ import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
 public class PhymlSingleQueueModel extends PhymlSingleModel 
 {
-	private Long identifier;
-	private String queueFileName;
-	private long startComputeTime;
-	private long endComputeTime;
-	private boolean preContinue = false;
+	private Long 	identifier;
+	private long 	computationTime = 0L;	
 	
-	public PhymlSingleQueueModel(Model model, int index, boolean justGetJCTree, ApplicationOptions options) 
+	public PhymlSingleQueueModel(Model model, int index, boolean justGetJCTree, boolean ignoreGaps, ApplicationOptions options) 
 	{
-		super(model, index, justGetJCTree, options);		
+		super(model, index, justGetJCTree, ignoreGaps, options);		
+		
+		writePhyml3CommandLine();
+		
+		//Same cmd => same job
+		this.identifier = Long.valueOf(commandLine.hashCode());
 	}
 	
 	public Long getIdentifier()
@@ -38,14 +38,17 @@ public class PhymlSingleQueueModel extends PhymlSingleModel
 	
 	public boolean preCompute(Long jobId)
 	{
-		// run phyml
-		notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index, model, null);
+		if (model.getLnL() < 1e-5 || ignoreGaps) 
+		{
+			// run phyml
+			notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index, model, null);
 
-		startTime = System.currentTimeMillis();
+			startTime = System.currentTimeMillis();
 
-		writePhyml3CommandLine(model, justGetJCTree);
+			writePhyml3CommandLine();
 		
-		preExecuteCommandLine(jobId);
+			preExecuteCommandLine(jobId);
+		}
 		
 		return !interrupted;
 	}
@@ -58,38 +61,31 @@ public class PhymlSingleQueueModel extends PhymlSingleModel
 			
 		String[] tokenizedCommandLine = commandLine.split(" ");
 		String[] cmd = Utilities.specialConcatStringArrays(executable, tokenizedCommandLine);
+				
+		ArrayList<String> inputFiles = new ArrayList<String>();
 		
-		//Same cmd => same job
-		this.identifier = Long.valueOf(commandLine.hashCode());
-		this.queueFileName = getDirName(this.phymlStatFileName) +  File.separator + String.format("jobDetails%s.txt", this.identifier);
-		
-		ArrayList<String> files = new ArrayList<String>();
-		
-		files.add(options.getAlignmentFile().getAbsolutePath());
+		inputFiles.add(options.getAlignmentFile().getAbsolutePath());
 
 		if (options.userTopologyExists || options.fixedTopology)
 		{
-			files.add(options.getTreeFile().getAbsolutePath());
+			inputFiles.add(options.getTreeFile().getAbsolutePath());
 		}
 		
-		String[] clines = new String[5];
-
-		clines[0] = "echo \"#\" `date` > " + getFileName(queueFileName);
-		clines[1] = "echo \"TIME INIT:\" `date +%s` >> " + getFileName(queueFileName);
+		ArrayList<String> outputFiles = new ArrayList<String>();
 		
-		clines[2] = "";
+		outputFiles.add(phymlStatFileName);
+		outputFiles.add(phymlTreeFileName);
+				
+		String cmdline = "";
+
 		for (int i=0; i<cmd.length; i++)
 		{
-			clines[2] += cmd[i] + " ";
+			cmdline += cmd[i] + " ";
 		}
-		
-		clines[3] = "echo \"#\" `date` >> " + getFileName(queueFileName);
-		clines[4] = "echo \"TIME END:\" `date +%s` >> " + getFileName(queueFileName);
 		
 		try
 		{
-			ModelTestQueue.getRunWorkerManager().initJob(jobId, identifier, clines);
-			ModelTestQueue.getRunWorkerManager().setJobFiles(identifier, files, true);
+			ModelTestQueue.getRunWorkerManager().createJob(jobId, identifier, cmdline, inputFiles, outputFiles);
 		}
 		catch (Exception e)
 		{
@@ -97,64 +93,41 @@ public class PhymlSingleQueueModel extends PhymlSingleModel
 			interrupted = true;
 		}
 	}
-		
-	public boolean preContinueCompute(Long jobId)
+			
+	public boolean continueCompute()
 	{
-		if (!preContinue)
-		{
-			preContinue = true;
+		if (!interrupted) 
+		{			
+			parsePhyml3Files();
 			
 			try 
 			{
-				if (!interrupted) 
-				{			
-					ArrayList<String> files = new ArrayList<String>();
-					
-					files.add(phymlStatFileName);
-					files.add(phymlTreeFileName);
-					files.add(queueFileName);
-					
-					ModelTestQueue.getRunWorkerManager().setJobFiles(identifier, files, false);
-				}			
+				computationTime = ModelTestQueue.getRunWorkerManager().getComputationTime(identifier);
 			}
 			catch (Exception e) 
 			{
-				interrupted = true;
-				notifyObservers(ProgressInfo.ERROR, index, model, "Cannot continue remote Phyml command line for some reason:" + e.getMessage());
+
 			}
 		}
-		
-		return !interrupted;
-	}
-	
-	public boolean continueCompute()
-	{
-		try 
-		{
-			if (!interrupted) 
-			{			
-				parsePhyml3Files(model);
-				parseQueueFiles();
-			}
 			
-			endTime = System.currentTimeMillis();
+		endTime = System.currentTimeMillis();
 			
-			model.setComputationTime(endTime - startTime);
-				
-			// completed
-			if (!interrupted) 
-			{			
-//				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, index, model, 
-//						Utilities.calculateRuntime(startTime, endTime) + "::" + String.valueOf(endTime - startTime) + "::" + commandLine);
-//				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, index, model, Utilities.calculateRuntime(startTime, endTime));
-				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, index, model, String.valueOf(endComputeTime - startComputeTime));
-				
-				ModelTestQueue.getRunWorkerManager().endJob(identifier);
-			}
-		}
-		catch (Exception e) 
-		{
-			notifyObservers(ProgressInfo.ERROR, index, model, "Cannot end remote Phyml command line for some reason; " + e.getMessage());
+		model.setComputationTime(endTime - startTime);
+			
+		// completed
+        if (!interrupted) 
+        {
+            int value = 0;
+            if (ignoreGaps) 
+            {
+                value = ProgressInfo.VALUE_IGAPS_OPTIMIZATION;
+            }
+            else 
+            {
+                value = ProgressInfo.VALUE_REGULAR_OPTIMIZATION;
+            }
+            
+            notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, value, model, String.valueOf(computationTime));
 		}
 		
 		return !interrupted;
@@ -194,8 +167,6 @@ public class PhymlSingleQueueModel extends PhymlSingleModel
 		{
 			interrupted = true;
 			
-			ModelTestQueue.getRunWorkerManager().cancelJob(identifier);
-			
 			optimizationCompleted();
 		}
 		catch (Exception e) 
@@ -206,39 +177,8 @@ public class PhymlSingleQueueModel extends PhymlSingleModel
     
 	public void optimizationCompleted()
 	{
-		ModelTestQueue.getRunWorkerManager().unassignResource(identifier);
-		
 		Utilities.deleteFile(phymlStatFileName);
 		Utilities.deleteFile(phymlTreeFileName);
-		Utilities.deleteFile(queueFileName);
 	}
 	
-	private void parseQueueFiles()
-	{
-		String line;
-		
-		try 
-		{
-			TextInputStream phymlStatFile = new TextInputStream(queueFileName);
-			
-			while ((line = phymlStatFile.readLine()) != null) 
-			{
-				if (line.length() > 0 && line.startsWith("TIME INIT:")) 
-				{
-					startComputeTime = Long.parseLong(Utilities.lastToken(line));
-				} 
-				else if (line.length() > 0 && line.startsWith("TIME END:")) 
-				{
-					endComputeTime = Long.parseLong(Utilities.lastToken(line));
-				}
-			}
-			
-			phymlStatFile.close();
-		}
-		catch (FileNotFoundException e) 
-		{
-			notifyObservers(ProgressInfo.ERROR, index, model, "Queue results file does not exist: " + queueFileName);
-			interrupted=true;
-		}
-	}
 }

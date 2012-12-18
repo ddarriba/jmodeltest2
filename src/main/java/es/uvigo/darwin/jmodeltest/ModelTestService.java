@@ -35,6 +35,7 @@ import es.uvigo.darwin.jmodeltest.selection.AICc;
 import es.uvigo.darwin.jmodeltest.selection.BIC;
 import es.uvigo.darwin.jmodeltest.selection.DT;
 import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
+import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
 
 public class ModelTestService {
@@ -78,15 +79,17 @@ public class ModelTestService {
         int limit = 0;
         String out = "";
         String outO = "Linux";
-        String os = System.getProperty("os.name");
-        if (os.startsWith("Mac")) {
-            outO = "Linux";
-        } else if (os.startsWith("Linux")) {
-            outO = "Linux";
-        } else if (os.startsWith("Win")) {
-            outO = "Windows";
+        switch (Utilities.findCurrentOS()) 
+        {
+        	case Utilities.OS_WINDOWS:
+        		outO = "Windows";
+        		break;
+        	case Utilities.OS_OSX:
+        	case Utilities.OS_LINUX:
+        		outO = "Linux";
+        		break;
         }
-        String outP = "JModelTest";
+        String outP = "PhyML";
         String outF = "PHYLIP";
         boolean lower = false;
         boolean numbers = false;
@@ -130,29 +133,27 @@ public class ModelTestService {
 //        return alignment;
     }
     
-	public InformationCriterion doIC(int ic, boolean writePAUPblock, boolean doImportances,
-			boolean doModelAveraging, double confidenceInterval, ModelTest modelTest) {
+	public InformationCriterion doIC(int ic, boolean writePAUPblock, boolean doImportances, boolean doModelAveraging, double confidenceInterval, ModelTest modelTest) 
+	{
 		InformationCriterion criterion;
-		switch (ic) {
-		case InformationCriterion.AIC:
-			criterion = new AIC(writePAUPblock, doImportances,
-					doModelAveraging, confidenceInterval, modelTest);
-			break;
-		case InformationCriterion.AICc:
-			criterion = new AICc(writePAUPblock, doImportances,
-					doModelAveraging, confidenceInterval, modelTest);
-			break;
-		case InformationCriterion.BIC:
-			criterion = new BIC(writePAUPblock, doImportances,
-					doModelAveraging, confidenceInterval, modelTest);
-			break;
-		case InformationCriterion.DT:
-			criterion = new DT(writePAUPblock, doImportances, doModelAveraging,
-					confidenceInterval, modelTest);
-			break;
-		default:
-			throw new InvalidArgumentException.UnexistentCriterionException(ic);
+		switch (ic) 
+		{
+			case InformationCriterion.IC_AIC:
+				criterion = new AIC(writePAUPblock, doImportances, doModelAveraging, confidenceInterval, modelTest);
+				break;
+			case InformationCriterion.IC_AICc:
+				criterion = new AICc(writePAUPblock, doImportances, doModelAveraging, confidenceInterval, modelTest);
+				break;
+			case InformationCriterion.IC_BIC:
+				criterion = new BIC(writePAUPblock, doImportances, doModelAveraging, confidenceInterval, modelTest);
+				break;
+			case InformationCriterion.IC_DT:
+				criterion = new DT(writePAUPblock, doImportances, doModelAveraging, confidenceInterval, modelTest);
+				break;
+			default:
+				throw new InvalidArgumentException.UnexistentCriterionException(ic);
 		}
+		
 		criterion.compute();
 		
 		return criterion;

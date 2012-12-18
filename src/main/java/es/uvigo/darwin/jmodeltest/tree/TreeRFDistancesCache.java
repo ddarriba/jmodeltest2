@@ -24,19 +24,20 @@ package es.uvigo.darwin.jmodeltest.tree;
  * 
  * @since 3.0
  */
-public class TreeEuclideanDistancesCache extends TreeDistancesCache 
+public class TreeRFDistancesCache extends TreeDistancesCache 
 {
-	private static TreeEuclideanDistancesCache instance;
+	private static TreeRFDistancesCache instance;
     
-	private TreeEuclideanDistancesCache() 
-	{
-		super(EUCLIDEAN);
-	}
+    private TreeRFDistancesCache() 
+    {
+        super(ROBINSON_FOULDS);
+    }
     
-    public static TreeEuclideanDistancesCache getInstance() 
+    public static TreeRFDistancesCache getInstance() 
     {        
         if (instance == null)
-                instance = new TreeEuclideanDistancesCache();
+                instance = new TreeRFDistancesCache();
         return instance;
     }
+	
 }

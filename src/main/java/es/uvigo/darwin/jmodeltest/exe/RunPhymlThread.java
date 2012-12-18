@@ -19,6 +19,7 @@ package es.uvigo.darwin.jmodeltest.exe;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.Callable;
@@ -30,12 +31,17 @@ import java.util.concurrent.Future;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
+import es.uvigo.darwin.jmodeltest.selection.AIC;
+import es.uvigo.darwin.jmodeltest.selection.AICc;
+import es.uvigo.darwin.jmodeltest.selection.BIC;
+import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
 
 public class RunPhymlThread extends RunPhyml 
 {
-
 	private ExecutorService threadPool;
-
+	private int currentStage;
+	private int numModelsInStage;
+     
 	public RunPhymlThread(Observer progress, ModelTest modelTest, Model[] models) 
 	{
 		super(progress, modelTest, models);
@@ -49,26 +55,107 @@ public class RunPhymlThread extends RunPhyml
 	 ***********************************************************************/
 
 	protected Object doPhyml() 
-	{
-		// compute likelihood scores for all models
-		// System.out.print("computing likelihood scores for "
-		// + models.length + " models with Phyml " + PHYML_VERSION);
-
-		notifyObservers(ProgressInfo.OPTIMIZATION_INIT, 0, models[0], null);
-		
-		Collection<Callable<Object>> c = new ArrayList<Callable<Object>>();
-
-		int current = 0;
-		for (Model model : models) 
-		{
-			PhymlSingleModel psm = new PhymlSingleModel(model, current, false, options);
-			psm.addObserver(this);
-			c.add(Executors.callable(psm));
-
-			current++;
-		}
-
+	{		
 		boolean errorsFound = false;
+        if (options.isClusteringSearch()) 
+        {
+            List<Model> evaluatedModels = new ArrayList<Model>();
+                
+            evaluatedModels.add(gtrModel);
+            Model globalBestModel = gtrModel;
+            if (gtrModel == null) 
+            {
+                globalBestModel = models[models.length - 1];
+            }
+            
+            double globalBestScore = Double.MAX_VALUE;
+            for (int groups=6; groups>0; groups--) 
+            {
+            	double bestScore = Double.MAX_VALUE;
+                String partition = globalBestModel==null ? "012345" : globalBestModel.getPartition();
+                Model[] currentModels = GuidedSearchManager.getModelsSubset(models, partition, groups, modelTest);
+
+                currentStage = 7 - groups;
+                numModelsInStage = currentModels.length;
+                        
+                if (currentModels.length > 0) 
+                {
+                    // Optimize the current models
+                    Model bestModel = currentModels[0];
+                    errorsFound |= !parallelExecute(currentModels, false);
+                                
+                    for (Model model : currentModels) 
+                    {
+                        double currentScore = Double.MAX_VALUE - 1.0;
+                        switch (options.getHeuristicInformationCriterion()) 
+                        {
+                            case InformationCriterion.IC_AIC:
+                                currentScore = AIC.computeAic(model, options);
+                                break;
+                            case InformationCriterion.IC_BIC:
+                                currentScore = BIC.computeBic(model, options);
+                                break;
+                            case InformationCriterion.IC_AICc:
+                                currentScore = AICc.computeAicc(model, options);
+                                break;
+                        }
+                        if (currentScore < bestScore) 
+                        {
+                            bestModel = model;
+                            bestScore = currentScore;
+                        }
+                    }
+                        
+                    // Check LnL
+                    if (globalBestModel.getLnL()>0 && bestScore > globalBestScore) 
+                    {
+                        // End of algorithm
+                        break;
+                    }
+                    else 
+                    {
+                    	globalBestModel = bestModel;
+                        globalBestScore = bestScore;
+                    }
+                }
+            }
+            
+            modelTest.purgeModels();
+        }
+        else 
+        {
+            errorsFound = !parallelExecute(models, false);
+		}
+        
+        if (errorsFound) 
+        {
+            notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_INTERRUPTED, models.length, null, null);
+            return "Interrupted";
+        }
+        else 
+        {
+            notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_OK, models.length, null, null);
+        }
+
+        return "All Done";
+	} // doPhyml
+        
+	@Override
+	protected boolean parallelExecute(Model models[], boolean ignoreGaps) 
+	{
+        Collection<Callable<Object>> c = new ArrayList<Callable<Object>>();
+        int current = 0;
+        for (Model model : models) 
+        {
+            if (model != null) 
+            {
+                PhymlSingleModel psm = new PhymlSingleModel(model, current, false, ignoreGaps, options);
+                psm.addObserver(this);
+                c.add(Executors.callable(psm));
+
+                current++;
+            }
+        }	
 
 		Collection<Future<Object>> futures = null;
 		try 
@@ -90,34 +177,24 @@ public class RunPhymlThread extends RunPhyml
 				}
 				catch (InterruptedException ex) 
 				{
-					errorsFound = true;
 					notifyObservers(ProgressInfo.INTERRUPTED, 0, null, null);
 					ex.printStackTrace();
-					return "Interrupted";
+					return false;
 				}
 				catch (ExecutionException ex) 
 				{
 					// Internal exception while computing model.
 					// Let's continue with errors
-					errorsFound = true;
 					ex.printStackTrace();
-					return "Interrupted";
+					return false;
 				}
 			}
 		}
 
-		if (!errorsFound) 
-		{
-			notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_OK, models.length, null, null);
-		}
-		else 
-		{
-			notifyObservers(ProgressInfo.OPTIMIZATION_COMPLETED_INTERRUPTED, models.length,	null, null);
-		}
+		return true;
+	}
 
-		return "All Done";
-	} // doPhyml
-
+	@Override
 	public void interruptThread() 
 	{
 		super.interruptThread();
@@ -134,6 +211,11 @@ public class RunPhymlThread extends RunPhyml
 			if (info.getType() == ProgressInfo.ERROR) 
 			{
 				interruptThread();
+			}
+			else if (options.isClusteringSearch()) 
+			{
+				info.setHeuristicStage(currentStage);
+				info.setNumModelsInStage(numModelsInStage);
 			}
 		}
 		super.update(o, arg);

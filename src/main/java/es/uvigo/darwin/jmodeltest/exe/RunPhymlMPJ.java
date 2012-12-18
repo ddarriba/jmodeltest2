@@ -125,7 +125,7 @@ public class RunPhymlMPJ extends RunPhyml
 			{
 				// compute
 				myModels.add(model);
-				PhymlSingleModel runenv = new PhymlSingleModel(model, 0, false, options);
+				PhymlSingleModel runenv = new PhymlSingleModel(model, 0, false, false, options);
 				runenv.addObserver(this);
 
 				if (!runenv.compute())
@@ -148,7 +148,7 @@ public class RunPhymlMPJ extends RunPhyml
 	{
 		if (ModelTest.MPJ_ME == 0) 
 		{
-			printSettings(modelTest.getMainConsole());
+			printSettings();
 
 			// TODO: Send topology to each processor
 			// estimate a NJ-JC tree if needed
@@ -156,7 +156,7 @@ public class RunPhymlMPJ extends RunPhyml
 			{
 				notifyObservers(ProgressInfo.BASE_TREE_INIT, 0, models[0], null);
 
-				PhymlSingleModel jcModel = new PhymlSingleModel(models[0], 0, true, options);
+				PhymlSingleModel jcModel = new PhymlSingleModel(models[0], 0, true, false, options);
 				jcModel.run();
 
 				// create JCtree file

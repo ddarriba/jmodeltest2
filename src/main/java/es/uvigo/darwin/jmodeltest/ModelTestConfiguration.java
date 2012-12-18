@@ -1,5 +1,6 @@
 package es.uvigo.darwin.jmodeltest;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -12,6 +13,9 @@ public abstract class ModelTestConfiguration {
     public static final String DEFAULT_EXE_DIR = "exe/phyml";
     public static final String DEFAULT_LOG_DIR = "log";
     public static final boolean DEFAULT_GLOBAL_PHYML = false;
+    
+    private static final String JAR_PATH = ModelTest.class.getProtectionDomain().getCodeSource().getLocation().getFile().replace(ModelTest.class.getName().replaceAll("\\.", "/"), "");
+    public static final String PATH = JAR_PATH.replaceFirst(new File(JAR_PATH).getName(),"");
     
     public static final String AUTO_LOG = "auto-logging";
     public static final String LOG_DIR = "log-dir";

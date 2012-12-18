@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011  Diego Darriba, David Posada
+Copyright (C) 2011  Diego 0Darriba, David Posada
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package es.uvigo.darwin.jmodeltest.selection;
 
 import java.util.Random;
 
+import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
@@ -40,45 +41,40 @@ public class AICc extends InformationCriterion {
 	public void compute() {
 
 		boolean sorted;
-		int i, temp2, pass, K;
-		double[] tempw = new double[options.numModels];
+		int temp2, pass;
+		double[] tempw = new double[options.getNumModels()];
 		double min, sumExp, cum, temp1;
 
 		// Calculate AICc and minAICc
-		if (options.countBLasParameters)
-			K = models[0].getK();
-		else
-			K = models[0].getK() - options.numBranches;
+		min = computeAicc(models[0], options);
 
-		min = 2 * (models[0].getLnL() + K)
-				+ (2 * K * (K + 1) / (double) (options.sampleSize - K - 1));
-
+		if (doCheckAgainstULK) {
+			unconstrainedModel.setAICc(computeSingle(unconstrainedModel));
+		}
+		
 		minModel = models[0];
-		for (i = 0; i < numModels; i++) {
-			if (options.countBLasParameters)
-				K = models[i].getK();
-			else
-				K = models[i].getK() - options.numBranches;
-
-			models[i].setAICc(2
-					* (models[i].getLnL() + K)
-					+ (2 * K * (K + 1) / (double) (options.sampleSize - K - 1)));
-
-			if (models[i].getAICc() < min) {
-				min = models[i].getAICc();
-				minModel = models[i];
+		for (Model model : models) {
+			model.setAICc(computeAicc(model, options));
+			
+			if (model.getAICc() < min) {
+				min = model.getAICc();
+				minModel = model;
+			}
+			
+			if (doCheckAgainstULK) {
+				model.setUAICcd(model.getAICc() - unconstrainedModel.getAICc());
 			}
 		}
 
 		// Calculate Akaike differences
 		sumExp = 0;
-		for (i = 0; i < numModels; i++) {
+		for (int i = 0; i < numModels; i++) {
 			models[i].setAICcd(models[i].getAICc() - minModel.getAICc());
 			sumExp += Math.exp(-0.5 * models[i].getAICcd());
 		}
 
 		// Calculate Akaike weights
-		for (i = 0; i < numModels; i++) {
+		for (int i = 0; i < numModels; i++) {
 			if (models[i].getAICcd() > 1000)
 				models[i].setAICcw(0.0);
 			else
@@ -92,7 +88,7 @@ public class AICc extends InformationCriterion {
 		pass = 1;
 		while (!sorted) {
 			sorted = true;
-			for (i = 0; i < (numModels - pass); i++)
+			for (int i = 0; i < (numModels - pass); i++)
 				if (tempw[i] > tempw[i + 1]) {
 					temp1 = tempw[i + 1];
 					tempw[i + 1] = tempw[i];
@@ -108,7 +104,7 @@ public class AICc extends InformationCriterion {
 		}
 
 		cum = 0;
-		for (i = 0; i < numModels; i++) {
+		for (int i = 0; i < numModels; i++) {
 			cum += models[order[i]].getAICcw();
 			models[order[i]].setCumAICcw(cum);
 		}
@@ -126,6 +122,32 @@ public class AICc extends InformationCriterion {
 
 	}
 
+	public double computeSingle(Model model) {
+		return computeAicc(model, options);
+	}
+		
+	public static double computeAicc(Model model, ApplicationOptions options) {
+		int K;
+		if (options.countBLasParameters)
+			K = model.getK();
+		else
+			K = model.getK() - options.getNumBranches();
+		
+		return 2 * (model.getLnL() + K)
+					+ (2 * K * (K + 1) / (double) (options.getSampleSize() - K - 1));
+	}
+	
+	public static double computeAicc(double lnL, int k, ApplicationOptions options) {
+		int K;
+		if (options.countBLasParameters)
+			K = k;
+		else
+			K = k - options.getNumBranches();
+		
+		return 2 * (lnL + K)
+						+ (2 * K * (K + 1) / (double) (options.getSampleSize() - K - 1));
+	}
+		
 	protected void printHeader(TextOutputStream stream) {
 		stream.println("\n\n\n---------------------------------------------------------------");
 		stream.println("*                                                             *");
@@ -135,7 +157,6 @@ public class AICc extends InformationCriterion {
 	}
 	
 	protected void printFooter(TextOutputStream stream) {
-		stream.println("\n------------------------------------------------------------------------");
 		stream.println("-lnL:\tnegative log likelihod");
 		stream.println(" K:\tnumber of estimated parameters");
 		stream.println(" AICc:\tCorrected Akaike Information Criterion");
@@ -234,13 +255,26 @@ public class AICc extends InformationCriterion {
 	}
 	
 	@Override
+	public double getUDelta(Model m) {
+		return m.getUAICcd();
+	}
+		
+	@Override
+	public double setUDelta(Model m) {
+		m.setUAICcd(computeAicc(m.getLnLIgnoringGaps(), m.getK(), options)
+				- computeAicc(unconstrainedModel.getLnL(),
+						unconstrainedModel.getK(), options));
+		return m.getUAICcd();
+	}
+	
+	@Override
 	public double getCumWeight(Model m) {
 		return m.getCumAICcw();
 	}
 	
 	@Override
 	public int getType() {
-		return AICc;
+		return IC_AICc;
 	}
 
 } // class AICc

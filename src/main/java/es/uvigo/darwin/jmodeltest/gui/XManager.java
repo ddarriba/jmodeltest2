@@ -110,7 +110,7 @@ public class XManager {
 					new DocumentOutputStream(PANE.getDocument()))));
 
 			modelTest.setCurrentOutStream(modelTest.getMainConsole());
-			ModelTest.printHeader(modelTest.getMainConsole());
+			ModelTest.printHeader(modelTest.getMainConsole(), false);
 			ModelTest.printNotice(modelTest.getMainConsole());
 			ModelTest.printCitation(modelTest.getMainConsole());
 

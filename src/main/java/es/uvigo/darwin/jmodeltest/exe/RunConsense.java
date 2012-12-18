@@ -54,7 +54,6 @@ public class RunConsense {
 	private int[] order;
 	private double confidenceInterval;
 	private Vector<Model> confidenceModels;
-	private double cumWeigth;
 
 	private double[] w;
 	private double[] cumw;
@@ -128,16 +127,16 @@ public class RunConsense {
 				double weight;
 				// set criterion
 				switch (criterion.getType()) {
-				case InformationCriterion.AIC:
+				case InformationCriterion.IC_AIC:
 					weight = m.getAICw();
 					break;
-				case InformationCriterion.AICc:
+				case InformationCriterion.IC_AICc:
 					weight = m.getAICcw();
 					break;
-				case InformationCriterion.BIC:
+				case InformationCriterion.IC_BIC:
 					weight = m.getBICw();
 					break;
-				case InformationCriterion.DT:
+				case InformationCriterion.IC_DT:
 					weight = m.getDTw();
 					break;
 				default:
@@ -178,7 +177,6 @@ public class RunConsense {
 	private void buildConfidenceInterval() {
 		int i;
 		Model tmodel;
-		cumWeigth = 0;
 		tmodel = model[0];
 
 		order = criterion.order;
@@ -199,7 +197,6 @@ public class RunConsense {
 				isInInterval[i] = true;
 				confidenceModels.add(tmodel);
 			}
-			cumWeigth = 1.0;
 		} else {
 			for (i = 0; i < numModels; i++) {
 				tmodel = model[order[i]];
@@ -210,7 +207,6 @@ public class RunConsense {
 				if (cumw[i] <= confidenceInterval) {
 					isInInterval[i] = true;
 					confidenceModels.add(tmodel);
-					cumWeigth += w[i];
 				} else
 					break;
 			}
@@ -225,7 +221,6 @@ public class RunConsense {
 			if (randomNumber <= probIn) {
 				isInInterval[i] = true;
 				confidenceModels.add(tmodel);
-				cumWeigth += w[i];
 			} else
 				isInInterval[i] = false;
 		}
@@ -260,7 +255,7 @@ public class RunConsense {
 		stream.println("*                                                             *");
 		stream.println("---------------------------------------------------------------");
 
-		if (criterion.getType() == InformationCriterion.DT)
+		if (criterion.getType() == InformationCriterion.IC_DT)
 			Utilities
 					.printRed("\nWarning: The DT weights used for this model averaged phylogeny are very gross"
 							+ " and should be used with caution. See the program documentation.\n", modelTest);
