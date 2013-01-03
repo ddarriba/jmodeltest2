@@ -15,8 +15,7 @@ public abstract class ModelTestConfiguration {
     public static final boolean DEFAULT_GLOBAL_PHYML = false;
     
     private static final String JAR_PATH = ModelTest.class.getProtectionDomain().getCodeSource().getLocation().getFile()
-			.replace(ModelTest.class.getName()
-					.replaceAll("\\.", "/"), "");
+    		.replace("%20", " ");
     public static final String PATH = JAR_PATH.replaceFirst(new File(JAR_PATH).getName(),"");
     
     public static final String AUTO_LOG = "auto-logging";
