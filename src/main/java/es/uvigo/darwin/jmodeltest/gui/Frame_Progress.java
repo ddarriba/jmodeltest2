@@ -72,7 +72,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	private static final int BUTTON_WIDTH = 100;
 	private static final int THREAD_LABEL_WIDTH = 80;
 
-	private static final String NO_MODEL = "iddle";
+	private static final String NO_MODEL = "idle";
 
 	private static final Color[] THREAD_COLOR = { new Color(177, 68, 68),
 			new Color(177, 68, 161), new Color(126, 68, 177),
