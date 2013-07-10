@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 package es.uvigo.darwin.jmodeltest.selection;
 
 import java.util.ArrayList;
@@ -22,6 +22,7 @@ import java.util.List;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
+import es.uvigo.darwin.jmodeltest.exe.PhymlSingleModel;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
@@ -29,14 +30,14 @@ import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 public abstract class InformationCriterion {
 
 	protected ApplicationOptions options = ApplicationOptions.getInstance();
-	
-	public static final int IC_AIC  = 1;
+
+	public static final int IC_AIC = 1;
 	public static final int IC_AICc = 2;
-	public static final int IC_BIC  = 3;
-	public static final int IC_DT   = 4;
-	
-	private static final String[] names = {"", "AIC", "AICc", "BIC", "DT"};
-	
+	public static final int IC_BIC = 3;
+	public static final int IC_DT = 4;
+
+	private static final String[] names = { "", "AIC", "AICc", "BIC", "DT" };
+
 	public int[] order;
 	protected int numModels;
 	protected Model[] models;
@@ -47,7 +48,7 @@ public abstract class InformationCriterion {
 	protected List<Model> confidenceModels;
 	protected double cumWeight;
 	protected Model minModel;
-	
+
 	protected boolean doCheckAgainstULK;
 	protected Model unconstrainedModel;
 
@@ -63,9 +64,9 @@ public abstract class InformationCriterion {
 	public List<Model> getConfidenceModels() {
 		return confidenceModels;
 	}
-	
-	public InformationCriterion(boolean mwritePAUPblock, boolean mdoImportances,
-			boolean mdoModelAveraging, double minterval) {
+
+	public InformationCriterion(boolean mwritePAUPblock,
+			boolean mdoImportances, boolean mdoModelAveraging, double minterval) {
 		List<Model> modelList = new ArrayList<Model>();
 		for (Model model : ModelTest.getCandidateModels()) {
 			if (model.getLnL() > 0) {
@@ -80,19 +81,20 @@ public abstract class InformationCriterion {
 		doModelAveraging = mdoModelAveraging;
 		confidenceInterval = minterval;
 		confidenceModels = new ArrayList<Model>();
-		
-		doCheckAgainstULK = (getType() != IC_DT && 
-				(options.getNumPatterns() > 0) &&
-				(options.getUnconstrainedLnL() > 1e-10));
-		
+
+		doCheckAgainstULK = (getType() != IC_DT
+				&& (options.getNumPatterns() > 0) && (options
+				.getUnconstrainedLnL() > 1e-10));
+
 		if (doCheckAgainstULK) {
-			unconstrainedModel = new Model(numModels, "UModel", "-", 
+			unconstrainedModel = new Model(numModels, "UModel", "-",
 					options.getNumPatterns() - 1);
 			unconstrainedModel.setLnL(options.getUnconstrainedLnL());
 		}
 	}
+
 	/**************************************************************
-	 * parameterImportance 
+	 * parameterImportance
 	 * 
 	 * Calculates the importance for each parameter
 	 * 
@@ -143,7 +145,7 @@ public abstract class InformationCriterion {
 					iRe += weight;
 				iRf += weight;
 			}
-			
+
 			/* rate variation */
 			if (tmodel.ispI() && !tmodel.ispG()) {
 				ipinvI += weight;
@@ -155,10 +157,10 @@ public abstract class InformationCriterion {
 			}
 		}
 	}
-	
+
 	/************************************************************
 	 * averageModels
-	 *  
+	 * 
 	 * Calculates the model averaged estimates
 	 * 
 	 * Assumes K81,TrN,TIM,TVMSIM, GRT estimate all rate parametes Ra-Rf
@@ -273,7 +275,7 @@ public abstract class InformationCriterion {
 		if (ipinvIG < minWeight)
 			apinvIG = NA;
 	}
-	
+
 	public double getAfA() {
 		return afA;
 	}
@@ -401,11 +403,11 @@ public abstract class InformationCriterion {
 	public double getAfC() {
 		return afC;
 	}
-		
+
 	public Model getMinModel() {
 		return minModel;
 	}
-	
+
 	@Override
 	public String toString() {
 		switch (getType()) {
@@ -424,7 +426,7 @@ public abstract class InformationCriterion {
 	public Model getModel(int i) {
 		return models[order[i]];
 	}
-	
+
 	public void print(TextOutputStream stream) {
 		int i, j;
 		String criterion = names[getType()];
@@ -440,30 +442,32 @@ public abstract class InformationCriterion {
 			ModelTest.WritePaupBlock(stream, criterion, minModel);
 
 		// print ML tree for best-fit model
-		if (options.optimizeMLTopology) {
-			stream.println(" ");
-			stream.println("ML tree (NNI) for the best "+criterion+" model = "
-					+ minModel.getTreeString());
-		}
+		stream.println(" ");
+		stream.println("Tree for the best " + criterion + " model = "
+				+ minModel.getTreeString());
 
 		// update unconstrained model
 		if (unconstrainedModel != null) {
 			unconstrainedModel.setLnL(minModel.getUnconstrainedLnL());
 		}
-		
+
 		// print weights
-		stream.println(" ");stream.println(" ");
-		stream.println("* "+criterion+" MODEL SELECTION : Selection uncertainty");
 		stream.println(" ");
-		stream.printf("Model             -lnL    K        %4s      delta      weight cumWeight", criterion);
+		stream.println(" ");
+		stream.println("* " + criterion
+				+ " MODEL SELECTION : Selection uncertainty");
+		stream.println(" ");
+		stream.printf(
+				"Model             -lnL    K        %4s      delta      weight cumWeight",
+				criterion);
 		if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
 			stream.println("       uDelta");
 		} else {
 			stream.println("");
 		}
-		stream.print  ("------------------------------------------------------------------------");
+		stream.print("------------------------------------------------------------------------");
 		if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
-			stream.print  ("-------------");
+			stream.print("-------------");
 		}
 		for (i = 0; i < numModels; i++) {
 			j = order[i];
@@ -474,7 +478,8 @@ public abstract class InformationCriterion {
 			if (options.countBLasParameters)
 				stream.printf("   %2d", models[j].getK());
 			else
-				stream.printf("  %2d", models[j].getK() - options.getNumBranches());
+				stream.printf("  %2d",
+						models[j].getK() - options.getNumBranches());
 			stream.printf("  %10.4f", getValue(models[j]));
 			stream.printf("  %9.4f", getDelta(models[j]));
 			if (getWeight(models[j]) > 0.0001)
@@ -485,7 +490,7 @@ public abstract class InformationCriterion {
 			if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
 				if (!options.isAmbiguous()) {
 					stream.printf("   %10.4f", getUDelta(models[j]));
-				} else if (i==0){
+				} else if (i == 0) {
 					stream.printf("   %10.4f", setUDelta(models[j]));
 				} else {
 					stream.print("            -");
@@ -494,11 +499,11 @@ public abstract class InformationCriterion {
 		}
 		stream.print("\n------------------------------------------------------------------------");
 		if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
-			stream.print  ("-------------");
+			stream.print("-------------");
 		}
 		stream.println("");
 		printFooter(stream);
-		
+
 		Utilities.toConsoleEnd();
 
 		// indicate table availability
@@ -508,11 +513,12 @@ public abstract class InformationCriterion {
 		}
 
 		// print confidence set
-		stream.println(" ");stream.println(" ");
-		stream.println("* "+criterion+" MODEL SELECTION : Confidence interval");
 		stream.println(" ");
-		stream.print("There are " + confidenceModels.size()
-				+ " models in the ");
+		stream.println(" ");
+		stream.println("* " + criterion
+				+ " MODEL SELECTION : Confidence interval");
+		stream.println(" ");
+		stream.print("There are " + confidenceModels.size() + " models in the ");
 		stream.printf("%.0f% ", confidenceInterval * 100);
 		stream.print("confidence interval: [ ");
 		for (Model m : confidenceModels) {
@@ -522,8 +528,10 @@ public abstract class InformationCriterion {
 
 		// print parameter importances
 		if (doImportances) {
-			stream.println(" ");stream.println(" ");
-			stream.println("* "+criterion+" MODEL SELECTION : Parameter importance");
+			stream.println(" ");
+			stream.println(" ");
+			stream.println("* " + criterion
+					+ " MODEL SELECTION : Parameter importance");
 			stream.println(" ");
 			stream.println("Parameter   Importance");
 			stream.print("----------------------");
@@ -558,8 +566,10 @@ public abstract class InformationCriterion {
 
 		// print model averaging
 		if (doModelAveraging) {
-			stream.println(" ");stream.println(" ");
-			stream.println("* "+criterion+" MODEL SELECTION : Model averaged estimates");
+			stream.println(" ");
+			stream.println(" ");
+			stream.println("* " + criterion
+					+ " MODEL SELECTION : Model averaged estimates");
 			stream.println(" ");
 			stream.println("           Model-averaged");
 			stream.println("Parameter       estimates");
@@ -593,29 +603,51 @@ public abstract class InformationCriterion {
 			stream.println(" (IG): considers only +I+G models.");
 		}
 
+		stream.println(" ");
+		stream.println(" ");
+		stream.println("* " + criterion
+				+ " MODEL SELECTION : Best Model's command line");
+		stream.println(" ");
+		stream.println("phyml "
+				+ PhymlSingleModel.writePhyml3CommandLine(getMinModel(), false,
+						options, false, -1));
 		if (getValue(minModel) < 0.0) {
 			stream.println(" ");
 			stream.println("WARNING! Criterion has negative values. Please check whether your sample size is big enough compared to the number of parameters (K)");
 		}
 	}
 
-	public int getNumModels() { return numModels; }
-	
+	public int getNumModels() {
+		return numModels;
+	}
+
 	public abstract void compute();
+
 	public abstract double computeSingle(Model model);
-	
-	//public abstract void print (TextOutputStream stream);
-	public abstract void buildConfidenceInterval ();
+
+	// public abstract void print (TextOutputStream stream);
+	public abstract void buildConfidenceInterval();
+
 	public abstract double getMinModelValue();
+
 	public abstract double getMinModelWeight();
+
 	public abstract double getValue(Model m);
+
 	public abstract double getDelta(Model m);
+
 	public abstract double getUDelta(Model m);
+
 	public abstract double setUDelta(Model m);
+
 	public abstract double getWeight(Model m);
+
 	public abstract double getCumWeight(Model m);
+
 	protected abstract void printHeader(TextOutputStream stream);
+
 	protected abstract void printFooter(TextOutputStream stream);
-	public abstract int getType(); 
-	
+
+	public abstract int getType();
+
 }
