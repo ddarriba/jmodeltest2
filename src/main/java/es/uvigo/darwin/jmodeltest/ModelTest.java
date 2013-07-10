@@ -1017,6 +1017,9 @@ public class ModelTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		// add default IC
+		options.doBIC |= !(options.doAIC || options.doAICc || options.doDT);
 	}
 
 	/****************************
