@@ -18,7 +18,8 @@ public abstract class ModelTestConfiguration {
     		.replace("%20", " ");
     public static final String PATH = JAR_PATH.replaceFirst(new File(JAR_PATH).getName(),"");
     
-    public static final String AUTO_LOG = "auto-logging";
+    public static final String HTML_LOG = "html-logging";
+    public static final String PHYML_LOG = "phyml-logging";
     public static final String LOG_DIR = "log-dir";
     public static final String EXE_DIR = "exe-dir";
     public static final String GLOBAL_PHYML_EXE = "global-phyml-exe";
@@ -52,8 +53,12 @@ public abstract class ModelTestConfiguration {
     	return (propValue != null && propValue.equalsIgnoreCase("true"));
     }
     
-    public static boolean isAutoLogEnabled() {
-    	return getProperty(AUTO_LOG).equalsIgnoreCase("enabled");
+    public static boolean isHtmlLogEnabled() {
+    	return getProperty(HTML_LOG).equalsIgnoreCase("enabled");
+    }
+    
+    public static boolean isPhymlLogEnabled() {
+    	return getProperty(PHYML_LOG).equalsIgnoreCase("enabled");
     }
     
     public static String getLogDir() {

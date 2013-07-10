@@ -137,13 +137,23 @@ public class ApplicationOptions implements Serializable {
 
 	private ApplicationOptions() {
 		try {
-			logFile = File.createTempFile("jmodeltest-phyml", ".log");
-			logFile.deleteOnExit();
+			if (ModelTestConfiguration.isPhymlLogEnabled()) {
+				logFile = File.createTempFile("jmodeltest-phyml", ".log", new File(ModelTestConfiguration.getLogDir()));
+			} else {
+				logFile = File.createTempFile("jmodeltest-phyml", ".log");
+				logFile.deleteOnExit();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+	public void deleteLogFile() {
+		if (!ModelTestConfiguration.isPhymlLogEnabled()) {
+			logFile.delete();
+		}
+	}
+	
 	// This method copies the input files into the scratch.
 	// It is important to speed up the I/O in distributed memory.
 	public void buildWorkFiles() throws IOException {

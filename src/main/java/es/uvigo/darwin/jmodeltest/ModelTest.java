@@ -85,7 +85,7 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.1.3";
+	public static final String CURRENT_VERSION = "2.1.4";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
@@ -454,7 +454,7 @@ public class ModelTest {
 
 			}
 
-			if (ModelTestConfiguration.isAutoLogEnabled()) {
+			if (ModelTestConfiguration.isHtmlLogEnabled()) {
 				HtmlReporter.buildReport(options,
 						ModelTest.getCandidateModels(), null, treeSummary);
 			}
