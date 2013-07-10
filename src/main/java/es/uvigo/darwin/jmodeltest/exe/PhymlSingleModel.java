@@ -96,21 +96,22 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	public boolean compute() {
 		if (model.getLnL() < 1e-5 || ignoreGaps) {
 			// run phyml
-			notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index, model,
-					null);
-	
+			notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index,
+					model, null);
+
 			startTime = System.currentTimeMillis();
-	
-			writePhyml3CommandLine(model, justGetJCTree);
+
+			commandLine = writePhyml3CommandLine(model, justGetJCTree, options,
+					ignoreGaps, numberOfThreads);
 			executeCommandLine();
 			if (!interrupted) {
 				parsePhyml3Files(model);
 			}
-	
+
 			endTime = System.currentTimeMillis();
-	
+
 			model.setComputationTime(endTime - startTime);
-	
+
 			// completed
 			if (!interrupted) {
 				int value = 0;
@@ -119,9 +120,10 @@ public class PhymlSingleModel extends Observable implements Runnable {
 				} else {
 					value = ProgressInfo.VALUE_REGULAR_OPTIMIZATION;
 				}
-				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED, value,
-						model, Utilities.calculateRuntime(startTime, endTime));
-	
+				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED,
+						value, model,
+						Utilities.calculateRuntime(startTime, endTime));
+
 			}
 		}
 		return !interrupted;
@@ -137,8 +139,9 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	 * line for Phyml3 * * *
 	 ***********************************************************************/
 
-	private void writePhyml3CommandLine(Model currentModel,
-			boolean justGetJCtree) {
+	public static String writePhyml3CommandLine(Model currentModel,
+			boolean justGetJCtree, ApplicationOptions options,
+			boolean ignoreGaps, int numberOfThreads) {
 
 		StringBuilder sb = new StringBuilder();
 
@@ -158,7 +161,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			sb.append(" --no_gap");
 		}
 		// set execution id
-		sb.append(" --run_id ").append(model.getName());
+		sb.append(" --run_id ").append(currentModel.getName());
 
 		// set custom model
 		sb.append(" -m ").append(currentModel.getPartition());
@@ -236,7 +239,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 									// lengthss
 		} // use ML optimized tree for each model
 
-		commandLine = sb.toString();
+		return sb.toString();
 	}
 
 	/***************************
@@ -334,31 +337,30 @@ public class PhymlSingleModel extends Observable implements Runnable {
 				while ((line = phymlStatFile.readLine()) != null) {
 					if (line.length() > 0) {
 						if (line.startsWith(". Log-likelihood")) {
-							currentModel
-									.setLnLIgnoringGaps((-1.0)
-											* Double.parseDouble(Utilities
-													.lastToken(line)));
+							currentModel.setLnLIgnoringGaps((-1.0)
+									* Double.parseDouble(Utilities
+											.lastToken(line)));
 						} else if (line.contains("Unconstrained likelihood")) {
 							double unconstrainedLnL = (-1.0)
-									* Double.parseDouble(Utilities.lastToken(line));
+									* Double.parseDouble(Utilities
+											.lastToken(line));
 							currentModel.setUnconstrainedLnL(unconstrainedLnL);
 							if (Math.abs(options.getUnconstrainedLnL()
-										- unconstrainedLnL) > 1e-10) {
+									- unconstrainedLnL) > 1e-10) {
 								// uLK has changed!!!
 								// temporary uLK is updated
 								options.setUnconstrainedLnL(unconstrainedLnL);
 							}
-						} 
+						}
 					}
 				}
 			} else {
 				while ((line = phymlStatFile.readLine()) != null) {
 					if (line.length() > 0) {
 						if (line.startsWith(". Log-likelihood")) {
-							currentModel
-									.setLnL((-1.0)
-											* Double.parseDouble(Utilities
-													.lastToken(line)));
+							currentModel.setLnL((-1.0)
+									* Double.parseDouble(Utilities
+											.lastToken(line)));
 							if (showParsing)
 								System.err.println("Reading lnL = "
 										+ currentModel.getLnL());
@@ -372,8 +374,9 @@ public class PhymlSingleModel extends Observable implements Runnable {
 									System.err.println("Reading numGammaCat = "
 											+ currentModel.getNumGammaCat());
 								line = phymlStatFile.readLine();
-								currentModel.setShape(Double.parseDouble(Utilities
-										.lastToken(line)));
+								currentModel
+										.setShape(Double.parseDouble(Utilities
+												.lastToken(line)));
 								if (showParsing)
 									System.err.println("Reading shape = "
 											+ currentModel.getShape());
@@ -414,9 +417,11 @@ public class PhymlSingleModel extends Observable implements Runnable {
 										+ currentModel.getPinv());
 						} else if (line.contains("Unconstrained likelihood")) {
 							double unconstrainedLnL = (-1.0)
-									* Double.parseDouble(Utilities.lastToken(line));
+									* Double.parseDouble(Utilities
+											.lastToken(line));
 							if (!options.isAmbiguous()) {
-								currentModel.setUnconstrainedLnL(unconstrainedLnL);
+								currentModel
+										.setUnconstrainedLnL(unconstrainedLnL);
 							} else {
 								currentModel.setUnconstrainedLnL(0.0d);
 							}
@@ -431,8 +436,10 @@ public class PhymlSingleModel extends Observable implements Runnable {
 								}
 							}
 							if (showParsing)
-								System.err.println("Reading unconstrained logLK = "
-										+ currentModel.getUnconstrainedLnL());
+								System.err
+										.println("Reading unconstrained logLK = "
+												+ currentModel
+														.getUnconstrainedLnL());
 						} else if (line
 								.startsWith(". GTR relative rate parameters")) {
 							line = phymlStatFile.readLine();
@@ -470,7 +477,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 								System.err.println("Reading Rf = "
 										+ currentModel.getRf());
 							}
-							// with custom models phyml does not provide a ti/tv, so
+							// with custom models phyml does not provide a
+							// ti/tv, so
 							// we
 							// calculate it from the rate parameters
 							// note this is kappa and we need to transform it to
