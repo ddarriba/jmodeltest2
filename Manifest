@@ -1,0 +1,5 @@
+Main-Class: es.uvigo.darwin.jmodeltest.ModelTest
+Class-Path: lib/appframework-1.0.3.jar lib/prottest-3.0.jar lib/mpj.
+ jar lib/pal.jar lib/alter.jar lib/swing-worker-1.1.jar.
+ jar lib/readseq.jar lib/freemarker.jar lib/BrowserLauncher2-all-1_3.
+ jar lib/jfreechart-1.0.14.jar lib/jcommon-1.0.17.jar

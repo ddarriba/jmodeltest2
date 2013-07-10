@@ -1,0 +1,372 @@
+-----------------------------------------------------------------------------
+jModelTest 2.1.3 Readme -	Mar/6/2013
+
+Diego Darriba (ddarriba@udc.es)
+Guillermo L. Taboada (taboada@udc.es)
+Ramon Doallo (doallo@udc.es)
+David Posada (dposada@uvigo.es)
+
+(c) Phylogenomics, Universidade de Vigo, Vigo, Spain
+(c) Grupo de Arquitectura de Computadores, UDC, A Coruna, Spain
+
+Project homepage:       http://code.google.com/p/jmodeltest2
+Extended documentation: http://code.google.com/p/jmodeltest2/wiki/GettingStarted
+Discussion group:       http://groups.google.com/group/jmodeltest
+
+When using jModelTest you should cite all these:
+
+Darriba D, Taboada GL, Doallo R, Posada D. 2012. jModelTest 2: more models, 
+new heuristics and parallel computing. Nature Methods 9(8), 772.
+
+Guindon S and Gascuel O (2003). A simple, fast and accurate method to estimate 
+large phylogenies by maximum-likelihood". Systematic Biology 52: 696-704. 
+
+-----------------------------------------------------------------------------
+
+TOC
+
+0. Quick Start
+1. Introduction
+2. Installation
+3. Structure
+4. How to run
+  4.1. Console execution
+    4.1.1. Sequential execution
+    4.1.2. Multithread execution
+    4.1.3. Cluster execution
+    4.1.4. Cluster hybrid execution
+  4.2. Graphical user interface execution
+5. Frequently Asked Questions
+
+-----------------------------------------------------------------------------
+0. Quick Start
+-----------------------------------------------------------------------------
+
+Console version
+
+$ tar zvxf jmodeltest-2.1-yyyymmdd.tar.gz
+(Linux/Unix/OS X)
+$ export JMODELTEST_HOME=$PWD/jmodeltest2
+(Windows)
+$ set JMODELTEST_HOME=$CWD\jmodeltest2
+$ cd $JMODELTEST_HOME
+$ java -jar jModelTest.jar -d example-data/aP6.fas -f -i -g 4 -s 11 -AIC -a
+
+Graphical version
+
+$ tar zvxf jmodeltest-2.1-yyyymmdd.tar.gz
+(Linux/Unix/OS X)
+$ export JMODELTEST_HOME=$PWD/jmodeltest2
+(Windows)
+$ set JMODELTEST_HOME=$CWD\jmodeltest2
+$ cd $JMODELTEST_HOME
+$ java -jar jModelTest.jar
+
+-----------------------------------------------------------------------------
+1. Introduction
+-----------------------------------------------------------------------------
+
+jModelTest 2 is a High Performance Computing implementation of jModelTest,
+for selection of best-fit models of DNA evolution.
+
+Please, report bugs and enquiries about jModelTest 2 to: ddarriba@udc.es,
+dposada@uvigo.es.
+
+The main page of the jModelTest project is located at
+http://code.google.com/p/jmodeltest2
+
+-----------------------------------------------------------------------------
+2. Installation
+-----------------------------------------------------------------------------
+
+All required software is included in the distributions. For further information, 
+please refer to the 'How to run' section.
+
+-----------------------------------------------------------------------------
+3. Structure
+-----------------------------------------------------------------------------
+
+Inside the jModelTest 2 directory you should find the following structure:
+
+$JMODELTEST_HOME/
+  |
+  |
+  |--conf/
+     # configuration files
+  	 | jmodeltest.conf
+  |--exe/
+     |--phyml/
+        # auxiliary binaries to calculate models likelihood
+        | phyml
+  |--example-data/
+     # some test alignments
+  |--extra/
+     # additional files for distributed memory execution
+     | filecluster8.conf.template  # machines file template for 8 node cluster
+     | machines                    # machines file for cluster execution
+     | mpj.tar.gz                  # MPJ Express distribution
+  |--trees/
+     # some test input trees
+  |
+  | COPYING                     # jModelTest 2 license
+  | jModelTest.jar              # jModelTest package
+  | README                      # this README file
+  | THIRDPARTYLICENSES          # Licenses for the used sources and binaries
+  | runjmodeltest-cluster.sh    # basic script for jModelTest cluster execution
+  | runjmodeltest-gui.sh        # basic script for jModelTest graphical version
+  
+- The external applications should be located on "exe" directory under the 
+jModelTest root, where at least the one which matches your computer architecture
+must exist (named "PhyML_3.0_[ARCH]" or "phyml"). If you prefer to use another
+binaries location or a system-wide installation of phyml (e.g., phyml installed
+through software repositories), just edit conf/jmodeltest.conf file.
+
+-----------------------------------------------------------------------------
+4. How to run
+-----------------------------------------------------------------------------
+
+There are several ways to run jModelTest according to the resources you want
+to use.
+
+It's preferred to use JRE 1.6 to run jModelTest, in fact, the graphical user
+interface will only work with JRE 1.6 or newer version.
+
+You can download the newest version at http://java.sun.com/javase/
+
+-----------------------------------------------------------------------------
+	4.1. Console execution
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+	4.1.1 Sequential execution
+-----------------------------------------------------------------------------
+
+Under command line you can use several parallel executions of jModelTest, but first
+it is important to understand how to run the sequential execution.
+
+These are the parameters of the sequential execution:
+
+     -d: input data file (e.g., -d data.phy)
+     -t: base tree for likelihood calculations (e.g., -t BIONJ)
+         fixed  (common BIONJ-JC topology)
+         BIONJ  (Neighbor-Joining topology)
+         ML     (Maximum Likelihood topology) (default)
+     -u: user tree for likelihood calculations  (e.g., -u data.tre)
+     -o: set output file (e.g., -o jmodeltest.out)
+     -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)
+     -f: include models with unequals base frecuencies (e.g., -f) (default is false)
+     -i: include models with a proportion invariable sites (e.g., -i) (default is false)
+     -g: include models with rate variation among sites and number of categories (e.g., -g 8) 
+         (default is false & 4 categories)
+     -S: tree topology search operation option (NNI (fast), SPR (a bit slower), BEST (best of NNI and SPR)) 
+         (default is BEST)
+     -n: sample size (e.g., -n NxL , or -n 547
+         ALIGNMENT     (number of sites) (default)
+         ALIGNMENT_VAR (number of variable sites)
+         NxL           (number of sites multiplied by number of taxa)
+         SHANNON       (Shannon entropy)
+         SHANNON_NxL   (normalized Shannon entropy multiplied by NxL)
+         [SampleSize]  (user defined value)
+     -AIC: calculate the Akaike Information Criterion (e.g., -AIC) (default is false)
+     -AICc: calculate the corrected Akaike Information Criterion (e.g., -AICc) (default is false)
+     -BIC: calculate the Bayesian Information Criterion (e.g., -BIC) (default is false)
+     -DT: calculate the decision theory criterion (e.g., -DT) (default is false)
+     -p: calculate parameter importances (e.g., -p) (default is false)
+     -v: do model averaging and parameter importances (e.g., -v) (default is false)
+     -c: confidence interval (e.g., -c 90) (default is 100)
+     -w: write PAUP block (e.g., -w) (default is false)
+     -dLRT: do dynamical likelihood ratio tests (e.g., -dLRT)(default is false)
+     -hLRT: do hierarchical likelihood ratio tests (default is false)
+     -O: hypothesis order for the hLRTs (e.g., -hLRT -O gpftv) (default is ftvgp/ftvwgp/ftvwxgp)
+            f=freq, t=titvi, v=2ti4tv(subst=3)/2ti(subst>3), w=2tv, x=4tv, g=gamma, p=pinv
+     -r: backward selection for the hLRT (e.g., -r) (default is forward)
+     -h: confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)
+     -a: estimate model-averaged phylogeny for each active criterion (e.g., -a) (default is false)
+     -z: strict consensus type for model-averaged phylogeny (e.g., -z) (default is majority rule)
+     -G: heuristic search. Requires a threshold > 0 (e.g., -G 0.1)
+     -H: information criterion for clustering search (AIC, AICc, BIC). (e.g., -H AIC) (default is BIC)
+     -uLnL: calculate delta AIC,AICc,BIC against unconstrained likelihood (e.g., -uLnL)
+            (default is false if the input alignment has gaps or ambiguous characters)
+     -tr: number of threads to execute (default is 2)
+     -machinesfile: gets the processors per host from a machines file
+
+Basic execution example:
+
+	$ cd $JMODELTEST_HOME
+	$ java -jar jModelTest.jar -d example-data/aP6.fas -s 11 -i -g 4 -f -BIC -a -tr 1
+
+-----------------------------------------------------------------------------
+	4.1.2 Multithread execution
+-----------------------------------------------------------------------------
+
+By default, jModelTest execution uses all the available cores in the machine,
+but the number of cores can be selected using the "tr" (threads) option.
+
+	$ cd $JMODELTEST_HOME
+	$ java -jar jModelTest.jar -d example-data/aP6.fas -s 11 -i -g 4 -f -BIC -a -tr 2
+
+It is remarkable that the substitution models will not be computed in a specific
+order, so the full output will be shown once all models have been computed. 
+Meanwhile, the main thread will notify each executed model by the standard output.
+
+-----------------------------------------------------------------------------
+	4.1.3 Cluster execution
+-----------------------------------------------------------------------------
+
+1. Besides the multithreading support, it is possible to run jModelTest in 
+a cluster. This support has been implemented using a Java message-passing 
+(MPJ) library, MPJ Express (http://mpj-express.org/). To execute jModelTest 
+in a cluster environment you have to:
+
+$ cd $JMODELTEST_HOME
+$ tar zvxf mpj.tar.gz
+$ export MPJ_HOME=$JMODELTEST_HOME/mpj
+$ export PATH=$MPJ_HOME/bin:$PATH
+
+You can also add the last two lines to ~/.bashrc to automatically set this
+variables at console startup.
+
+2. $JMODELTEST_HOME/machines file contains the set of compute nodes amongst the
+mpj processes will be executed. By default it points to the localhost machine,
+so you should change it if you want to run parallel execution over a cluster
+machine, just writing on each line the compute nodes (e.g. see 
+filecluster8.conf.template).
+
+3. Start the MPJ Express daemons:
+
+$ mpjboot machines
+
+The application "mpjboot" should be in the execution path (it is located at
+$MPJ_HOME/bin). A ssh service must be running in the machines listed in the
+machines file. Moreover, port 10000 should be free. For more details refer to
+the MPJ Express documentation.
+
+4. Run jModelTest. For the execution the jModelTest distribution provides a
+bash script: 'runjmodeltest-cluster.sh'
+
+The basic syntax is:
+	./runjmodeltest-cluster.sh $NUMBER_OF_PROCESSORS $APPLICATION_PARAMETERS
+
+$ ./runjmodeltest-cluster.sh 2 -d example-data/aP6.fas -s 11 -i -g 4 -f -BIC -a
+
+-----------------------------------------------------------------------------
+	4.1.4 Cluster hybrid execution
+-----------------------------------------------------------------------------
+
+This strategy relies on a thread-based implementation of phyml together with the
+distributed memory of jModelTest version. Please request us the thread-based
+phyml source code and further documentation.
+
+-----------------------------------------------------------------------------
+	4.2. Graphical user interface execution
+-----------------------------------------------------------------------------
+
+If you are running jModelTEst on your desktop computer, you'd better use the
+graphical user interface, provided by the package. It will show more clear
+results for the user and will be easier to manipulate them too.
+
+The graphical interface can use a sequential or a shared memory execution
+of the application, so it will be the best choice for running jModelTest on
+a local multicore machine.
+
+$ cd $JMODELTEST_HOME
+$ ./runjmodeltest-gui.sh
+
+-----------------------------------------------------------------------------
+5. Frequently Asked Questions
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+    5.1. I got an error while jModelTest attempts to execute phyml  
+-----------------------------------------------------------------------------
+
+It is possible that jModelTest requires a more recent revision of phyml. Try
+downloading the latest phyml distribution from http://code.google.com/p/phyml,
+or downloading jModelTest package that includes phyml binaries.
+
+If the problem persist, please contact us.
+
+-----------------------------------------------------------------------------
+    5.2. I have already installed phyml. May I use it instead of the binaries
+         included in the jModelTest distribution?  
+-----------------------------------------------------------------------------
+
+If you have installed phyml in your HFS (from your APT repositories), you can
+set the global-phyml-exe variable to true in conf/jmodeltest.conf file:
+
+	##########################################################
+	#                                                        #
+	# Phyml Binaries path                                    #
+	#                                                        #
+	# By default, jModelTest will search for the PhyML       #
+	# executables in $JMODELTEST_HOME/exe/phyml. User can    #
+	# define a different path, wether absolute (starting     #
+	# with '/') or relative to $JMODELTEST_HOME directory    #
+	# using exe-dir property.                                #
+	#                                                        #
+	# If an usable version of PhyML is installed system-wide #
+	# (for example, from the Ubuntu/Debian repositories),    #
+	# the user can set 'global-phyml-exe' property to true   #
+	# and jModelTest will use the global binary instead of   #
+	# local ones.                                            #
+	#                                                        #
+	##########################################################
+	global-phyml-exe    = true
+
+If you don't have phyml in the path but you already have a functional binary
+you can set the exe-dir variable in conf/jmodeltest.conf file:
+
+	global-phyml-exe    = false
+	exe-dir				= PATH_TO_YOUR_PHYML_BINARY
+
+You can also link the binary file from the "exe/phyml" directory:
+
+	$ cd $JMODELTEST_HOME/exe/phyml
+	$ ln -s `which phyml` phyml
+
+Take care if the version of phyml you have in your system is old. If there are
+errors in the execution, take a look at Section 5.1.
+
+-----------------------------------------------------------------------------
+    5.3. I'd like to install jModelTest system-wide in a Unix Based OS (just 
+         running on multiple threads)  
+-----------------------------------------------------------------------------
+
+While jModelTest 2 does not implement this feature, we can do a workaround 
+instead, allowing jModelTest 2 to run under an HFS. You have to follow this 
+steps:
+
+1. Move your jModelTest directory to /usr/local/lib/jmodeltest (make sure
+you have read/write permissions).
+
+2. Put the following bash scripts under /usr/local/bin/ (this directory 
+should be in the system PATH)
+
+File: /usr/local/bin/jmodeltest
+
+	JMODELTEST_HOME=/usr/local/lib/jmodeltest
+	PREVIOUS_PATH=$PWD
+	cd $JMODELTEST_HOME
+
+	args=`getopt d:u: $*`
+	for i
+	do
+	case "$i" in
+        -d) shift;INPUT_FILE=`echo $PREVIOUS_PATH/$1`;shift;
+           MY_ARGS="$MY_ARGS -d $INPUT_FILE";;
+        -u) shift;TREE_FILE=`echo $PREVIOUS_PATH/$1`;shift;
+            MY_ARGS="$MY_ARGS -u $TREE_FILE";;
+	esac
+	done
+
+	java -jar $JMODELTEST_HOME/jModelTest.jar $MY_ARGS $*
+
+File: /usr/local/bin/jmodeltest-gui
+
+	export JMODELTEST_HOME=/usr/local/lib/jmodeltest
+	cd $JMODELTEST_HOME
+	./runjmodeltest-gui.sh
+
+3. Make them executables 
+
+	$ chmod +x /usr/local/bin/jmodeltest /usr/local/bin/jmodeltest-gui
