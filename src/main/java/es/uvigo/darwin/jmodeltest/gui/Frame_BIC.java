@@ -20,12 +20,9 @@ package es.uvigo.darwin.jmodeltest.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -56,7 +53,6 @@ public class Frame_BIC extends JModelTestFrame {
 	private JCheckBox jCheckBoxAveraging = new JCheckBox();
 	private JCheckBox jCheckBoxImportance = new JCheckBox();
 	private JSlider JSliderInterval = new JSlider();
-	private JComboBox comboSampleSizeMode = new JComboBox(ApplicationOptions.SampleSizeMode.values());
 
 	private BIC myBIC;
 
@@ -101,25 +97,11 @@ public class Frame_BIC extends JModelTestFrame {
 						new java.awt.Color(102, 102, 153)));
 		TextFieldSizeBIC.setVisible(true);
 		TextFieldSizeBIC.setSize(170, 40);
-		options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.ALIGNMENT);
 		TextFieldSizeBIC.setText(Utilities.format(options.getSampleSize(),10,4,false));
 		TextFieldSizeBIC.setHorizontalAlignment(JTextField.RIGHT);
 		TextFieldSizeBIC.setLocation(30, 20);
 		TextFieldSizeBIC.setEnabled(false);
 
-		comboSampleSizeMode.setVisible(true);
-		comboSampleSizeMode.setSize(170, 40);
-		comboSampleSizeMode.setLocation(220, 20);
-		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
-		comboSampleSizeMode
-			.setToolTipText("Select the mode the sample size is computed.");
-		comboSampleSizeMode
-		.setBorder(new BorderUIResource.TitledBorderUIResource(
-				new LineBorder(new java.awt.Color(
-						153, 153, 153), 1, false), "Sample size mode", 4, 2,
-				new java.awt.Font("Application", 1, 10),
-				new java.awt.Color(102, 102, 153)));
-		
 		jCheckBoxImportance.setVisible(true);
 		jCheckBoxImportance.setSize(260, 20);
 		jCheckBoxImportance.setText("Calculate parameter importances");
@@ -168,7 +150,6 @@ public class Frame_BIC extends JModelTestFrame {
 
 		PanelBICSettings.add(TextFieldTaxaBIC);
 		PanelBICSettings.add(TextFieldSizeBIC);
-		PanelBICSettings.add(comboSampleSizeMode);
 		PanelBICSettings.add(jCheckBoxAveraging);
 		PanelBICSettings.add(jCheckBoxImportance);
 		PanelBICSettings.add(jCheckBoxPAUPblock);
@@ -196,21 +177,6 @@ public class Frame_BIC extends JModelTestFrame {
 					}
 				});
 
-		comboSampleSizeMode
-		.addItemListener(new ItemListener() {
-			
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if ((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem() != ApplicationOptions.SampleSizeMode.USER) {
-					options.setSampleSizeMode((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem());
-					TextFieldSizeBIC.setText(Utilities.format(options.getSampleSize(),10,4,false));
-					TextFieldSizeBIC.setEnabled(false);
-				} else {
-					TextFieldSizeBIC.setEnabled(true);
-				}
-			}
-		});
-		
 		JSliderInterval
 				.addChangeListener(new ChangeListener() {
 					public void stateChanged(ChangeEvent e) {
@@ -309,7 +275,6 @@ public class Frame_BIC extends JModelTestFrame {
 
 	public void JButtonDefaultBICActionPerformed(java.awt.event.ActionEvent e) {
 		TextFieldSizeBIC.setEnabled(false);
-		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
 		TextFieldSizeBIC.setText(Utilities.format(options.getSampleSize(),10,4,false));
 		ApplicationOptions.getInstance().countBLasParameters = true;
 		XManager.getInstance().selectedMenuResultsBLasParameters(true);

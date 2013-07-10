@@ -726,7 +726,6 @@ public class FrameMain extends JModelTestFrame {
 							"  number of sequences: " + options.getNumTaxa());
 					ModelTest.getMainConsole().println(
 							"  number of sites: " + options.getNumSites());
-					options.checkSampleSize();
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(this, "The specified file \""
 							+ dataFileName
@@ -1048,7 +1047,7 @@ public class FrameMain extends JModelTestFrame {
 			about += "e-mail: ddarriba@udc.es, dposada@uvigo.es\n\n";
 			about += "Citation: Darriba D, Taboada GL, Doallo R and Posada D. 2012.\n" +
           "\"jModelTest 2: more models, new heuristics and parallel computing\".\n" +
-          "Nature Methods 9, 772.\n";
+          "Nature Methods 9(8), 772.\n";
 			JOptionPane.showMessageDialog(new JFrame(), about,
 					"jModelTest", JOptionPane.INFORMATION_MESSAGE,
 					XManager.makeIcon("JMT48", "JMT2"));

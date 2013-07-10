@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -84,7 +85,7 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.1.1";
+	public static final String CURRENT_VERSION = "2.1.3";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
@@ -147,6 +148,8 @@ public class ModelTest {
 	// constructor without GUI
 	public ModelTest(String[] arg) {
 		try {
+			// open mainConsole
+			MAIN_CONSOLE = new TextOutputStream(System.out);
 			ParseArguments();
 			if (options.doingSimulations) {
 				Simulation sim = new Simulation(options);
@@ -218,8 +221,6 @@ public class ModelTest {
 	 * the program needs to carry out * * *
 	 ***********************************************************************/
 	public void runCommandLine() {
-		// open mainConsole
-		MAIN_CONSOLE = new TextOutputStream(System.out);
 
 		if (MPJ_ME == 0) {
 			// print header information
@@ -555,7 +556,19 @@ public class ModelTest {
 					}
 				}
 
-				else if (arg.equals("-s")) {
+				else if (arg.equals("-o")) {
+					String outFile = arguments[i++];
+					try {
+						MAIN_CONSOLE = new TextOutputStream(new PrintStream(
+								outFile));
+					} catch (FileNotFoundException e1) {
+						System.err
+								.println("An error has ocurred while trying to open the output file \""
+										+ outFile + "\" for writing");
+						e1.printStackTrace();
+						System.exit(-1);
+					}
+				} else if (arg.equals("-s")) {
 					if (i < arguments.length) {
 						String type = arguments[i++];
 						try {
@@ -661,38 +674,6 @@ public class ModelTest {
 						System.err
 								.println(error
 										+ "-H option requires an argument (AIC, BIC, AICc).");
-						PrintUsage();
-					}
-				}
-
-				else if (arg.equals("-n")) {
-					if (i < arguments.length) {
-						String sampleSize = arguments[i++];
-						if (sampleSize.equalsIgnoreCase("ALIGNMENT")) {
-							options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.ALIGNMENT);
-						} else if (sampleSize.equalsIgnoreCase("ALIGNMENT_VAR")) {
-							options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.ALIGNMENT_VAR);
-						} else if (sampleSize.equalsIgnoreCase("NxL")) {
-							options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.NxL);
-						} else if (sampleSize.equalsIgnoreCase("SHANNON")) {
-							options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.SHANNON);
-						} else if (sampleSize.equalsIgnoreCase("SHANNON_NxL")) {
-							options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.SHANNON_NxL);
-						} else {
-							try {
-								options.setSampleSizeModeUser(Integer
-										.parseInt(sampleSize));
-							} catch (NumberFormatException e) {
-								System.err.println("Number ex.");
-								System.err.println(error
-										+ "-n option requires a sample size.");
-								PrintUsage();
-							}
-						}
-					} else {
-						System.err.println("Args ex.");
-						System.err.println(error
-								+ "-n option requires a sample size.");
 						PrintUsage();
 					}
 				} else if (arg.equals("-t")) {
@@ -824,7 +805,7 @@ public class ModelTest {
 					options.doHLRT = true;
 				}
 
-				else if (arg.equals("-o")) {
+				else if (arg.equals("-O")) {
 					if (i < arguments.length) {
 						String type = arguments[i++];
 						char[] array = type.toCharArray();
@@ -841,7 +822,7 @@ public class ModelTest {
 						} else {
 							System.err
 									.println(error
-											+ "-o option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
+											+ "-O option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
 							PrintUsage();
 						}
 
@@ -849,7 +830,7 @@ public class ModelTest {
 						if (!Arrays.equals(array, valid)) {
 							System.err
 									.println(error
-											+ "-o option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
+											+ "-O option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
 							PrintUsage();
 						} else {
 							testingOrder = new Vector<String>();
@@ -1045,23 +1026,17 @@ public class ModelTest {
 		if (MPJ_ME == 0) {
 			String usage = "\njModelTest command usage"
 					+ "\n -d: input data file (e.g., -d data.phy)"
-					+ "\n -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)"
-					+ "\n -f: include models with unequals base frecuencies (e.g., -f) (default is false)"
-					+ "\n -i: include models with a proportion invariable sites (e.g., -i) (default is false)"
-					+ "\n -g: include models with rate variation among sites and number of categories (e.g., -g 8) (default is false & 4 categories)"
 					+ "\n -t: base tree for likelihood calculations (e.g., -t BIONJ)"
 					+ "\n     fixed  (common BIONJ-JC topology)"
 					+ "\n     BIONJ  (Neighbor-Joining topology)"
 					+ "\n     ML     (Maximum Likelihood topology) (default)"
 					+ "\n -u: user tree for likelihood calculations  (e.g., -u data.tre)"
+					+ "\n -o: set output file (e.g., -o jmodeltest.out)"
+					+ "\n -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)"
+					+ "\n -f: include models with unequals base frecuencies (e.g., -f) (default is false)"
+					+ "\n -i: include models with a proportion invariable sites (e.g., -i) (default is false)"
+					+ "\n -g: include models with rate variation among sites and number of categories (e.g., -g 8) (default is false & 4 categories)"
 					+ "\n -S: tree topology search operation option (NNI (fast), SPR (a bit slower), BEST (best of NNI and SPR)) (default is BEST)"
-					+ "\n -n: sample size (e.g., -n NxL , or -n 547"
-					+ "\n     ALIGNMENT     (number of sites) (default)"
-					+ "\n     ALIGNMENT_VAR (number of variable sites)"
-					+ "\n     NxL           (number of sites multiplied by number of taxa)"
-					+ "\n     SHANNON       (Shannon entropy)"
-					+ "\n     SHANNON_NxL   (normalized Shannon entropy multiplied by NxL)"
-					+ "\n     [SampleSize]  (user defined value)"
 					+ "\n -AIC: calculate the Akaike Information Criterion (e.g., -AIC) (default is false)"
 					+ "\n -AICc: calculate the corrected Akaike Information Criterion (e.g., -AICc) (default is false)"
 					+ "\n -BIC: calculate the Bayesian Information Criterion (e.g., -BIC) (default is false)"
@@ -1072,7 +1047,7 @@ public class ModelTest {
 					+ "\n -w: write PAUP block (e.g., -w) (default is false)"
 					+ "\n -dLRT: do dynamical likelihood ratio tests (e.g., -dLRT)(default is false)"
 					+ "\n -hLRT: do hierarchical likelihood ratio tests (default is false)"
-					+ "\n -o: hypothesis order for the hLRTs (e.g., -hLRT -o gpftv) (default is ftvgp/ftvwgp/ftvwxgp)"
+					+ "\n -O: hypothesis order for the hLRTs (e.g., -hLRT -O gpftv) (default is ftvgp/ftvwgp/ftvwxgp)"
 					+ "\n        f=freq, t=titvi, v=2ti4tv(subst=3)/2ti(subst>3), w=2tv, x=4tv, g=gamma, p=pinv"
 					+ "\n -r: backward selection for the hLRT (e.g., -r) (default is forward)"
 					+ "\n -h: confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)"
@@ -1150,7 +1125,7 @@ public class ModelTest {
 		stream.println("--------------------------------------------------------------------------------");
 		stream.println("Citation: Darriba D, Taboada GL, Doallo R and Posada D. 2012.");
 		stream.println("          \"jModelTest 2: more models, new heuristics and parallel computing\".");
-		stream.println("          Nature Methods 9, 772.");
+		stream.println("          Nature Methods 9(8), 772.");
 		stream.println("--------------------------------------------------------------------------------");
 		stream.println(" ");
 		// stream.println("***************************************************************************\n");
@@ -1207,7 +1182,7 @@ public class ModelTest {
 				stream.printf("%.4f ", model.getRb());
 				stream.printf("%.4f ", model.getRc());
 				stream.printf("%.4f ", model.getRd());
-				stream.printf("%.4f ", model.getRe());
+				stream.printf("%.4f)", model.getRe());
 				/* stream.print("1.0000)"); */
 			}
 
@@ -1259,8 +1234,6 @@ public class ModelTest {
 						+ options.getNumTaxa());
 				MAIN_CONSOLE.println("  number of sites: "
 						+ options.getNumSites());
-				MAIN_CONSOLE.println("  ambiguity : " + options.isAmbiguous());
-				options.checkSampleSize();
 			} catch (Exception e)// file cannot be read correctly
 			{
 				System.err.println("\nThe specified file \""

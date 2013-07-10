@@ -131,8 +131,9 @@ public class AICc extends InformationCriterion {
 		else
 			K = model.getK() - options.getNumBranches();
 
-		return 2 * (model.getLnL() + K)
+		double aicc = 2 * (model.getLnL() + K)
 				+ (2 * K * (K + 1) / (double) (options.getSampleSize() - K - 1));
+		return aicc;
 	}
 	
 	public static double computeAicc(double lnL, int k, ApplicationOptions options) {
@@ -142,8 +143,10 @@ public class AICc extends InformationCriterion {
 		else
 			K = k - options.getNumBranches();
 
-		return 2 * (lnL + K)
+		double aicc = 2 * (lnL + K)
 				+ (2 * K * (K + 1) / (double) (options.getSampleSize() - K - 1));
+		System.out.println("AICC 2 IS " + aicc);
+		return aicc;
 	}
 	
 	protected void printHeader(TextOutputStream stream) {
@@ -152,6 +155,8 @@ public class AICc extends InformationCriterion {
 		stream.println("*        CORRECTED AKAIKE INFORMATION CRITERION (AICc)        *");
 		stream.println("*                                                             *");
 		stream.println("---------------------------------------------------------------");
+		stream.println(" ");
+		stream.println(" Sample size: " + options.getSampleSize());
 	}
 	
 	protected void printFooter(TextOutputStream stream) {

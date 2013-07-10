@@ -593,6 +593,10 @@ public abstract class InformationCriterion {
 			stream.println(" (IG): considers only +I+G models.");
 		}
 
+		if (getValue(minModel) < 0.0) {
+			stream.println(" ");
+			stream.println("WARNING! Criterion has negative values. Please check whether your sample size is big enough compared to the number of parameters (K)");
+		}
 	}
 
 	public int getNumModels() { return numModels; }

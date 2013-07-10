@@ -171,6 +171,8 @@ public class DT extends InformationCriterion {
 		stream.println("*      DECISION THEORY PERFORMANCE-BASED SELECTION (DT)       *");
 		stream.println("*                                                             *");
 		stream.println("---------------------------------------------------------------");
+		stream.println(" ");
+		stream.println(" Sample size: " + options.getSampleSize());
 	}
 	
 	protected void printFooter(TextOutputStream stream) {

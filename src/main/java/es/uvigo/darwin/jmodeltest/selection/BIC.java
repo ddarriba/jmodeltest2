@@ -149,6 +149,8 @@ public class BIC extends InformationCriterion {
 		stream.println("*             BAYESIAN INFORMATION CRITERION (BIC)            *");
 		stream.println("*                                                             *");
 		stream.println("---------------------------------------------------------------");
+		stream.println(" ");
+		stream.println(" Sample size: " + options.getSampleSize());
 	}
 	
 	protected void printFooter(TextOutputStream stream) {

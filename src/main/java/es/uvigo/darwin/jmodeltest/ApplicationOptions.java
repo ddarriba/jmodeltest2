@@ -45,17 +45,12 @@ public class ApplicationOptions implements Serializable {
 
 	private static final long serialVersionUID = -3961572952922591321L;
 	private static final int AMBIGUOUS_DATATYPE_STATE = 4;
-	
+
 	/** Tree topology search algorithms */
 	public static enum TreeSearch {
 		NNI, SPR, BEST
 	};
 
-	/** Tree topology search algorithms */
-	public static enum SampleSizeMode {
-		ALIGNMENT, ALIGNMENT_VAR, NxL, SHANNON, SHANNON_NxL, USER
-	};
-	
 	private static ApplicationOptions instance;
 	private static Vector<String> testOrder;
 
@@ -67,7 +62,7 @@ public class ApplicationOptions implements Serializable {
 	private boolean forceCheckULnL = false;
 	private double unconstrainedLnL = 0.0d;
 	private int numPatterns = 0;
-	
+
 	// Newick user tree
 	private String userTree;
 
@@ -116,21 +111,19 @@ public class ApplicationOptions implements Serializable {
 
 	public TreeSearch treeSearchOperations = TreeSearch.BEST;
 
-	// Threshold for the guided search mode. A QST == 0.0 means no model 
+	// Threshold for the guided search mode. A QST == 0.0 means no model
 	// but the GTR one is optimized. A high QST means the whole set of
 	// set of models will be optimized.
 	private double guidedSearchThreshold = 0.0d;
 	private boolean doClusteringSearch = false;
 	private int heuristicInformationCriterion = InformationCriterion.IC_BIC;
-	
+
 	private int numSites;
 	private int numTaxa;
 	private int numBranches;
 	private int numInvariableSites;
-	
+
 	private int numModels;
-	private double sampleSize = 0.0;
-	private SampleSizeMode sampleSizeMode = SampleSizeMode.ALIGNMENT;
 
 	public String consensusType = "50% majority rule"; // consensus type
 														// for model
@@ -162,9 +155,8 @@ public class ApplicationOptions implements Serializable {
 		try {
 			ModelTestService.readAlignment(inputDataFile, alignmentFile);
 
-			setAlignment(AlignmentReader.readAlignment(
-					new PrintWriter(System.err),
-					alignmentFile.getAbsolutePath(), true));
+			setAlignment(AlignmentReader.readAlignment(new PrintWriter(
+					System.err), alignmentFile.getAbsolutePath(), true));
 		} catch (AlignmentParseException e) {
 			e.printStackTrace();
 		}
@@ -208,40 +200,43 @@ public class ApplicationOptions implements Serializable {
 					includeModel = false;
 				if (!doF && !ModelConstants.equalBaseFrequencies[i]) // is F
 					includeModel = false;
-				if (!doI && (ModelConstants.rateVariation[i] == 1 
-						|| ModelConstants.rateVariation[i] == 3))
+				if (!doI
+						&& (ModelConstants.rateVariation[i] == 1 || ModelConstants.rateVariation[i] == 3))
 					includeModel = false;
-				if (!doG && (ModelConstants.rateVariation[i] == 2
-						|| ModelConstants.rateVariation[i] == 3))
+				if (!doG
+						&& (ModelConstants.rateVariation[i] == 2 || ModelConstants.rateVariation[i] == 3))
 					includeModel = false;
-	
+
 				if (includeModel) {
-					// System.out.println("Including model" + Model.modelName[i] +
+					// System.out.println("Including model" + Model.modelName[i]
+					// +
 					// " out of " + ModelTest.numModels + " models");
 					loadModelConstraints(ModelTest.getCandidateModel(j), j, i);
 					j++;
 				}
 			}
 		} else {
-			int j=0;
-			for (int ratesCount=1; ratesCount<=6; ratesCount++) {
-				for (String partition : ModelConstants.fullModelSet.get(ratesCount)) {
+			int j = 0;
+			for (int ratesCount = 1; ratesCount <= 6; ratesCount++) {
+				for (String partition : ModelConstants.fullModelSet
+						.get(ratesCount)) {
 					boolean baseFrequencies;
 					int rateVariation;
-					for (int k=0; k<8; k++) {
-						baseFrequencies = (k/4==1);
-						rateVariation = (k%4);
+					for (int k = 0; k < 8; k++) {
+						baseFrequencies = (k / 4 == 1);
+						rateVariation = (k % 4);
 						includeModel = true;
 						if (!doF && baseFrequencies)
 							includeModel = false;
-						if (!doI && (rateVariation == 1 
-								|| rateVariation == 3))
+						if (!doI && (rateVariation == 1 || rateVariation == 3))
 							includeModel = false;
-						if (!doG && (rateVariation == 2
-								|| rateVariation == 3))
+						if (!doG && (rateVariation == 2 || rateVariation == 3))
 							includeModel = false;
 						if (includeModel) {
-							loadModelConstraints(ModelTest.getCandidateModel(j), j, partition, baseFrequencies, rateVariation, ratesCount);
+							loadModelConstraints(
+									ModelTest.getCandidateModel(j), j,
+									partition, baseFrequencies, rateVariation,
+									ratesCount);
 							j++;
 						}
 					}
@@ -343,17 +338,19 @@ public class ApplicationOptions implements Serializable {
 
 		ModelTest.getCandidateModels()[order] = new Model(order + 1,
 				ModelConstants.modelName[modelNo],
-				ModelConstants.modelCode[modelNo], modelParameters, pF, pT,
-				pV, pR, pI, pG, ModelConstants.numTransitions[modelNo],
+				ModelConstants.modelCode[modelNo], modelParameters, pF, pT, pV,
+				pR, pI, pG, ModelConstants.numTransitions[modelNo],
 				ModelConstants.numTransversions[modelNo]);
 	}
 
-	public void loadModelConstraints(Model currentModel, int order, String partition, boolean baseFrequencies, int rateVariation, int ratesCount) {
+	public void loadModelConstraints(Model currentModel, int order,
+			String partition, boolean baseFrequencies, int rateVariation,
+			int ratesCount) {
 		int modelParameters, BL, nTi, nTv;
 		boolean pF, pT, pV, pR, pI, pG;
 
 		pT = pV = pR = pI = pG = false;
-		
+
 		pF = baseFrequencies;
 
 		switch (rateVariation) {
@@ -374,40 +371,39 @@ public class ApplicationOptions implements Serializable {
 		else
 			BL = 0;
 
-		modelParameters = (ratesCount-1) +
-				(pF?3:0) + (pI?1:0) + (pG?1:0) + 
-				BL + (optimizeMLTopology?1:0);
+		modelParameters = (ratesCount - 1) + (pF ? 3 : 0) + (pI ? 1 : 0)
+				+ (pG ? 1 : 0) + BL + (optimizeMLTopology ? 1 : 0);
 
 		String modelName;
-		
+
 		if (ModelConstants.codeList.contains(partition)) {
 			int index = ModelConstants.codeList.indexOf(partition);
-			if (pF)	index += 4;
-			if (pI) index += 1;
-			if (pG) index += 2;
+			if (pF)
+				index += 4;
+			if (pI)
+				index += 1;
+			if (pG)
+				index += 2;
 			modelName = ModelConstants.modelName[index];
 			nTi = ModelConstants.numTransitions[index];
 			nTv = ModelConstants.numTransversions[index];
-			if (nTi == 1
-					&& nTv == 1) {
+			if (nTi == 1 && nTv == 1) {
 				pT = true;
-			} else if (nTi > 1
-					|| nTv > 1) {
+			} else if (nTi > 1 || nTv > 1) {
 				pR = true;
 			}
 		} else {
-			modelName = partition 
-					 + (pI?"+I":"") + (pG?"+G":"") + (pF?"+F":"");
-			nTi = 0;//ModelConstants.getNumberOfTransitions(partition);
-			nTv = 0;//ModelConstants.getNumberOfTransversions(partition);
+			modelName = partition + (pI ? "+I" : "") + (pG ? "+G" : "")
+					+ (pF ? "+F" : "");
+			nTi = 0;// ModelConstants.getNumberOfTransitions(partition);
+			nTv = 0;// ModelConstants.getNumberOfTransversions(partition);
 			pT = false;
 			pR = true;
 		}
-		ModelTest.getCandidateModels()[order] = new Model(order + 1,
-				modelName, partition, modelParameters, pF, pT,
-				pV, pR, pI, pG, 0, 0);
+		ModelTest.getCandidateModels()[order] = new Model(order + 1, modelName,
+				partition, modelParameters, pF, pT, pV, pR, pI, pG, 0, 0);
 	}
-	
+
 	public File getInputFile() {
 		return inputDataFile;
 	}
@@ -446,20 +442,20 @@ public class ApplicationOptions implements Serializable {
 		setNumSites(alignment.getSiteCount());
 		setNumBranches(2 * numTaxa - 3);
 		setNumInvariableSites(Utilities.calculateInvariableSites(alignment));
-		
+
 		DataType dt = alignment.getDataType();
 		// check ambiguity
 		isAmbiguous = false;
 		if (alignment.getDataType().isAmbiguous()) {
 			isAmbiguous = true;
 		} else {
-			for (int i=0 ; i<numTaxa; i++) {
+			for (int i = 0; i < numTaxa; i++) {
 				String seq = alignment.getAlignedSequenceString(i);
 				if (seq.indexOf(Alignment.GAP) >= 0) {
 					isAmbiguous = true;
 					break;
 				}
-				for (int j=0 ; j<seq.length(); j++) {
+				for (int j = 0; j < seq.length(); j++) {
 					if (dt.getState(seq.charAt(j)) == AMBIGUOUS_DATATYPE_STATE) {
 						isAmbiguous = true;
 						break;
@@ -484,7 +480,7 @@ public class ApplicationOptions implements Serializable {
 	public void setUnconstrainedLnL(double unconstrainedLikelihood) {
 		this.unconstrainedLnL = unconstrainedLikelihood;
 	}
-	
+
 	public int getNumPatterns() {
 		return numPatterns;
 	}
@@ -539,51 +535,9 @@ public class ApplicationOptions implements Serializable {
 	}
 
 	public double getSampleSize() {
-		return sampleSize;
-	}
-	
-	public SampleSizeMode getSampleSizemode() {
-		return sampleSizeMode;
+		return numTaxa * numSites;
 	}
 
-	public void setSampleSizeMode(SampleSizeMode mode) {
-		sampleSizeMode = mode;
-		switch (mode) {
-		default: 
-			// by default, use ALIGNMENT. USER is not allowed here.
-			// notice this default case has no break!
-			sampleSizeMode = SampleSizeMode.ALIGNMENT;
-		case ALIGNMENT:
-			sampleSize = numSites;
-			break;
-		case ALIGNMENT_VAR:
-			sampleSize = numSites - numInvariableSites;
-			break;
-		case NxL:
-			sampleSize = numSites * numTaxa;
-			break;
-		case SHANNON:
-		case SHANNON_NxL:
-			if (alignment == null) {
-				sampleSize = Utilities.calculateShannonSampleSize(alignmentFile, (mode == SampleSizeMode.SHANNON));
-			} else {
-				sampleSize = Utilities.calculateShannonSampleSize(alignment, (mode == SampleSizeMode.SHANNON));
-			}
-			break;
-		}
-	}
-	
-	public void setSampleSizeModeUser(double sampleSize) {
-		this.sampleSizeMode = SampleSizeMode.USER;
-		this.sampleSize = sampleSize;
-	}
-	
-	public void checkSampleSize() {
-		if (sampleSize <= 0.0) {
-			setSampleSizeMode(sampleSizeMode);
-		}
-	}
-	
 	public static void setInstance(ApplicationOptions newInstance) {
 		File alignmentFile = instance.alignmentFile;
 		File treeFile = instance.treeFile;
@@ -603,15 +557,15 @@ public class ApplicationOptions implements Serializable {
 	public boolean isGuidedSearch() {
 		return guidedSearchThreshold > 1e-6;
 	}
-	
+
 	public double getGuidedSearchThreshold() {
 		return guidedSearchThreshold;
 	}
-	
+
 	public void setGuidedSearchThreshold(double guidedSearchThreshold) {
 		this.guidedSearchThreshold = guidedSearchThreshold;
 	}
-	
+
 	public void setMachinesFile(File machinesFile) throws FileNotFoundException {
 		if (ModelTest.HOSTS_TABLE.containsKey(ModelTest.getHostname())) {
 
@@ -628,11 +582,11 @@ public class ApplicationOptions implements Serializable {
 			this.numberOfThreads = 1;
 		}
 	}
-	
+
 	public File getMachinesFile() {
 		return machinesFile;
 	}
-	
+
 	public boolean isClusteringSearch() {
 		return doClusteringSearch;
 	}
@@ -640,12 +594,13 @@ public class ApplicationOptions implements Serializable {
 	public void setClusteringSearch(boolean doClusteringSearch) {
 		this.doClusteringSearch = doClusteringSearch;
 	}
-	
+
 	public int getHeuristicInformationCriterion() {
 		return heuristicInformationCriterion;
 	}
-	
-	public void setHeuristicInformationCriterion(int heuristicInformationCriterion) {
+
+	public void setHeuristicInformationCriterion(
+			int heuristicInformationCriterion) {
 		this.heuristicInformationCriterion = heuristicInformationCriterion;
 	}
 
@@ -680,7 +635,7 @@ public class ApplicationOptions implements Serializable {
 	public void setNumInvariableSites(int numInvariableSites) {
 		this.numInvariableSites = numInvariableSites;
 	}
-	
+
 	public int getNumModels() {
 		return numModels;
 	}

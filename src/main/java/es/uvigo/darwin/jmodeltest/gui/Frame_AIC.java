@@ -20,12 +20,9 @@ package es.uvigo.darwin.jmodeltest.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -58,7 +55,6 @@ public class Frame_AIC extends JModelTestFrame {
 	private JCheckBox checkBoxAveraging = new JCheckBox();
 	private JCheckBox checkBoxImportance = new JCheckBox();
 	private JSlider sliderInterval = new JSlider();
-	private JComboBox comboSampleSizeMode = new JComboBox(ApplicationOptions.SampleSizeMode.values());
 
 	private AIC myAIC;
 	private AICc myAICc;
@@ -111,7 +107,6 @@ public class Frame_AIC extends JModelTestFrame {
 						new java.awt.Color(102, 102, 153)));
 		textSizeAICc.setVisible(true);
 		textSizeAICc.setSize(170, 40);
-		options.setSampleSizeMode(ApplicationOptions.SampleSizeMode.ALIGNMENT);
 		textSizeAICc.setText(Utilities.format(options.getSampleSize(),10,4,false));
 		textSizeAICc.setHorizontalAlignment(JTextField.RIGHT);
 		textSizeAICc.setLocation(300, 20);
@@ -136,19 +131,6 @@ public class Frame_AIC extends JModelTestFrame {
 		checkBoxPAUPblock
 				.setToolTipText("Writes a block of PAUP* commands implementing the selected model");
 
-		comboSampleSizeMode.setVisible(true);
-		comboSampleSizeMode.setSize(170, 40);
-		comboSampleSizeMode.setLocation(300, 60);
-		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
-		comboSampleSizeMode
-			.setToolTipText("Select the mode the sample size is computed.");
-		comboSampleSizeMode
-		.setBorder(new BorderUIResource.TitledBorderUIResource(
-				new LineBorder(new java.awt.Color(
-						153, 153, 153), 1, false), "Sample size mode", 4, 2,
-				new java.awt.Font("Application", 1, 10),
-				new java.awt.Color(102, 102, 153)));
-		
 		sliderInterval.setVisible(true);
 		sliderInterval
 				.setToolTipText("Set the confidence interval for model averaging and/or parameter importance");
@@ -186,7 +168,6 @@ public class Frame_AIC extends JModelTestFrame {
 		panelAICSettings.add(checkBoxImportance);
 		panelAICSettings.add(checkBoxPAUPblock);
 		panelAICSettings.add(sliderInterval);
-		panelAICSettings.add(comboSampleSizeMode);
 		getContentPane().add(panelAICSettings);
 
 		setSize(510, 280);
@@ -221,21 +202,6 @@ public class Frame_AIC extends JModelTestFrame {
 					}
 				});
 		
-		comboSampleSizeMode
-		.addItemListener(new ItemListener() {
-			
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if ((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem() != ApplicationOptions.SampleSizeMode.USER) {
-					options.setSampleSizeMode((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem());
-					textSizeAICc.setText(Utilities.format(options.getSampleSize(),10,4,false));
-					textSizeAICc.setEnabled(false);
-				} else {
-					textSizeAICc.setEnabled(true);
-				}
-			}
-		});
-
 		buttonDefaultAIC
 				.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -338,7 +304,6 @@ public class Frame_AIC extends JModelTestFrame {
 	public void JButtonDefaultAICActionPerformed(java.awt.event.ActionEvent e) {
 		checkBoxAICc.setSelected(false);
 		textSizeAICc.setEnabled(false);
-		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
 		runButtonAIC.setText("Do AIC calculations");
 		ApplicationOptions.getInstance().countBLasParameters = true;
 		XManager.getInstance().selectedMenuResultsBLasParameters(true);

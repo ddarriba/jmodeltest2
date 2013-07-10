@@ -20,12 +20,9 @@ package es.uvigo.darwin.jmodeltest.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -57,7 +54,6 @@ public class Frame_DT extends JModelTestFrame {
 	private JCheckBox checkBoxAveraging = new JCheckBox();
 	private JCheckBox checkBoxImportance = new JCheckBox();
 	private JSlider sliderInterval = new JSlider();
-	private JComboBox comboSampleSizeMode = new JComboBox(ApplicationOptions.SampleSizeMode.values());
 
 	private DT myDT;
 
@@ -96,19 +92,6 @@ public class Frame_DT extends JModelTestFrame {
 		textSizeDT.setLocation(30, 20);
 		textSizeDT.setEnabled(false);
 
-		comboSampleSizeMode.setVisible(true);
-		comboSampleSizeMode.setSize(170, 40);
-		comboSampleSizeMode.setLocation(220, 20);
-		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
-		comboSampleSizeMode
-			.setToolTipText("Select the mode the sample size is computed.");
-		comboSampleSizeMode
-		.setBorder(new BorderUIResource.TitledBorderUIResource(
-				new LineBorder(new java.awt.Color(
-						153, 153, 153), 1, false), "Sample size mode", 4, 2,
-				new java.awt.Font("Application", 1, 10),
-				new java.awt.Color(102, 102, 153)));
-		
 		checkBoxImportance.setVisible(true);
 		checkBoxImportance.setSize(260, 20);
 		checkBoxImportance.setText("Calculate parameter importances");
@@ -171,21 +154,6 @@ public class Frame_DT extends JModelTestFrame {
 		checkBoxImportance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				jCheckBoxImportanceStateChanged(e);
-			}
-		});
-
-		comboSampleSizeMode
-		.addItemListener(new ItemListener() {
-			
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if ((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem() != ApplicationOptions.SampleSizeMode.USER) {
-					options.setSampleSizeMode((ApplicationOptions.SampleSizeMode)comboSampleSizeMode.getSelectedItem());
-					textSizeDT.setText(Utilities.format(options.getSampleSize(),10,4,false));
-					textSizeDT.setEnabled(false);
-				} else {
-					textSizeDT.setEnabled(true);
-				}
 			}
 		});
 
@@ -290,7 +258,6 @@ public class Frame_DT extends JModelTestFrame {
 	public void JButtonDefaultDTActionPerformed(java.awt.event.ActionEvent e) 
 		{
 		textSizeDT.setEnabled(false);
-		comboSampleSizeMode.setSelectedItem(ApplicationOptions.SampleSizeMode.ALIGNMENT);
 		ApplicationOptions.getInstance().countBLasParameters = true;
 		XManager.getInstance().selectedMenuResultsBLasParameters(true);
 		checkBoxPAUPblock.setSelected(false);
