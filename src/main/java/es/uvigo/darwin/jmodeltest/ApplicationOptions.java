@@ -109,7 +109,7 @@ public class ApplicationOptions implements Serializable {
 	// whether to optimize the BIONJ-model tree by ML
 	public boolean optimizeMLTopology = true;
 
-	public TreeSearch treeSearchOperations = TreeSearch.BEST;
+	public TreeSearch treeSearchOperations = TreeSearch.NNI;
 
 	// Threshold for the guided search mode. A QST == 0.0 means no model
 	// but the GTR one is optimized. A high QST means the whole set of
