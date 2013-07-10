@@ -869,7 +869,7 @@ public class FrameMain extends JModelTestFrame {
 			}
 
 			if (dialog.getFile() != null
-					&& ModelTestConfiguration.isAutoLogEnabled()) /*
+					&& ModelTestConfiguration.isHtmlLogEnabled()) /*
 																 * a file was
 																 * selected
 																 */

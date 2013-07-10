@@ -37,12 +37,10 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 	private static String CURRENT_DIRECTORY = ModelTestConfiguration.PATH;
 
+	private boolean PHYML_GLOBAL = false;
 	public String PHYML_PATH = CURRENT_DIRECTORY + "exe/phyml/";
-
 	private String phymlStatFileName;
 	private String phymlTreeFileName;
-
-	private boolean PHYML_GLOBAL = false;
 
 	private Model model;
 	private long startTime;
@@ -54,7 +52,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	private boolean interrupted = false;
 	private ApplicationOptions options;
 	private int numberOfThreads = -1;
-
+	
 	public Model getModel() {
 		return model;
 	}
@@ -80,7 +78,6 @@ public class PhymlSingleModel extends Observable implements Runnable {
 				PHYML_PATH += File.separator;
 			}
 		}
-
 		this.phymlStatFileName = options.getAlignmentFile().getAbsolutePath()
 				+ RunPhyml.PHYML_STATS_SUFFIX + model.getName() + ".txt";
 		this.phymlTreeFileName = options.getAlignmentFile().getAbsolutePath()
