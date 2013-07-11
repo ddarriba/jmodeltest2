@@ -48,7 +48,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.plaf.BorderUIResource;
-
+import javax.swing.text.DefaultCaret;
 
 import pal.tree.Tree;
 import edu.stanford.ejalbert.BrowserLauncher;
@@ -408,6 +408,8 @@ public class FrameMain extends JModelTestFrame {
 
 		phymlScrollPane.setVisible(true);
 		phymlScrollPane.setAutoscrolls(true);
+		DefaultCaret caret = (DefaultCaret)phymlEditorPane.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		
 		mainEditorPane.setMargin(new Insets(5, 5, 5, 5));
 		mainEditorPane.setFont(XManager.FONT_CONSOLE);
