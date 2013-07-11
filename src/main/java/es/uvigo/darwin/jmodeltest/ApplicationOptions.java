@@ -218,9 +218,6 @@ public class ApplicationOptions implements Serializable {
 					includeModel = false;
 
 				if (includeModel) {
-					// System.out.println("Including model" + Model.modelName[i]
-					// +
-					// " out of " + ModelTest.numModels + " models");
 					loadModelConstraints(ModelTest.getCandidateModel(j), j, i);
 					j++;
 				}

@@ -328,7 +328,8 @@ public abstract class RunPhyml extends Observable implements Observer {
 
 	private void deleteFiles() {
 		/* phymlFolder */
-		options.getLogFile().delete();
+		//if (options.getLogFile() != null)
+			options.getLogFile().delete();
 	}
 
 	protected void notifyObservers(int type, int value, Model model,
