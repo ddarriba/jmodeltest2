@@ -7,16 +7,23 @@ import java.util.Properties;
 
 public abstract class ModelTestConfiguration {
 
+	private static String convertPathToAbsolute(String path) {
+    	if (!path.startsWith(File.separator)) {
+    		path = PATH + path;
+    	}
+    	return path;
+	}
+	
 	 /** The application APPLICATION_PROPERTIES. */
     private static final Properties APPLICATION_PROPERTIES;
     
-    public static final String DEFAULT_EXE_DIR = "exe/phyml";
-    public static final String DEFAULT_LOG_DIR = "log";
     public static final boolean DEFAULT_GLOBAL_PHYML = false;
     
     private static final String JAR_PATH = ModelTest.class.getProtectionDomain().getCodeSource().getLocation().getFile()
     		.replace("%20", " ");
     public static final String PATH = JAR_PATH.replaceFirst(new File(JAR_PATH).getName(),"");
+    public static final String DEFAULT_EXE_DIR = PATH + "exe/phyml";
+    public static final String DEFAULT_LOG_DIR = PATH + "log";
     
     public static final String HTML_LOG = "html-logging";
     public static final String PHYML_LOG = "phyml-logging";
@@ -30,7 +37,6 @@ public abstract class ModelTestConfiguration {
     static {
         APPLICATION_PROPERTIES = new Properties();
         try {
-        	
         	FileInputStream prop = new FileInputStream(PATH + ModelTest.CONFIG_FILE);
             APPLICATION_PROPERTIES.load(prop);
         } catch (IOException e) {
@@ -45,7 +51,10 @@ public abstract class ModelTestConfiguration {
     
     public static String getExeDir() {
     	String exeDir = getProperty(EXE_DIR);
-    	return exeDir != null?exeDir : DEFAULT_EXE_DIR;
+    	if (exeDir == null) {
+    		exeDir = DEFAULT_EXE_DIR;
+    	}
+    	return convertPathToAbsolute(exeDir);
     }
         
     public static boolean isGlobalPhymlBinary() {
@@ -63,7 +72,10 @@ public abstract class ModelTestConfiguration {
     
     public static String getLogDir() {
     	String logDir = getProperty(LOG_DIR);
-    	return logDir != null?logDir : DEFAULT_LOG_DIR;
+    	if (logDir == null) {
+    		logDir = DEFAULT_LOG_DIR;
+    	}
+    	return convertPathToAbsolute(logDir);
     }
     
     public static Properties getProperties() {
