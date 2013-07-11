@@ -3,7 +3,7 @@
   * Added phyml auto-logging.
   * Added phyml command lines for best-fit models.
   * Added phyml log tab in the GUI.
-  * Removed sample size modes (and "-n" argument). Sample size is fixed to NxL.
+  * Removed sample size modes (and "-n" argument). Sample size is fixed to alignment size.
   * Fixed bug with relative paths when calling from a different path.
   * Fixed typos in the GUI.
 
