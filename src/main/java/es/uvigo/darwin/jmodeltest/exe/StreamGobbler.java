@@ -41,6 +41,7 @@ class StreamGobbler extends Thread {
 	}
 
 	public void run() {
+		int i=0;
 		try {
 			PrintWriter pwFile = null;
 			PrintWriter pwConsole = null;
@@ -79,6 +80,8 @@ class StreamGobbler extends Thread {
 				if (pwConsole != null) {
 					pwConsole.println(type + ">" + line);
 				}
+				if (pwConsole != null)
+					pwConsole.flush();
 			}
 			if (pwFile != null)
 				pwFile.flush();

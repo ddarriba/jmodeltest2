@@ -5,13 +5,21 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import es.uvigo.darwin.jmodeltest.utilities.Utilities;
+
 public abstract class ModelTestConfiguration {
 
 	private static String convertPathToAbsolute(String path) {
-    	if (!path.startsWith(File.separator)) {
+		if (Utilities.isWindows()) {
+			// change wrong path separators
+			path.replace('/', '\\');
+		} else {
+		File fPath = new File(path);
+    	if (!fPath.isAbsolute()) {
     		path = PATH + path;
     	}
-    	return path;
+		}
+		return path;
 	}
 	
 	 /** The application APPLICATION_PROPERTIES. */
@@ -22,7 +30,7 @@ public abstract class ModelTestConfiguration {
     private static final String JAR_PATH = ModelTest.class.getProtectionDomain().getCodeSource().getLocation().getFile()
     		.replace("%20", " ");
     public static final String PATH = JAR_PATH.replaceFirst(new File(JAR_PATH).getName(),"");
-    public static final String DEFAULT_EXE_DIR = PATH + "exe/phyml";
+    public static final String DEFAULT_EXE_DIR = PATH + "exe" + File.separator + "phyml";
     public static final String DEFAULT_LOG_DIR = PATH + "log";
     
     public static final String HTML_LOG = "html-logging";
