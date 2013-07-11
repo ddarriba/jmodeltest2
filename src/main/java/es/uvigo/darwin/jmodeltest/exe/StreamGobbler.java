@@ -30,19 +30,24 @@ import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 class StreamGobbler extends Thread {
 	private InputStream is;
 	private String type;
-	private OutputStream os;
+	private OutputStream osFile, osConsole;
 
-	StreamGobbler(InputStream is, String type, OutputStream redirect) {
+	StreamGobbler(InputStream is, String type, OutputStream fileRedirect,
+			OutputStream consoleRedirect) {
 		this.is = is;
 		this.type = type;
-		this.os = redirect;
+		this.osFile = fileRedirect;
+		this.osConsole = consoleRedirect;
 	}
 
 	public void run() {
 		try {
-			PrintWriter pw = null;
-			if (os != null)
-				pw = new PrintWriter(os);
+			PrintWriter pwFile = null;
+			PrintWriter pwConsole = null;
+			if (osFile != null)
+				pwFile = new PrintWriter(osFile);
+			if (osConsole != null)
+				pwConsole = new PrintWriter(osConsole);
 
 			InputStreamReader isr = new InputStreamReader(is);
 			BufferedReader br = new BufferedReader(isr);
@@ -50,9 +55,10 @@ class StreamGobbler extends Thread {
 			while ((line = br.readLine()) != null) {
 				if (line.contains("patterns found")) {
 					try {
-						int numPatterns =
-							Integer.parseInt(Utilities.firstNumericToken(line));
-						ApplicationOptions options = ApplicationOptions.getInstance();
+						int numPatterns = Integer.parseInt(Utilities
+								.firstNumericToken(line));
+						ApplicationOptions options = ApplicationOptions
+								.getInstance();
 						if (Math.abs(options.getNumPatterns()) == 0) {
 							options.setNumPatterns(numPatterns);
 						} else {
@@ -65,14 +71,19 @@ class StreamGobbler extends Thread {
 					} catch (NumberFormatException nfe) {
 						// ignore
 					}
-					
+
 				}
-				if (pw != null) {
-					pw.println(type + ">" + line);
+				if (pwFile != null) {
+					pwFile.println(type + ">" + line);
+				}
+				if (pwConsole != null) {
+					pwConsole.println(type + ">" + line);
 				}
 			}
-			if (pw != null)
-				pw.flush();
+			if (pwFile != null)
+				pwFile.flush();
+			if (pwConsole != null)
+				pwConsole.flush();
 		} catch (IOException ioe) {
 			System.err.println("INFO: [StreamGobbler] The stream was closed!");
 		}

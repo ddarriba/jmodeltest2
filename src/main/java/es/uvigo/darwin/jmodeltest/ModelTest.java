@@ -94,6 +94,7 @@ public class ModelTest {
 	public static final String UNKNOWN_HOSTNAME = "UNKNOWN";
 
 	private static TextOutputStream MAIN_CONSOLE;
+	private static TextOutputStream PHYML_CONSOLE = null;
 	private static TextOutputStream CURRENT_OUT_STREAM;
 
 	public static String[] arguments;
@@ -1307,6 +1308,15 @@ public class ModelTest {
 		return MAIN_CONSOLE;
 	}
 
+	public static TextOutputStream setPhymlConsole(TextOutputStream phymlConsole) {
+		ModelTest.PHYML_CONSOLE = phymlConsole;
+		return phymlConsole;
+	}
+
+	public static TextOutputStream getPhymlConsole() {
+		return PHYML_CONSOLE;
+	}
+	
 	public static TextOutputStream getCurrentOutStream() {
 		return CURRENT_OUT_STREAM;
 	}

@@ -25,6 +25,7 @@ import java.util.Observable;
 
 import pal.tree.TreeParseException;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
+import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.io.TextInputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
@@ -271,12 +272,12 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 			// any error message?
 			StreamGobbler errorGobbler = new StreamGobbler(
-					proc.getErrorStream(), "ERROR", System.err);
+					proc.getErrorStream(), "ERROR", System.err, ModelTest.getPhymlConsole());
 			// any output?
 			FileOutputStream logFile = new FileOutputStream(
 					options.getLogFile(), true);
 			StreamGobbler outputGobbler = new StreamGobbler(
-					proc.getInputStream(), "OUTPUT", logFile);
+					proc.getInputStream(), "OUTPUT", logFile, ModelTest.getPhymlConsole());
 
 			// kick them off
 			errorGobbler.start();
