@@ -36,6 +36,7 @@ TOC
     4.1.3. Cluster execution
     4.1.4. Cluster hybrid execution
   4.2. Graphical user interface execution
+  4.3. Running under Windows
 5. Frequently Asked Questions
 
 -----------------------------------------------------------------------------
@@ -159,17 +160,10 @@ These are the parameters of the sequential execution:
      -g: include models with rate variation among sites and number of categories (e.g., -g 8) 
          (default is false & 4 categories)
      -S: tree topology search operation option (NNI (fast), SPR (a bit slower), BEST (best of NNI and SPR)) 
-         (default is BEST)
-     -n: sample size (e.g., -n NxL , or -n 547
-         ALIGNMENT     (number of sites) (default)
-         ALIGNMENT_VAR (number of variable sites)
-         NxL           (number of sites multiplied by number of taxa)
-         SHANNON       (Shannon entropy)
-         SHANNON_NxL   (normalized Shannon entropy multiplied by NxL)
-         [SampleSize]  (user defined value)
+         (default is NNI)
      -AIC: calculate the Akaike Information Criterion (e.g., -AIC) (default is false)
      -AICc: calculate the corrected Akaike Information Criterion (e.g., -AICc) (default is false)
-     -BIC: calculate the Bayesian Information Criterion (e.g., -BIC) (default is false)
+     -BIC: calculate the Bayesian Information Criterion (e.g., -BIC) (true, unless other criteria are selected)
      -DT: calculate the decision theory criterion (e.g., -DT) (default is false)
      -p: calculate parameter importances (e.g., -p) (default is false)
      -v: do model averaging and parameter importances (e.g., -v) (default is false)
@@ -272,6 +266,25 @@ a local multicore machine.
 $ cd $JMODELTEST_HOME
 $ ./runjmodeltest-gui.sh
 
+or
+
+$ cd $JMODELTEST_HOME
+$ java -jar jModelTest.jar
+
+-----------------------------------------------------------------------------
+        4.3. Running under windows
+-----------------------------------------------------------------------------
+
+Although you can run jModelTest in the command console (see Section 4.1), 
+most Windows users prefer to use Graphical Interface. First you have to do
+is extracting the tarball into a separate folder. DO NOT RUN JMODELTEST
+DIRECTLY FROM THE TARBALL, or it will be impossible to execute the phyML
+binaries.
+
+The next step is double-clicking the jar file (jModelTest.jar). The main
+frame should open in your desktop. First of all, try running some example
+file (e.g., aP6.phy / aP6.fas).
+
 -----------------------------------------------------------------------------
 5. Frequently Asked Questions
 -----------------------------------------------------------------------------
@@ -284,7 +297,7 @@ It is possible that jModelTest requires a more recent revision of phyml. Try
 downloading the latest phyml distribution from http://code.google.com/p/phyml,
 or downloading jModelTest package that includes phyml binaries.
 
-If the problem persist, please contact us.
+If the problem persist, feel free to contact us.
 
 -----------------------------------------------------------------------------
     5.2. I have already installed phyml. May I use it instead of the binaries
@@ -317,7 +330,7 @@ If you don't have phyml in the path but you already have a functional binary
 you can set the exe-dir variable in conf/jmodeltest.conf file:
 
 	global-phyml-exe    = false
-	exe-dir				= PATH_TO_YOUR_PHYML_BINARY
+	exe-dir	            = PATH_TO_YOUR_PHYML_BINARY
 
 You can also link the binary file from the "exe/phyml" directory:
 
