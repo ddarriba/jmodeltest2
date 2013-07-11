@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.URI;
 
@@ -43,6 +44,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.plaf.BorderUIResource;
@@ -53,7 +55,9 @@ import edu.stanford.ejalbert.BrowserLauncher;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.ModelTestService;
+import es.uvigo.darwin.jmodeltest.io.DocumentOutputStream;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
+import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.tree.TreeSummary;
 import es.uvigo.darwin.jmodeltest.utilities.InitialFocusSetter;
 import es.uvigo.darwin.jmodeltest.utilities.PrintUtilities;
@@ -69,8 +73,11 @@ public class FrameMain extends JModelTestFrame {
 			+ File.separator + "log" + File.separator);
 
 	public static JPanel Panel = new JPanel();
+	private JTabbedPane tabbedPane = new JTabbedPane();
 	private JScrollPane scrollPane = new JScrollPane();
+	private JScrollPane phymlScrollPane = new JScrollPane();
 	private JTextPane mainEditorPane = new JTextPane();
+	private JTextPane phymlEditorPane = new JTextPane();
 	
 	private JPanel StatusPanel = new JPanel();
 	private JLabel LabelStatusLikelihoods = new JLabel();
@@ -392,20 +399,36 @@ public class FrameMain extends JModelTestFrame {
 		Panel.setLayout(new BorderLayout());
 		Panel.setBackground(null);
 
-		scrollPane.setSize(new java.awt.Dimension(590, 600));
-		scrollPane.setLocation(new java.awt.Point(20, 20));
+		tabbedPane.setSize(590, 610);
+		tabbedPane.setLocation(20, 10);
+		tabbedPane.setVisible(true);
+		
 		scrollPane.setVisible(true);
 		scrollPane.setAutoscrolls(true);
 
+		phymlScrollPane.setVisible(true);
+		phymlScrollPane.setAutoscrolls(true);
+		
 		mainEditorPane.setMargin(new Insets(5, 5, 5, 5));
 		mainEditorPane.setFont(XManager.FONT_CONSOLE);
 
 		mainEditorPane.setBackground(XManager.PANE_BACK_COLOR);
 		mainEditorPane.setEditable(false);
-		mainEditorPane.setSize(new java.awt.Dimension(15, 10));
+		mainEditorPane.setSize(15, 10);
 		mainEditorPane.setAutoscrolls(true);
 		mainEditorPane.setVisible(true);
 
+		phymlEditorPane.setMargin(new Insets(5, 5, 5, 5));
+		phymlEditorPane.setFont(XManager.FONT_CONSOLE);
+
+		phymlEditorPane.setBackground(XManager.PANE_BACK_COLOR);
+		phymlEditorPane.setEditable(false);
+		phymlEditorPane.setSize(15, 10);
+		phymlEditorPane.setAutoscrolls(true);
+		phymlEditorPane.setVisible(true);
+		ModelTest.setPhymlConsole(new TextOutputStream(new PrintStream(
+					new DocumentOutputStream(phymlEditorPane.getDocument()))));
+		
 		StatusPanel.setPreferredSize(new java.awt.Dimension(592, 30));
 		StatusPanel.setBorder(new BorderUIResource.EtchedBorderUIResource(1,
 				XManager.INNER_BORDER_COLOR, XManager.OUTER_BORDER_COLOR));
@@ -477,9 +500,12 @@ public class FrameMain extends JModelTestFrame {
 
 		menuTools.add(menuToolsLRT);
 
-		Panel.add(scrollPane, BorderLayout.CENTER);
+		tabbedPane.addTab("Main", scrollPane);
+		tabbedPane.addTab("PhyML-log", phymlScrollPane);
+		Panel.add(tabbedPane, BorderLayout.CENTER);
 		Panel.add(StatusPanel, BorderLayout.PAGE_END);
 		scrollPane.getViewport().add(mainEditorPane);
+		phymlScrollPane.getViewport().add(phymlEditorPane);
 		StatusPanel.add(LabelStatusLikelihoods, BorderLayout.LINE_START);
 		StatusPanel.add(LabelStatusData, BorderLayout.LINE_END);
 
