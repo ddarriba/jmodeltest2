@@ -8,7 +8,8 @@ import java.util.Properties;
 public abstract class ModelTestConfiguration {
 
 	private static String convertPathToAbsolute(String path) {
-    	if (!path.startsWith(File.separator)) {
+		File fPath = new File(path);
+    	if (!fPath.isAbsolute()) {
     		path = PATH + path;
     	}
     	return path;
