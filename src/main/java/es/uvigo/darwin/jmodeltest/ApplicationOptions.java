@@ -542,7 +542,7 @@ public class ApplicationOptions implements Serializable {
 	}
 
 	public double getSampleSize() {
-		return numTaxa * numSites;
+		return numSites;
 	}
 
 	public static void setInstance(ApplicationOptions newInstance) {
