@@ -48,21 +48,7 @@ public class DT extends InformationCriterion {
 		double min, sum, sumReciprocal, cum, temp1;
 		double[] tempw = new double[numModels];
 		double[] bicValues = new double[numModels];
-
-		/*
-		 * // Calculate BICs and BIC exponentials sumBICexp = 0; for (i=0;
-		 * i<numModels; i++) { if (ModelTest.countBLasParameters) BIC[i]
-		 * = 2 * model[i].lnL + model[i].K * Math.log(ModelTest.sampleSize);
-		 * else BIC[i] = 2 * model[i].lnL + (model[i].K - ModelTest.numBranches)
-		 * * Math.log(ModelTest.sampleSize); BICexp[i] = Math.exp(-0.5 *
-		 * BIC[i]); // DP: e^1000 gives 0... sumBICexp += BICexp[i]; } //
-		 * Calculate DT and minDT min = 999999; for (i=0; i<numModels; i++) {
-		 * model[i].DT = 0; for (j=0; j<numModels; j++) model[i].DT +=
-		 * euclideanDistances[i][j] * (BICexp[j]/sumBICexp);
-		 * 
-		 * if (model[i].DT < min) { min = model[i].DT; ModelTest.minDT =
-		 * model[i]; } }
-		 */
+		double[] bicLike = new double[numModels];
 
 		/* exactly as in DT-ModSel.pl */
 		// get BICs and min BIC
@@ -72,22 +58,24 @@ public class DT extends InformationCriterion {
 			if (bicValues[i] < minBIC)
 				minBIC = bicValues[i];
 		}
+		
+		double denom = 0.0;
+		for (i = 0; i < numModels; i++) {
+			bicLike[i] = Math.exp(-0.5*(bicValues[i] - minBIC));
+			denom += bicLike[i];
+		}
 
 		for (Model model1 : models) {
-			sum = 0;
+			sum = 0.0;
 			j = 0;
 			for (Model model2 : models) {
 				double distance = distances.getDistance(model1.getTree(), model2.getTree());
 				if (distance > 0) {
-					double power = Math.log(distance) - bicValues[j]
-							+ minBIC;
-					if (power > -30) {
-						sum += Math.exp(power);
-					}
+					sum += distance * bicLike[j];
 				}
 				j++;
 			}
-			model1.setDT(sum);
+			model1.setDT(sum / denom);
 			if (model1.getDT() < min) {
 				min = model1.getDT();
 				minModel = model1;
@@ -98,19 +86,8 @@ public class DT extends InformationCriterion {
 		sumReciprocal = sum = 0;
 		for (i = 0; i < numModels; i++) {
 			models[i].setDTd(models[i].getDT() - minModel.getDT());
-//			sumExp += Math.exp(-0.5 * models[i].getDTd());
 			sumReciprocal += 1.0 / models[i].getDT();
 		}
-
-		// Calculate DT weights
-		// NOTE: It gives very small and similar weigths, as we are taking logs
-		// of
-		// small and similar numbers
-		/*
-		 * for (i=0; i<numModels; i++) { model[i].DTw =
-		 * Math.exp(-0.5*model[i].DTd) / sumExp; tempw[i] = model[i].DTw;
-		 * order[i] = i; }
-		 */
 
 		// DP we need to do it in a different way?: i think so...
 		for (i = 0; i < numModels; i++) {
