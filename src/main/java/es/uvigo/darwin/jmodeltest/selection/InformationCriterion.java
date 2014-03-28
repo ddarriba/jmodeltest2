@@ -458,14 +458,14 @@ public abstract class InformationCriterion {
 				+ " MODEL SELECTION : Selection uncertainty");
 		stream.println(" ");
 		stream.printf(
-				"Model             -lnL    K        %4s      delta      weight cumWeight",
+				"Model             -lnL    K     %4s       delta       weight   cumWeight",
 				criterion);
 		if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
 			stream.println("       uDelta");
 		} else {
 			stream.println("");
 		}
-		stream.print("------------------------------------------------------------------------");
+		stream.print("-------------------------------------------------------------------------");
 		if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
 			stream.print("-------------");
 		}
@@ -474,19 +474,19 @@ public abstract class InformationCriterion {
 			// j = i;
 			stream.println(" ");
 			stream.printf("%-10s", models[j].getName());
-			stream.printf("  %10.4f", models[j].getLnL());
+			stream.printf("  %10.5f", models[j].getLnL());
 			if (options.countBLasParameters)
 				stream.printf("   %2d", models[j].getK());
 			else
 				stream.printf("  %2d",
 						models[j].getK() - options.getNumBranches());
-			stream.printf("  %10.4f", getValue(models[j]));
-			stream.printf("  %9.4f", getDelta(models[j]));
+			stream.printf("  %10.6f", getValue(models[j]));
+			stream.printf("  %9.6f", getDelta(models[j]));
 			if (getWeight(models[j]) > 0.0001)
-				stream.printf("   %9.4f", getWeight(models[j]));
+				stream.printf("   %9.6f", getWeight(models[j]));
 			else
 				stream.printf("   %4.2e", getWeight(models[j]));
-			stream.printf("   %7.4f", getCumWeight(models[j]));
+			stream.printf("   %7.6f", getCumWeight(models[j]));
 			if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
 				if (!options.isAmbiguous()) {
 					stream.printf("   %10.4f", getUDelta(models[j]));
@@ -497,7 +497,7 @@ public abstract class InformationCriterion {
 				}
 			}
 		}
-		stream.print("\n------------------------------------------------------------------------");
+		stream.print("\n-------------------------------------------------------------------------");
 		if (doCheckAgainstULK && minModel.getUnconstrainedLnL() > 1e-10) {
 			stream.print("-------------");
 		}
