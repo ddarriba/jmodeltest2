@@ -185,18 +185,6 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		} else
 			sb.append(" -c 1");
 
-		// search strategy
-		switch (options.treeSearchOperations) {
-		case SPR:
-			sb.append(" -s SPR");
-			break;
-		case BEST:
-			sb.append(" -s BEST");
-			break;
-		default:
-			sb.append(" -s NNI");
-		}
-
 		// threaded version
 		if (numberOfThreads > 0) {
 			sb.append(" --num_threads ").append(numberOfThreads);
@@ -214,7 +202,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		 * branch lengths are fixed.
 		 */
 		if (justGetJCtree) {
-			sb.append(" -o r"); // both tree topology and branch
+			sb.append(" -o lr"); // both tree topology and branch
 								// lengths are fixed.
 		}
 		/*
@@ -233,9 +221,19 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			sb.append(" -o lr"); // tree topology fixed; optimize
 									// branch lengths
 		} else {
-			sb.append(" -o tlr"); // optimize tree topology and branch
-									// lengthss
-		} // use ML optimized tree for each model
+			sb.append(" -o tlr"); // optimize tree topology and branch lengthss
+			// search strategy
+			switch (options.treeSearchOperations) {
+			case SPR:
+				sb.append(" -s SPR");
+				break;
+			case BEST:
+				sb.append(" -s BEST");
+				break;
+			default:
+				sb.append(" -s NNI");
+			}
+		}
 
 		return sb.toString();
 	}
