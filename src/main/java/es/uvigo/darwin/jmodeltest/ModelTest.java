@@ -1264,7 +1264,7 @@ public class ModelTest {
 				System.err.println("\nThe specified file \""
 						+ inputFile.getAbsolutePath()
 						+ "\" cannot be read as an alignment");
-				MAIN_CONSOLE.println(" failed.\n");
+				MAIN_CONSOLE.println(" failed.\n" + e.getMessage());
 				throw new InvalidArgumentException.InvalidAlignmentFileException(
 						inputFile);
 			}
