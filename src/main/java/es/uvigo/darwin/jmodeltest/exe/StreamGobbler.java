@@ -31,13 +31,22 @@ class StreamGobbler extends Thread {
 	private InputStream is;
 	private String type;
 	private OutputStream osFile, osConsole;
-
+	private static int runId = 1;
+	private int localRunId;
+	
+	public int getRunId() {
+		return localRunId;
+	}
+	
 	StreamGobbler(InputStream is, String type, OutputStream fileRedirect,
 			OutputStream consoleRedirect) {
 		this.is = is;
 		this.type = type;
 		this.osFile = fileRedirect;
 		this.osConsole = consoleRedirect;
+		synchronized(is) {
+			this.localRunId = runId++;
+		}
 	}
 
 	public void run() {
@@ -75,16 +84,16 @@ class StreamGobbler extends Thread {
 
 				}
 				if (pwFile != null) {
-					pwFile.println(type + ">" + line);
+					synchronized (pwFile) {
+						pwFile.println(type + "("+localRunId+")>" + line);
+						pwFile.flush();
+					}
 				}
 				if (pwConsole != null) {
-					pwConsole.println(type + ">" + line);
+						pwConsole.println(type + "("+localRunId+")>" + line);
+						pwConsole.flush();
 				}
-				if (pwConsole != null)
-					pwConsole.flush();
 			}
-			if (pwFile != null)
-				pwFile.flush();
 			if (pwConsole != null)
 				pwConsole.flush();
 		} catch (IOException ioe) {

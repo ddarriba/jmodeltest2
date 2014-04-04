@@ -768,6 +768,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 					.setCaretPosition(
 							XManager.getInstance().getPane().getDocument()
 									.getLength());
+			options.createLogFile();
 			// run phyml
 			this.task = new ComputeLikelihoodTask();
 			this.runPhyml = task.getValue();
