@@ -23,6 +23,8 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Observable;
 
+import javax.sql.rowset.spi.SyncResolver;
+
 import pal.tree.TreeParseException;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
@@ -36,16 +38,11 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 	private int verbose = 0;
 
-	private static String CURRENT_DIRECTORY = ModelTestConfiguration.PATH;
-
-	private boolean PHYML_GLOBAL = false;
-	public String PHYML_PATH = CURRENT_DIRECTORY + "exe/phyml/";
 	private String phymlStatFileName;
 	private String phymlTreeFileName;
 
 	private Model model;
-	private long startTime;
-	private long endTime;
+	private long startTime, endTime;
 	private String commandLine;
 	private int index;
 	private boolean justGetJCTree = false;
@@ -66,20 +63,6 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		this.justGetJCTree = justGetJCTree;
 		this.ignoreGaps = ignoreGaps;
 		
-		PHYML_GLOBAL = ModelTestConfiguration.isGlobalPhymlBinary();
-		if (PHYML_GLOBAL) {
-			PHYML_PATH = "";
-		} else {
-			String path = ModelTestConfiguration.getExeDir();
-			if (!path.startsWith(File.separator)) {
-				PHYML_PATH = CURRENT_DIRECTORY + File.separator + path;
-			} else {
-				PHYML_PATH = path;
-			}
-			if (!PHYML_PATH.endsWith(File.separator)) {
-				PHYML_PATH += File.separator;
-			}
-		}
 		this.phymlStatFileName = options.getAlignmentFile().getAbsolutePath()
 				+ RunPhyml.PHYML_STATS_SUFFIX + model.getName() + ".txt";
 		this.phymlTreeFileName = options.getAlignmentFile().getAbsolutePath()
@@ -135,10 +118,11 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	}
 
 	/************************
-	 * writePhym3lCommandLine ********************** * Builds up the command
-	 * line for Phyml3 * * *
-	 ***********************************************************************/
-
+	 * writePhym3lCommandLine 
+	 ************************
+	 * Builds up the command
+	 * line for Phyml3
+	 ************************/
 	public static String writePhyml3CommandLine(Model currentModel,
 			boolean justGetJCtree, ApplicationOptions options,
 			boolean ignoreGaps, int numberOfThreads) {
@@ -176,10 +160,6 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		if (currentModel.ispI())
 			sb.append(" -v e");
 
-		// optimize rate parameters
-		// if (currentModel.pT || currentModel.pR)
-		// commandLine += rateParameters;
-
 		// optimize alpha if needed
 		if (currentModel.ispG()) {
 			sb.append(" -c ").append(options.numGammaCat);
@@ -195,7 +175,6 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		// avoid memory warning
 		sb.append(" --no_memory_check");
 
-		// do optimize topology?
 		/*
 		 * params=tlr: tree topology (t), branch length (l) and substitution
 		 * rate parameters (r) are optimised. params = tlr or tl: optimize tree
@@ -204,26 +183,19 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		 * branch lengths are fixed.
 		 */
 		if (justGetJCtree) {
-			sb.append(" -o lr"); // both tree topology and branch
-								// lengths are fixed.
-		}
-		/*
-		 * else if (ModelTest.userTreeExists) // use user tree for all models {
-		 * commandLine += " -u " + userTreeFileName; commandLine += " -o " +
-		 * "r"; // both tree topology and branch lengths are fixed. }
-		 */
-		// use a single tree for all models
-		else if (options.userTopologyExists || options.fixedTopology) {
+			// tree topology is fixed.
+			sb.append(" -o lr");
+		} else if (options.userTopologyExists || options.fixedTopology) {
+			// use a single tree for all models
 			sb.append(" -u ").append(options.getTreeFile().getAbsolutePath());
-			sb.append(" -o lr"); // tree topology fixed; optimize
-									// branch lengths
-		} else if (!options.optimizeMLTopology) // use BIONJ tree for
-												// each model
+			sb.append(" -o lr"); // tree topology fixed; optimize branch lengths
+		} else if (!options.optimizeMLTopology)
 		{
-			sb.append(" -o lr"); // tree topology fixed; optimize
-									// branch lengths
+			// use BIONJ tree for each model
+			sb.append(" -o lr"); // tree topology fixed; optimize branch lengths
 		} else {
 			sb.append(" -o tlr"); // optimize tree topology and branch lengthss
+
 			// search strategy
 			switch (options.treeSearchOperations) {
 			case SPR:
@@ -248,27 +220,17 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	private void executeCommandLine() {
 		String[] executable = new String[1];
 		try {
-			File dir = new File(PHYML_PATH);
-			if (PHYML_GLOBAL) {
-				executable[0] = "phyml";
-			} else {
-				File phymlBinary = new File(PHYML_PATH + "phyml");
-				if (phymlBinary.exists() && phymlBinary.canExecute()) {
-					executable[0] = phymlBinary.getAbsolutePath();
-				} else {
-					executable[0] = PHYML_PATH + Utilities.getBinaryVersion();
-				}
-				/* Check if binary exists */
-				phymlBinary = new File(executable[0]);
-				if (!phymlBinary.exists()) {
+			if (!ModelTestConfiguration.isGlobalPhymlBinary()) {
+				if (!RunPhyml.phymlBinary.exists()) {
 					notifyObservers(
-							ProgressInfo.ERROR_BINARY_NOEXISTS, index, model, phymlBinary.getAbsolutePath());
-				} else if (!phymlBinary.canExecute()) {
+							ProgressInfo.ERROR_BINARY_NOEXISTS, index, model, RunPhyml.phymlBinary.getAbsolutePath());
+				} else if (!RunPhyml.phymlBinary.canExecute()) {
 					notifyObservers(
-							ProgressInfo.ERROR_BINARY_NOEXECUTE, index, model, phymlBinary.getAbsolutePath());
+							ProgressInfo.ERROR_BINARY_NOEXECUTE, index, model, RunPhyml.phymlBinary.getAbsolutePath());
 					
 				}
 			}
+			executable[0] = RunPhyml.phymlBinaryStr;
 			
 			String[] tokenizedCommandLine = commandLine.split(" ");
 			String[] cmd = Utilities.specialConcatStringArrays(executable,
@@ -276,8 +238,8 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 			// get process and execute command line
 			Runtime rt = Runtime.getRuntime();
-			Process proc = rt.exec(cmd, null, PHYML_PATH.equals("") ? null
-					: dir);
+			Process proc = rt.exec(cmd, null, RunPhyml.PHYML_PATH.equals("") ? null
+					: new File(RunPhyml.PHYML_PATH));
 			ProcessManager.getInstance().registerProcess(proc);
 
 			// any error message?
@@ -302,10 +264,32 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 			// print command line to phmyl logfile
 			PrintWriter printout = new PrintWriter(logFile);
-			printout.println("Command line used for settings above = "
-					+ commandLine);
+			printout.println(" ");
+			printout.println("Command line used for process "+ outputGobbler.getRunId() +":");
+			String uCommand = commandLine.replace(options.getAlignmentFile().getAbsolutePath(), 
+					options.getInputFile().getAbsolutePath());
+			if (options.userTopologyExists) {
+				uCommand = uCommand.replace(options.getTreeFile().getAbsolutePath(), 
+						options.getInputTreeFile().getAbsolutePath());
+			}
+			printout.println("    " + RunPhyml.phymlBinary.getAbsolutePath() + " "
+					+ uCommand);
+			printout.println(" ");
 			printout.flush();
 			printout.close();
+			
+			// print to console
+			if (ModelTest.getPhymlConsole() != null) {
+				synchronized (ModelTest.getPhymlConsole()) {
+					ModelTest.getPhymlConsole().println(" ");
+					ModelTest.getPhymlConsole().println("Command line used for process "+ outputGobbler.getRunId() +":");
+					ModelTest.getPhymlConsole().println("    " + RunPhyml.phymlBinary.getAbsolutePath() + " "
+							+ uCommand);
+					ModelTest.getPhymlConsole().println(" ");
+					ModelTest.getPhymlConsole().flush();
+					ModelTest.getPhymlConsole().close();
+				}
+			}
 
 		} catch (InterruptedException e) {
 			notifyObservers(ProgressInfo.INTERRUPTED, index, model, null);
@@ -536,14 +520,22 @@ public class PhymlSingleModel extends Observable implements Runnable {
 					+ phymlTreeFileName);
 
 		} catch (TreeParseException e) {
+			StringBuffer sb = new StringBuffer();
+			sb.append(" Please, check the PhyML log");
+			if (ModelTest.execMode == ModelTest.ExecMode.GUI) {
+				sb.append(" tab,");
+			} else {
+				sb.append(" file at " + options.getLogFile());
+			}
+			sb.append(" or run PhyML alone for getting more information: ");
 			notifyObservers(ProgressInfo.ERROR, index, model, "ML tree for "
-					+ currentModel.getName() + " is invalid.");
+					+ currentModel.getName() + " is invalid." + sb.toString());
 		}
 		Utilities.deleteFile(phymlStatFileName);
 		Utilities.deleteFile(phymlTreeFileName);
 
 	}
-
+	
 	private void notifyObservers(int type, int value, Model model,
 			String message) {
 		setChanged();

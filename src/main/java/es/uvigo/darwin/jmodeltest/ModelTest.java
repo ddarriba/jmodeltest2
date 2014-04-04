@@ -86,7 +86,7 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.1.4";
+	public static final String CURRENT_VERSION = "2.1.5";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
@@ -108,7 +108,11 @@ public class ModelTest {
 	public static Vector<String> testingOrder; // order of the hLRTs
 	public static String averagedTreeString; // model-averaged phylogeny in
 												// Newick format
-
+	public static enum ExecMode {
+		CONSOLE, GUI
+	};
+	public static ExecMode execMode;
+	
 	private static AIC myAIC;
 	private static AICc myAICc;
 	private static BIC myBIC;
@@ -146,6 +150,7 @@ public class ModelTest {
 	public ModelTest() {
 		if (!GraphicsEnvironment.isHeadless()) {
 			options.createLogFile();
+			execMode = ExecMode.GUI;
 			XManager.getInstance();
 		} else {
 			System.err.println("");
@@ -159,6 +164,7 @@ public class ModelTest {
 		try {
 			// open mainConsole
 			MAIN_CONSOLE = new TextOutputStream(System.out);
+			execMode = ExecMode.CONSOLE;
 			ParseArguments();
 			options.createLogFile();
 			if (options.doingSimulations) {
