@@ -26,6 +26,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
@@ -134,6 +138,12 @@ public final class Utilities {
 		return h + "h:" + m + ":" + s + "";
 	}
 
+	public static String getCurrentTime(String format) {
+		Calendar cal = new GregorianCalendar();
+	    SimpleDateFormat date_format = new SimpleDateFormat(format);
+	    return date_format.format(cal.getTime());
+	}
+	
 	public static String displayRuntime(long time) {
 		long decimes = (long) Math.round(time / 100.0);
 		int hours = (int) (decimes / 36000.0);

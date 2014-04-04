@@ -122,14 +122,6 @@ public class ModelTestService {
         FileWriter fw = new FileWriter(outputFile);
         fw.write(out);
         fw.close();
-//        PushbackReader pr = new PushbackReader(new StringReader(out));
-//        alignment = readAlignment(output, pr, debug);
-//
-//        if (alignment == null) {
-//            throw new AlignmentParseException("There's some error in your data, exiting...");
-//        }
-
-//        return alignment;
     }
     
 	public InformationCriterion doIC(int ic, boolean writePAUPblock, boolean doImportances,

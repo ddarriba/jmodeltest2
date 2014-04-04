@@ -73,7 +73,8 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	private static final int THREAD_LABEL_WIDTH = 80;
 
 	private static final String NO_MODEL = "idle";
-
+	private static final long lockTime = 3000;
+	
 	private static final Color[] THREAD_COLOR = { new Color(177, 68, 68),
 			new Color(177, 68, 161), new Color(126, 68, 177),
 			new Color(68, 97, 177), new Color(68, 177, 162),
@@ -99,7 +100,9 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	private JLabel footerStageLabel = new JLabel();
 
 	/** Timer for calculate the elapsed time **/
-	private long startTime;
+	private volatile long startTime;
+	private volatile long lockTimer = 0;
+	
 	private Frame_CalcLike frameCalcLike;
 	private Timer timer;
 
@@ -343,8 +346,10 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-
+	public synchronized void update(Observable o, Object arg) {
+		
+		if (Math.abs(System.currentTimeMillis() - lockTimer) < lockTime) return;
+		
 		if (arg != null) {
 			ProgressInfo info = (ProgressInfo) arg;
 
@@ -477,6 +482,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 				break;
 
 			case ProgressInfo.INTERRUPTED:
+				lockTimer = System.currentTimeMillis();
 				if (!interrupted) {
 					interrupted = true;
 					stream.println(" ");
@@ -490,7 +496,6 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 							.printRed("\nComputation of likelihood scores interrupted. It took "
 									+ Utilities.calculateRuntime(startTime,
 											System.currentTimeMillis()) + ".\n");
-
 					stream.println(" ");
 					XManager.getInstance()
 							.getPane()
@@ -502,9 +507,28 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 				break;
 
 			case ProgressInfo.ERROR:
+				lockTimer = System.currentTimeMillis();
 				progressBarCancel(null);
 				Utilities.printRed(info.getMessage());
 				JOptionPane.showMessageDialog(new JFrame(), info.getMessage(),
+						"jModeltest error", JOptionPane.ERROR_MESSAGE);
+				break;
+			case ProgressInfo.ERROR_BINARY_NOEXECUTE:
+				lockTimer = System.currentTimeMillis();
+				progressBarCancel(null);
+				Utilities.printRed("\n********************\n");
+				Utilities.printRed("PhyML binary does not have execution permission: " + info.getMessage());
+				Utilities.printRed("\n********************\n");
+				JOptionPane.showMessageDialog(new JFrame(),  "PhyML binary does not have execution permission:\n   " +info.getMessage(),
+						"jModeltest error", JOptionPane.ERROR_MESSAGE);
+				break;
+			case ProgressInfo.ERROR_BINARY_NOEXISTS:
+				lockTimer = System.currentTimeMillis();
+				progressBarCancel(null);
+				Utilities.printRed("\n********************\n");
+				Utilities.printRed("PhyML binary does not exist: " + info.getMessage());
+				Utilities.printRed("\n********************\n");
+				JOptionPane.showMessageDialog(new JFrame(),  "PhyML binary does not exist:\n   " +info.getMessage(),
 						"jModeltest error", JOptionPane.ERROR_MESSAGE);
 				break;
 

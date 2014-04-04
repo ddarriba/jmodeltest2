@@ -887,8 +887,6 @@ public class Frame_CalcLike extends JModelTestFrame {
 				;
 			}
 			if (tree != null) {
-				// delete previous usertreefile from phyml directory if needed
-				// Utilities.deleteFile(RunPhyml.userTreePhymlFileName);
 				options.setUserTree(TreeUtilities.toNewick(tree, true, false,
 						false));
 				TextOutputStream out = new TextOutputStream(options

@@ -65,6 +65,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		this.index = index;
 		this.justGetJCTree = justGetJCTree;
 		this.ignoreGaps = ignoreGaps;
+		
 		PHYML_GLOBAL = ModelTestConfiguration.isGlobalPhymlBinary();
 		if (PHYML_GLOBAL) {
 			PHYML_PATH = "";
@@ -102,6 +103,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			commandLine = writePhyml3CommandLine(model, justGetJCTree, options,
 					ignoreGaps, numberOfThreads);
 			executeCommandLine();
+			
 			if (!interrupted) {
 				parsePhyml3Files(model);
 			}
@@ -247,7 +249,6 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		String[] executable = new String[1];
 		try {
 			File dir = new File(PHYML_PATH);
-
 			if (PHYML_GLOBAL) {
 				executable[0] = "phyml";
 			} else {
@@ -257,7 +258,18 @@ public class PhymlSingleModel extends Observable implements Runnable {
 				} else {
 					executable[0] = PHYML_PATH + Utilities.getBinaryVersion();
 				}
+				/* Check if binary exists */
+				phymlBinary = new File(executable[0]);
+				if (!phymlBinary.exists()) {
+					notifyObservers(
+							ProgressInfo.ERROR_BINARY_NOEXISTS, index, model, phymlBinary.getAbsolutePath());
+				} else if (!phymlBinary.canExecute()) {
+					notifyObservers(
+							ProgressInfo.ERROR_BINARY_NOEXECUTE, index, model, phymlBinary.getAbsolutePath());
+					
+				}
 			}
+			
 			String[] tokenizedCommandLine = commandLine.split(" ");
 			String[] cmd = Utilities.specialConcatStringArrays(executable,
 					tokenizedCommandLine);
@@ -275,7 +287,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			FileOutputStream logFile = new FileOutputStream(
 					options.getLogFile(), true);
 			StreamGobbler outputGobbler = new StreamGobbler(
-					proc.getInputStream(), "OUTPUT", logFile, ModelTest.getPhymlConsole());
+					proc.getInputStream(), "PHYML", logFile, ModelTest.getPhymlConsole());
 
 			// kick them off
 			errorGobbler.start();
