@@ -124,6 +124,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 
 				PhymlSingleModel jcModelPhyml = new PhymlSingleModel(jcModel,
 						0, true, false, options);
+				jcModelPhyml.addObserver(this);
 				jcModelPhyml.run();
 
 				// create JCtree file

@@ -302,6 +302,7 @@ public class Frame_BIC extends JModelTestFrame {
 			dispose();
 
 			writePAUPblock = jCheckBoxPAUPblock.isSelected();
+			options.writePAUPblock |= writePAUPblock;
 			doImportances = jCheckBoxImportance.isSelected();
 			doModelAveraging = jCheckBoxAveraging.isSelected();
 

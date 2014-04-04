@@ -45,6 +45,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.plaf.BorderUIResource;
@@ -77,7 +78,7 @@ public class FrameMain extends JModelTestFrame {
 	private JScrollPane scrollPane = new JScrollPane();
 	private JScrollPane phymlScrollPane = new JScrollPane();
 	private JTextPane mainEditorPane = new JTextPane();
-	private JTextPane phymlEditorPane = new JTextPane();
+	private JTextArea phymlEditorPane = new JTextArea();
 	
 	private JPanel StatusPanel = new JPanel();
 	private JLabel LabelStatusLikelihoods = new JLabel();

@@ -17,15 +17,18 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package es.uvigo.darwin.jmodeltest.io;
 
+import java.awt.GraphicsEnvironment;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -91,8 +94,8 @@ public abstract class HtmlReporter {
 			}
 		} else {
 			outputFile = new File(LOG_DIR.getPath() + File.separator
-					+ ApplicationOptions.getInstance().getInputFile().getName()
-					+ ".jmodeltest." + Calendar.getInstance().getTimeInMillis()
+					+ options.getInputFile().getName()
+					+ ".jmodeltest." + options.getExecutionName()
 					+ ".html");
 		}
 		
@@ -126,6 +129,19 @@ public abstract class HtmlReporter {
 			for (Model model : ModelTest.getMyAIC().getConfidenceModels())
 				aicConfModels.append(model.getName() + " ");
 			datamodel.put("aicConfidenceList", aicConfModels.toString());
+			if (options.writePAUPblock) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				PrintStream ps = new PrintStream(baos);
+				TextOutputStream strOutput = new TextOutputStream(ps);
+			    ModelTest.WritePaupBlock(strOutput, "AIC", ModelTest.getMyAIC().getMinModel());
+			    try {
+			    	String pblock = baos.toString("UTF8");
+			    	pblock = pblock.replaceAll("\n", "<br/>");
+					datamodel.put("aicPaup", pblock);
+				} catch (UnsupportedEncodingException e) {
+				}
+				
+			}
 			buildChart(outputFile, ModelTest.getMyAIC());
 			datamodel.put("aicEuImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_eu_AIC.png");
 			datamodel.put("aicRfImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_rf_AIC.png");
@@ -144,6 +160,19 @@ public abstract class HtmlReporter {
 			for (Model model : ModelTest.getMyAICc().getConfidenceModels())
 				aiccConfModels.append(model.getName() + " ");
 			datamodel.put("aiccConfidenceList", aiccConfModels.toString());
+			if (options.writePAUPblock) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				PrintStream ps = new PrintStream(baos);
+				TextOutputStream strOutput = new TextOutputStream(ps);
+			    ModelTest.WritePaupBlock(strOutput, "AICc", ModelTest.getMyAICc().getMinModel());
+			    try {
+			    	String pblock = baos.toString("UTF8");
+			    	pblock = pblock.replaceAll("\n", "<br/>");
+					datamodel.put("aiccPaup", pblock);
+				} catch (UnsupportedEncodingException e) {
+				}
+				
+			}
 			buildChart(outputFile, ModelTest.getMyAICc());
 			datamodel.put("aiccEuImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_eu_AICc.png");
 			datamodel.put("aiccRfImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_rf_AICc.png");
@@ -162,6 +191,19 @@ public abstract class HtmlReporter {
 			for (Model model : ModelTest.getMyBIC().getConfidenceModels())
 				bicConfModels.append(model.getName() + " ");
 			datamodel.put("bicConfidenceList", bicConfModels.toString());
+			if (options.writePAUPblock) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				PrintStream ps = new PrintStream(baos);
+				TextOutputStream strOutput = new TextOutputStream(ps);
+			    ModelTest.WritePaupBlock(strOutput, "BIC", ModelTest.getMyBIC().getMinModel());
+			    try {
+			    	String pblock = baos.toString("UTF8");
+			    	pblock = pblock.replaceAll("\n", "<br/>");
+					datamodel.put("bicPaup", pblock);
+				} catch (UnsupportedEncodingException e) {
+				}
+				
+			}
 			buildChart(outputFile, ModelTest.getMyBIC());
 			datamodel.put("bicEuImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_eu_BIC.png");
 			datamodel.put("bicRfImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_rf_BIC.png");
@@ -180,6 +222,19 @@ public abstract class HtmlReporter {
 			for (Model model : ModelTest.getMyDT().getConfidenceModels())
 				dtConfModels.append(model.getName() + " ");
 			datamodel.put("dtConfidenceList", dtConfModels.toString());
+			if (options.writePAUPblock) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				PrintStream ps = new PrintStream(baos);
+				TextOutputStream strOutput = new TextOutputStream(ps);
+			    ModelTest.WritePaupBlock(strOutput, "DT", ModelTest.getMyDT().getMinModel());
+			    try {
+			    	String pblock = baos.toString("UTF8");
+			    	pblock = pblock.replaceAll("\n", "<br/>");
+					datamodel.put("dtPaup", pblock);
+				} catch (UnsupportedEncodingException e) {
+				}
+				
+			}
 			buildChart(outputFile, ModelTest.getMyDT());
 			datamodel.put("dtEuImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_eu_DT.png");
 			datamodel.put("dtRfImagePath",IMAGES_DIR.getName() + File.separator + outputFile.getName() + "_rf_DT.png");
@@ -307,6 +362,7 @@ public abstract class HtmlReporter {
 		datamodel.put("isBIC", options.doBIC ? new Integer(1) : new Integer(0));
 		datamodel.put("isDT", options.doDT ? new Integer(1) : new Integer(0));
 		datamodel.put("numCat", options.numGammaCat);
+		datamodel.put("isPAUP", options.writePAUPblock ? new Integer(1) : new Integer(0));
 
 		StringBuffer optimizedParameters = new StringBuffer(
 				"Substitution parameters ");
@@ -585,6 +641,10 @@ public abstract class HtmlReporter {
 	}
 
 	private static void buildChart(File mOutputFile, InformationCriterion ic) {
+		
+		/* This line prevents Swing exceptions on headless environments */
+		if (GraphicsEnvironment.isHeadless()) { return; }
+		
 		int width = 500;
 		int height = 300;
 		try {

@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package es.uvigo.darwin.jmodeltest;
 
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -143,7 +144,14 @@ public class ModelTest {
 
 	// constructor with GUI
 	public ModelTest() {
-		XManager.getInstance();
+		if (!GraphicsEnvironment.isHeadless()) {
+			options.createLogFile();
+			XManager.getInstance();
+		} else {
+			System.err.println("");
+			System.err.println("ERROR: You are trying to run a GUI interface in a headless server.");
+			finalize(-1);
+		}
 	}
 
 	// constructor without GUI
@@ -152,6 +160,7 @@ public class ModelTest {
 			// open mainConsole
 			MAIN_CONSOLE = new TextOutputStream(System.out);
 			ParseArguments();
+			options.createLogFile();
 			if (options.doingSimulations) {
 				Simulation sim = new Simulation(options);
 				sim.run();
@@ -723,6 +732,17 @@ public class ModelTest {
 					}
 				}
 
+				else if (arg.equals("-n")) {
+					if (i < arguments.length) {
+						options.setExecutionName(arguments[i++]);
+					} else {
+						System.err
+								.println(error
+										+ "-n option requires a name for the execution");
+						PrintUsage();
+					}
+				}
+				
 				else if (arg.equals("-S")) {
 					if (i < arguments.length) {
 						String type = arguments[i++];
@@ -1035,6 +1055,7 @@ public class ModelTest {
 					+ "\n     BIONJ  (Neighbor-Joining topology)"
 					+ "\n     ML     (Maximum Likelihood topology) (default)"
 					+ "\n -u: user tree for likelihood calculations  (e.g., -u data.tre)"
+					+ "\n -n: execution name for appending to the log filenames (default: current time yyyyMMddhhmmss)"
 					+ "\n -o: set output file (e.g., -o jmodeltest.out)"
 					+ "\n -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)"
 					+ "\n -f: include models with unequals base frecuencies (e.g., -f) (default is false)"
@@ -1208,7 +1229,7 @@ public class ModelTest {
 				stream.print("0");
 
 			stream.print(";\nEND;");
-			stream.print("\n--");
+			stream.print("\n--\n");
 		}
 
 		catch (Exception e) {
@@ -1225,10 +1246,10 @@ public class ModelTest {
 		if (inputFile.exists()) {
 
 			try {
-
+				
 				ModelTestService.readAlignment(inputFile,
 						options.getAlignmentFile());
-
+				
 				options.setAlignment(AlignmentReader.readAlignment(
 						new PrintWriter(System.err), options.getAlignmentFile()
 								.getAbsolutePath(), true)); // file
