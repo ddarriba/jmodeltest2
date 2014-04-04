@@ -535,6 +535,7 @@ public class ModelTest {
 		String arg = "";
 		String error = "\nCOMMAND LINE ERROR: ";
 		boolean isInputFile = false;
+		boolean getPhylip = false;
 		try {
 			i = 0;
 			while (i < arguments.length) {
@@ -716,6 +717,8 @@ public class ModelTest {
 										+ "fixed, BIONJ or ML");
 						PrintUsage();
 					}
+				} else if (arg.equals("-getphylip")) {
+					getPhylip = true;
 				}
 
 				else if (arg.equals("-u")) {
@@ -1035,6 +1038,37 @@ public class ModelTest {
 						+ "Input File is required (-d argument)");
 				PrintUsage();
 			}
+			if (getPhylip) {
+				MAIN_CONSOLE.print("\n\nReading data file \"" + options.getInputFile().getName()
+						+ "\"...");
+
+				if (options.getInputFile().exists()) {
+
+					try {
+						File outputFile = new File(options.getInputFile().getAbsolutePath() + ".phy");
+						ModelTestService.readAlignment(options.getInputFile(),
+								outputFile, false);
+						MAIN_CONSOLE.println(" OK.");
+						MAIN_CONSOLE.println("Result written into " + outputFile.getPath());
+						MAIN_CONSOLE.println("");
+					} catch (Exception e)// file cannot be read correctly
+					{
+						System.err.println("\nThe specified file \""
+								+ options.getInputFile().getAbsolutePath()
+								+ "\" cannot be read as an alignment");
+						MAIN_CONSOLE.println(" failed.\n" + e.getMessage());
+						throw new InvalidArgumentException.InvalidAlignmentFileException(
+								options.getInputFile());
+					}
+				} else // file does not exist
+				{
+					System.err.println("\nThe specified file \""
+							+ options.getInputFile().getAbsolutePath() + "\" cannot be found");
+					throw new InvalidArgumentException.UnexistentAlignmentFileException(
+							options.getInputFile());
+				}
+				finalize(0);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1056,6 +1090,7 @@ public class ModelTest {
 					+ "\n     ML     (Maximum Likelihood topology) (default)"
 					+ "\n -u: user tree for likelihood calculations  (e.g., -u data.tre)"
 					+ "\n -n: execution name for appending to the log filenames (default: current time yyyyMMddhhmmss)"
+					+ "\n -getphylip: converts the input file into phylip format"
 					+ "\n -o: set output file (e.g., -o jmodeltest.out)"
 					+ "\n -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)"
 					+ "\n -f: include models with unequals base frecuencies (e.g., -f) (default is false)"
