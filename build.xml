@@ -27,8 +27,11 @@
 	<target name="compile" description="Compile code">
 		<mkdir dir="${bin}" />
 		<mkdir dir="${lib}" />
-		<javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no" target="1.6" classpathref="lib.path" debug="${compile.debug}">
-		</javac>
+		<property environment="env" />
+		<property name="java6.boot.classpath" value="${env.JAVA6_BOOTCLASSES}" />
+		<javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no" 
+			target="1.6" source="1.6" bootclasspath="${java5.boot.classpath}"
+			classpathref="lib.path" debug="${compile.debug}"/>
 		<copy todir="${bin}/es">
 			<fileset dir="${src.resources.dir}/es" includes="**/*.xml,**/*.properties,**/*.gif,**/*.ico" />
 		</copy>
@@ -54,6 +57,7 @@
 		</copy>
 		<mkdir dir="${log}" />
 		<chmod perm="755" dir="${dist}" includes="*.sh *.bat" />
+		<chmod perm="755" dir="${dist}/exe/phyml" includes="*" />
 	</target>
 
 	<target name="run" depends="jar" description="Run jar file">
