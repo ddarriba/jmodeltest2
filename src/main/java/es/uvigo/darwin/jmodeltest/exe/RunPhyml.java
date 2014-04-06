@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package es.uvigo.darwin.jmodeltest.exe;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +31,7 @@ import java.util.concurrent.Future;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
+import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.model.ModelComparator;
@@ -63,8 +65,42 @@ public abstract class RunPhyml extends Observable implements Observer {
 	public static String PHYML_TREE_SUFFIX = "_phyml_tree_";
 	public static String PHYML_STATS_SUFFIX = "_phyml_stats_";
 
+	public static File phymlBinary;
+	public static String phymlBinaryStr;
+	private static String CURRENT_DIRECTORY = ModelTestConfiguration.PATH;
+	private static boolean PHYML_GLOBAL = false;
+	public static String PHYML_PATH = CURRENT_DIRECTORY + "exe/phyml/";
+
+	
 	protected Observer progress;
 
+	static {
+		if (PHYML_GLOBAL) {
+			PHYML_PATH = "";
+		} else {
+			String path = ModelTestConfiguration.getExeDir();
+			if (!path.startsWith(File.separator)) {
+				PHYML_PATH = CURRENT_DIRECTORY + File.separator + path;
+			} else {
+				PHYML_PATH = path;
+			}
+			if (!PHYML_PATH.endsWith(File.separator)) {
+				PHYML_PATH += File.separator;
+			}
+		}
+		if (PHYML_GLOBAL) {
+			phymlBinaryStr = "phyml";
+		} else {
+			phymlBinary = new File(PHYML_PATH + "phyml");
+			if (phymlBinary.exists() && phymlBinary.canExecute()) {
+				phymlBinaryStr = phymlBinary.getAbsolutePath();
+			} else {
+				phymlBinaryStr = PHYML_PATH + Utilities.getBinaryVersion();
+			}
+			/* Check if binary exists */
+			phymlBinary = new File(phymlBinaryStr);
+		}
+	}
 	public RunPhyml(Observer progress, ApplicationOptions options,
 			Model[] models) {
 		if (models != null)
@@ -124,6 +160,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 
 				PhymlSingleModel jcModelPhyml = new PhymlSingleModel(jcModel,
 						0, true, false, options);
+				jcModelPhyml.addObserver(this);
 				jcModelPhyml.run();
 
 				// create JCtree file
@@ -235,7 +272,9 @@ public abstract class RunPhyml extends Observable implements Observer {
 		stream.println("::Settings::");
 		stream.println(" ");
 		stream.println(" Phyml version = " + PHYML_VERSION);
-		stream.println(" Phyml binary = " + Utilities.getBinaryVersion());
+		stream.println(" Phyml binary = " + phymlBinary.getName());
+		stream.println(" Phyml path = " + phymlBinary.getAbsolutePath()
+				.substring(0, phymlBinary.getAbsolutePath().lastIndexOf(File.separator)) + File.separator);
 		stream.println(" Candidate models = " + models.length);
 		stream.print("   number of substitution schemes = ");
 

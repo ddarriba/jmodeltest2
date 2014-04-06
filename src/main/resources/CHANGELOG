@@ -1,3 +1,14 @@
+05 Apr 2014 Version 2.1.5 Revision 20140405
+
+  * Updated OS X binary
+  * Fixed bug with computation of JC model for "fixed" topology
+  * Fixed bug with DT criterion computation
+  * Added "-n" argument for naming executions (the name is included in the log filenames)
+  * Added "-getphylip" argument for converting alignments into PHYLIP format with ALTER
+  * Fixed bug in PhyML logging in GUI. Added a unique ID for every model in the log file
+  * Added PAUP* block into log files if required ("-w" argument)
+  * Added more verbose error messages
+
 10 Jul 2013 Version 2.1.4 Revision 20130710
 
   * Added phyml auto-logging.

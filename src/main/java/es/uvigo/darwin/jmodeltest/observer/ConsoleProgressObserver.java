@@ -45,7 +45,7 @@ public class ConsoleProgressObserver implements Observer {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
+	public synchronized void update(Observable o, Object arg) {
 
 		if (arg != null) {
 			ProgressInfo info = (ProgressInfo) arg;
@@ -143,7 +143,18 @@ public class ConsoleProgressObserver implements Observer {
 				stream.println("Computation of likelihood scores discontinued ...");
 				System.exit(-1);
 				break;
-
+			case ProgressInfo.ERROR_BINARY_NOEXISTS:
+				stream.println("");
+				stream.println("ERROR: PhyML binary does not exists: " + info.getMessage());
+				stream.println("");
+				ModelTest.finalize(ProgressInfo.ERROR_BINARY_NOEXISTS);
+				break;
+			case ProgressInfo.ERROR_BINARY_NOEXECUTE:
+				stream.println("");
+				stream.println("ERROR: PhyML binary does not have execution permission: " + info.getMessage());
+				stream.println("");
+				ModelTest.finalize(ProgressInfo.ERROR_BINARY_NOEXECUTE);
+				break;
 			case ProgressInfo.OPTIMIZATION_COMPLETED_OK:
 
 				stream.println(" ");

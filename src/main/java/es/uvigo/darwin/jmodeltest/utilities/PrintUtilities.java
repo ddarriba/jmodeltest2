@@ -36,12 +36,10 @@ public class PrintUtilities implements Printable {
     printJob.setPrintable(this);
     if (printJob.printDialog())
       try {
-        //System.out.println("Calling PrintJob.print()");
         printJob.print();
-        //System.out.println("End PrintJob.print()");
       }
       catch (PrinterException pe) {
-        System.out.println("Error printing: " + pe);
+        System.err.println("Error printing: " + pe);
       }
   }
 

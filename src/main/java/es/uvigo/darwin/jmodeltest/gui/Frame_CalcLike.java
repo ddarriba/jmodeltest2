@@ -768,6 +768,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 					.setCaretPosition(
 							XManager.getInstance().getPane().getDocument()
 									.getLength());
+			options.createLogFile();
 			// run phyml
 			this.task = new ComputeLikelihoodTask();
 			this.runPhyml = task.getValue();
@@ -887,8 +888,6 @@ public class Frame_CalcLike extends JModelTestFrame {
 				;
 			}
 			if (tree != null) {
-				// delete previous usertreefile from phyml directory if needed
-				// Utilities.deleteFile(RunPhyml.userTreePhymlFileName);
 				options.setUserTree(TreeUtilities.toNewick(tree, true, false,
 						false));
 				TextOutputStream out = new TextOutputStream(options
