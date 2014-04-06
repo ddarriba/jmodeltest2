@@ -331,6 +331,7 @@ public class Frame_AIC extends JModelTestFrame {
 			dispose();
 
 			writePAUPblock = checkBoxPAUPblock.isSelected();
+			options.writePAUPblock |= writePAUPblock;
 			doImportances = checkBoxImportance.isSelected();
 			doModelAveraging = checkBoxAveraging.isSelected();
 

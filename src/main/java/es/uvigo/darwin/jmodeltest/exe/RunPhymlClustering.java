@@ -123,7 +123,9 @@ public class RunPhymlClustering extends RunPhyml {
 	public void update(Observable o, Object arg) {
 		if (arg != null) {
 			ProgressInfo info = (ProgressInfo) arg;
-			if (info.getType() == ProgressInfo.ERROR) {
+			if (info.getType() == ProgressInfo.ERROR || 
+					info.getType() == ProgressInfo.ERROR_BINARY_NOEXECUTE || 
+					info.getType() == ProgressInfo.ERROR_BINARY_NOEXISTS) {
 				interruptThread();
 			} else {
 				info.setHeuristicStage(currentStage);

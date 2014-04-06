@@ -290,6 +290,7 @@ public class Frame_DT extends JModelTestFrame {
 			dispose();
 
 			writePAUPblock = checkBoxPAUPblock.isSelected();
+			options.writePAUPblock |= writePAUPblock;
 			doImportances = checkBoxImportance.isSelected();
 			doModelAveraging = checkBoxAveraging.isSelected();
 			credibleInterval = sliderInterval.getValue()/100.0;

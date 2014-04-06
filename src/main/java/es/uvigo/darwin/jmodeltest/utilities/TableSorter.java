@@ -57,15 +57,15 @@ public class TableSorter extends TableMap {
 		Class type = model.getColumnClass(column);
         TableModel data = model;
 
-        // Check for nulls.
-
+        /* Check for nulls. */
         Object o1 = data.getValueAt(row1, column);
         Object o2 = data.getValueAt(row2, column); 
 
-        // If both values are null, return 0.
+        /* If both values are null, return 0. */
         if (o1 == null && o2 == null) {
             return 0; 
-        } else if (o1 == null) { // Define null less than everything. 
+        } else if (o1 == null) { 
+        	/* Define null less than everything. */ 
             return -1; 
         } else if (o2 == null) { 
             return 1; 
@@ -162,18 +162,17 @@ public class TableSorter extends TableMap {
     public void reallocateIndexes() {
         int rowCount = model.getRowCount();
 
-        // Set up a new array of indexes with the right number of elements
-        // for the new data model.
+        /* Set up a new array of indexes with the right number of elements
+         * for the new data model. */
         indexes = new int[rowCount];
 
-        // Initialise with the identity mapping.
+        /* Initialise with the identity mapping. */
         for (int row = 0; row < rowCount; row++) {
             indexes[row] = row;
         }
     }
 
     public void tableChanged(TableModelEvent e) {
-        //System.out.println("Sorter: tableChanged"); 
         reallocateIndexes();
 
         super.tableChanged(e);
@@ -189,10 +188,7 @@ public class TableSorter extends TableMap {
         checkModel();
 
         compares = 0;
-        // n2sort();
-        // qsort(0, indexes.length-1);
         shuttlesort((int[])indexes.clone(), indexes, 0, indexes.length);
-        //System.out.println("Compares: "+compares);
     }
 
     public void n2sort() {
@@ -205,13 +201,15 @@ public class TableSorter extends TableMap {
         }
     }
 
-    // This is a home-grown implementation which we have not had time
-    // to research - it may perform poorly in some circumstances. It
-    // requires twice the space of an in-place algorithm and makes
-    // NlogN assigments shuttling the values between the two
-    // arrays. The number of compares appears to vary between N-1 and
-    // NlogN depending on the initial order but the main reason for
-    // using it here is that, unlike qsort, it is stable.
+     /*
+      * This is a home-grown implementation which we have not had time
+      * to research - it may perform poorly in some circumstances. It
+      * requires twice the space of an in-place algorithm and makes
+      * NlogN assigments shuttling the values between the two
+      * arrays. The number of compares appears to vary between N-1 and
+      * NlogN depending on the initial order but the main reason for
+      * using it here is that, unlike qsort, it is stable.
+      */
     public void shuttlesort(int from[], int to[], int low, int high) {
         if (high - low < 2) {
             return;
@@ -223,21 +221,22 @@ public class TableSorter extends TableMap {
         int p = low;
         int q = middle;
 
-        /* This is an optional short-cut; at each recursive call,
-        check to see if the elements in this subset are already
-        ordered.  If so, no further comparisons are needed; the
-        sub-array can just be copied.  The array must be copied rather
-        than assigned otherwise sister calls in the recursion might
-        get out of sinc.  When the number of elements is three they
-        are partitioned so that the first set, [low, mid), has one
-        element and and the second, [mid, high), has two. We skip the
-        optimisation when the number of elements is three or less as
-        the first compare in the normal merge will produce the same
-        sequence of steps. This optimisation seems to be worthwhile
-        for partially ordered lists but some analysis is needed to
-        find out how the performance drops to Nlog(N) as the initial
-        order diminishes - it may drop very quickly.  */
-
+        /* 
+         * This is an optional short-cut; at each recursive call,
+         * check to see if the elements in this subset are already
+         * ordered.  If so, no further comparisons are needed; the
+         * sub-array can just be copied.  The array must be copied rather
+         * than assigned otherwise sister calls in the recursion might
+         * get out of sinc.  When the number of elements is three they
+         * are partitioned so that the first set, [low, mid), has one
+         * element and and the second, [mid, high), has two. We skip the
+         * optimisation when the number of elements is three or less as
+         * the first compare in the normal merge will produce the same
+         * sequence of steps. This optimisation seems to be worthwhile
+         * for partially ordered lists but some analysis is needed to
+         * find out how the performance drops to Nlog(N) as the initial
+         * order diminishes - it may drop very quickly.  
+         */
         if (high - low >= 4 && compare(from[middle-1], from[middle]) <= 0) {
             for (int i = low; i < high; i++) {
                 to[i] = from[i];
@@ -263,9 +262,8 @@ public class TableSorter extends TableMap {
         indexes[j] = tmp;
     }
 
-    // The mapping only affects the contents of the data rows.
-    // Pass all requests to these rows through the mapping array: "indexes".
-
+    /*The mapping only affects the contents of the data rows.
+     * Pass all requests to these rows through the mapping array: "indexes". */
     public Object getValueAt(int aRow, int aColumn) {
         checkModel();
         return model.getValueAt(indexes[aRow], aColumn);
@@ -288,9 +286,8 @@ public class TableSorter extends TableMap {
         super.tableChanged(new TableModelEvent(this)); 
     }
 
-    // There is no-where else to put this. 
-    // Add a mouse listener to the Table to trigger a table sort 
-    // when a column heading is clicked in the JTable. 
+    /* Add a mouse listener to the Table to trigger a table sort 
+     * when a column heading is clicked in the JTable.*/ 
     public void addMouseListenerToHeaderInTable(JTable table) { 
         final TableSorter sorter = this; 
         final JTable tableView = table; 
@@ -301,7 +298,6 @@ public class TableSorter extends TableMap {
                 int viewColumn = columnModel.getColumnIndexAtX(e.getX()); 
                 int column = tableView.convertColumnIndexToModel(viewColumn); 
                 if (e.getClickCount() == 1 && column != -1) {
-                    //System.out.println("Sorting ..."); 
                     int shiftPressed = e.getModifiers()&InputEvent.SHIFT_MASK; 
                     boolean ascending = (shiftPressed == 0); 
                     sorter.sortByColumn(column, ascending); 

@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package es.uvigo.darwin.jmodeltest;
 
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -85,7 +86,7 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.1.4";
+	public static final String CURRENT_VERSION = "2.1.5";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
@@ -107,7 +108,11 @@ public class ModelTest {
 	public static Vector<String> testingOrder; // order of the hLRTs
 	public static String averagedTreeString; // model-averaged phylogeny in
 												// Newick format
-
+	public static enum ExecMode {
+		CONSOLE, GUI
+	};
+	public static ExecMode execMode;
+	
 	private static AIC myAIC;
 	private static AICc myAICc;
 	private static BIC myBIC;
@@ -143,7 +148,15 @@ public class ModelTest {
 
 	// constructor with GUI
 	public ModelTest() {
-		XManager.getInstance();
+		if (!GraphicsEnvironment.isHeadless()) {
+			options.createLogFile();
+			execMode = ExecMode.GUI;
+			XManager.getInstance();
+		} else {
+			System.err.println("");
+			System.err.println("ERROR: You are trying to run a GUI interface in a headless server.");
+			finalize(-1);
+		}
 	}
 
 	// constructor without GUI
@@ -151,7 +164,9 @@ public class ModelTest {
 		try {
 			// open mainConsole
 			MAIN_CONSOLE = new TextOutputStream(System.out);
+			execMode = ExecMode.CONSOLE;
 			ParseArguments();
+			options.createLogFile();
 			if (options.doingSimulations) {
 				Simulation sim = new Simulation(options);
 				sim.run();
@@ -526,6 +541,7 @@ public class ModelTest {
 		String arg = "";
 		String error = "\nCOMMAND LINE ERROR: ";
 		boolean isInputFile = false;
+		boolean getPhylip = false;
 		try {
 			i = 0;
 			while (i < arguments.length) {
@@ -707,6 +723,8 @@ public class ModelTest {
 										+ "fixed, BIONJ or ML");
 						PrintUsage();
 					}
+				} else if (arg.equals("-getphylip")) {
+					getPhylip = true;
 				}
 
 				else if (arg.equals("-u")) {
@@ -723,6 +741,17 @@ public class ModelTest {
 					}
 				}
 
+				else if (arg.equals("-n")) {
+					if (i < arguments.length) {
+						options.setExecutionName(arguments[i++]);
+					} else {
+						System.err
+								.println(error
+										+ "-n option requires a name for the execution");
+						PrintUsage();
+					}
+				}
+				
 				else if (arg.equals("-S")) {
 					if (i < arguments.length) {
 						String type = arguments[i++];
@@ -1015,6 +1044,37 @@ public class ModelTest {
 						+ "Input File is required (-d argument)");
 				PrintUsage();
 			}
+			if (getPhylip) {
+				MAIN_CONSOLE.print("\n\nReading data file \"" + options.getInputFile().getName()
+						+ "\"...");
+
+				if (options.getInputFile().exists()) {
+
+					try {
+						File outputFile = new File(options.getInputFile().getAbsolutePath() + ".phy");
+						ModelTestService.readAlignment(options.getInputFile(),
+								outputFile, false);
+						MAIN_CONSOLE.println(" OK.");
+						MAIN_CONSOLE.println("Result written into " + outputFile.getPath());
+						MAIN_CONSOLE.println("");
+					} catch (Exception e)// file cannot be read correctly
+					{
+						System.err.println("\nThe specified file \""
+								+ options.getInputFile().getAbsolutePath()
+								+ "\" cannot be read as an alignment");
+						MAIN_CONSOLE.println(" failed.\n" + e.getMessage());
+						throw new InvalidArgumentException.InvalidAlignmentFileException(
+								options.getInputFile());
+					}
+				} else // file does not exist
+				{
+					System.err.println("\nThe specified file \""
+							+ options.getInputFile().getAbsolutePath() + "\" cannot be found");
+					throw new InvalidArgumentException.UnexistentAlignmentFileException(
+							options.getInputFile());
+				}
+				finalize(0);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1035,6 +1095,8 @@ public class ModelTest {
 					+ "\n     BIONJ  (Neighbor-Joining topology)"
 					+ "\n     ML     (Maximum Likelihood topology) (default)"
 					+ "\n -u: user tree for likelihood calculations  (e.g., -u data.tre)"
+					+ "\n -n: execution name for appending to the log filenames (default: current time yyyyMMddhhmmss)"
+					+ "\n -getphylip: converts the input file into phylip format"
 					+ "\n -o: set output file (e.g., -o jmodeltest.out)"
 					+ "\n -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)"
 					+ "\n -f: include models with unequals base frecuencies (e.g., -f) (default is false)"
@@ -1208,7 +1270,7 @@ public class ModelTest {
 				stream.print("0");
 
 			stream.print(";\nEND;");
-			stream.print("\n--");
+			stream.print("\n--\n");
 		}
 
 		catch (Exception e) {
@@ -1225,10 +1287,10 @@ public class ModelTest {
 		if (inputFile.exists()) {
 
 			try {
-
+				
 				ModelTestService.readAlignment(inputFile,
 						options.getAlignmentFile());
-
+				
 				options.setAlignment(AlignmentReader.readAlignment(
 						new PrintWriter(System.err), options.getAlignmentFile()
 								.getAbsolutePath(), true)); // file
@@ -1243,7 +1305,7 @@ public class ModelTest {
 				System.err.println("\nThe specified file \""
 						+ inputFile.getAbsolutePath()
 						+ "\" cannot be read as an alignment");
-				MAIN_CONSOLE.println(" failed.\n");
+				MAIN_CONSOLE.println(" failed.\n" + e.getMessage());
 				throw new InvalidArgumentException.InvalidAlignmentFileException(
 						inputFile);
 			}

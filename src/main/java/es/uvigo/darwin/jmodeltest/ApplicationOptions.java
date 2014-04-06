@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Vector;
 
 import pal.alignment.Alignment;
@@ -122,9 +123,10 @@ public class ApplicationOptions implements Serializable {
 	private int numTaxa;
 	private int numBranches;
 	private int numInvariableSites;
-
 	private int numModels;
 
+	private String executionName;
+	
 	public String consensusType = "50% majority rule"; // consensus type
 														// for model
 														// averaged
@@ -134,20 +136,25 @@ public class ApplicationOptions implements Serializable {
 
 	private int substTypeCode = 0; // number of substitution types to
 									// consider
+	private ApplicationOptions() { }
 
-	private ApplicationOptions() {
+	public void createLogFile() {
 		try {
-			if (ModelTestConfiguration.isPhymlLogEnabled()) {
-				logFile = File.createTempFile("jmodeltest-phyml", ".log", new File(ModelTestConfiguration.getLogDir()));
+			if (executionName == null) {
+				executionName = Utilities.getCurrentTime("yyyyMMddHHmmss");
+			}
+			if (ModelTestConfiguration.isPhymlLogEnabled() && getInputFile() != null) {
+				logFile = new File(ModelTestConfiguration.getLogDir() + File.separator + getInputFile().getName() 
+						+ ".phyml." + executionName + ".log");
 			} else {
 				logFile = File.createTempFile("jmodeltest-phyml", ".log");
 				logFile.deleteOnExit();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("Error creating PhyML log file");
 		}
 	}
-
+	
 	public void deleteLogFile() {
 		if (!ModelTestConfiguration.isPhymlLogEnabled()) {
 			logFile.delete();
@@ -498,6 +505,14 @@ public class ApplicationOptions implements Serializable {
 
 	public boolean isAmbiguous() {
 		return isAmbiguous;
+	}
+
+	public String getExecutionName() {
+		return executionName;
+	}
+
+	public void setExecutionName(String executionName) {
+		this.executionName = executionName;
 	}
 
 	public File getTreeFile() {

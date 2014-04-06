@@ -41,11 +41,25 @@ import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
 public class ModelTestService {
 
 	/**
+     * Read alignment into a temporary file.
+     * 
+     * @param inputFile the file to be read
+     * @param outputFile the file to write in
+     * 
+     * @throws AlignmentParseException the alignment parse exception.
+     * @throws FileNotFoundException Signals that the input filename does not exist.
+     * @throws IOException Signals that an I/O exception has occured.
+     */
+	public static void readAlignment(File inputFile, File outputFile)
+            throws AlignmentParseException, FileNotFoundException, IOException {
+		readAlignment(inputFile, outputFile, true);
+	}
+	
+	/**
      * Read alignment.
      * 
-     * @param output the output writer
-     * @param filename the filename
-     * @param debug the debug
+     * @param inputFile the file to be read
+     * @param outputFile the file to write in
      * 
      * @return the alignment
      * 
@@ -53,7 +67,7 @@ public class ModelTestService {
      * @throws FileNotFoundException Signals that the input filename does not exist.
      * @throws IOException Signals that an I/O exception has occured.
      */
-    public static void readAlignment(File inputFile, File outputFile)
+    public static void readAlignment(File inputFile, File outputFile, boolean deleteOnExit)
             throws AlignmentParseException, FileNotFoundException, IOException {
 
         StringBuilder text = new StringBuilder();
@@ -117,19 +131,13 @@ public class ModelTestService {
         	outputFile.delete();
         }
         outputFile.createNewFile();
-        outputFile.deleteOnExit();
+        if (deleteOnExit) {
+        	outputFile.deleteOnExit();
+        }
         	
         FileWriter fw = new FileWriter(outputFile);
         fw.write(out);
         fw.close();
-//        PushbackReader pr = new PushbackReader(new StringReader(out));
-//        alignment = readAlignment(output, pr, debug);
-//
-//        if (alignment == null) {
-//            throw new AlignmentParseException("There's some error in your data, exiting...");
-//        }
-
-//        return alignment;
     }
     
 	public InformationCriterion doIC(int ic, boolean writePAUPblock, boolean doImportances,

@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------------
-jModelTest 2.1.4 Readme -	Mar/6/2013
+jModelTest 2.1.5 Readme -	Apr/5/2014
 
 Diego Darriba (ddarriba@udc.es)
 Guillermo L. Taboada (taboada@udc.es)
@@ -147,12 +147,14 @@ it is important to understand how to run the sequential execution.
 
 These are the parameters of the sequential execution:
 
-     -d: input data file (e.g., -d data.phy)
+     -d:  input data file (e.g., -d data.phy)
      -t: base tree for likelihood calculations (e.g., -t BIONJ)
          fixed  (common BIONJ-JC topology)
          BIONJ  (Neighbor-Joining topology)
          ML     (Maximum Likelihood topology) (default)
      -u: user tree for likelihood calculations  (e.g., -u data.tre)
+     -n: execution name for appending to the log filenames (default: current time yyyyMMddhhmmss)
+     -getphylip: converts the input file into phylip format
      -o: set output file (e.g., -o jmodeltest.out)
      -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)
      -f: include models with unequals base frecuencies (e.g., -f) (default is false)

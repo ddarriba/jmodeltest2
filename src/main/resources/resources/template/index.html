@@ -381,7 +381,11 @@ ${aicConfidenceList}
     </div>
     <div style="clear:both;"></div>
   </div><!--selection-distances-->
-  
+
+<#if isPAUP == 1>
+<h2> PAUP block </h2>
+${aicPaup}
+</#if>
 <#if doAICAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
 
@@ -483,7 +487,10 @@ ${aiccConfidenceList}
     </div>
     <div style="clear:both;"></div>
   </div><!--selection-distances-->
-
+<#if isPAUP == 1>
+<h2> PAUP block </h2>
+${aiccPaup}
+</#if>
 <#if doAICcAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
 
@@ -588,7 +595,10 @@ ${bicConfidenceList}
     </div>
     <div style="clear:both;"></div>
   </div><!--selection-distances-->
-
+<#if isPAUP == 1>
+<h2> PAUP block </h2>
+${bicPaup}
+</#if>
 <#if doBICAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
 
@@ -692,7 +702,10 @@ ${dtConfidenceList}
     </div>
     <div style="clear:both;"></div>
   </div><!--selection-distances-->
-  
+  <#if isPAUP == 1>
+    <h2> PAUP block </h2>
+    ${dtPaup}
+  </#if>
 <#if doDTAveragedPhylogeny == 1>
 <h2> Model Averaged Phylogeny </h2>
 
