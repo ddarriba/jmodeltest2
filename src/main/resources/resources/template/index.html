@@ -1,0 +1,752 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://gmpg.org/xfn/11">
+	<title>jModelTest Output</title>
+
+	<link rel="stylesheet" href="resources/style.css" type="text/css" media="screen" />
+	<!--[if IE]>
+	<style type="text/css">
+	  .clearfix {
+		zoom: 1;
+		display: block; 
+		} 
+	</style>
+	<![endif]-->
+
+</head>
+
+<body>
+
+<div id="container1">
+<div id="container2">
+ 
+	<div id="header">
+		<div id="logo">
+			<a href="http://code.google.com/p/jmodeltest2">
+				<img src="resources/logo0.png" style="width:129px; height:80px;"/>
+			</a>
+		</div>
+		<div id="header-links">
+			<ul>
+				<li  class="header_button"><a href="http://code.google.com/p/jmodeltest2" title="Home">Home</a></li>
+				<li  class="header_button_span"><a href="https://groups.google.com/group/jmodeltest" title="Group">Discussion group</a></li>
+				<li  class="header_button"><a href="https://groups.google.com/forum/#!forum/jmodeltest" title="Forum">Forum</a></li>
+				<li  class="header_button"><a href="mailto:ddarriba@udc.es" title="Contact">Contact</a></li>
+			</ul>
+		</div>
+		<div id="menul1">
+			<ul>
+				<li  class="selection_button"><a href="#program-meta" title="Meta">Meta</a></li>
+				<li  class="selection_button"><a href="#settings" title="Settings">Settings</a></li>
+				<li  class="selection_button"><a href="#results" title="Input Data">Results</a></li>
+					<li class="selection_button_span"><a>Selection</a></li>
+
+			</ul>
+		</div>
+		<div id="menul2">
+			<ul>
+				<#if isAIC == 1>
+					<li  class="selection_button">
+				<#else>
+					<li  class="selection_button_na">
+				</#if>
+					<a href="#aic" title="AIC">AIC</a></li>
+				<#if isAICc == 1>
+					<li  class="selection_button">
+				<#else>
+					<li  class="selection_button_na">
+				</#if>
+					<a href="#aicc" title="AICc">AICc</a></li>
+				<#if isBIC == 1>
+					<li  class="selection_button">
+				<#else>
+					<li  class="selection_button_na">
+				</#if>
+					<a href="#bic" title="BIC">BIC</a></li>
+				<#if isDT == 1>
+					<li  class="selection_button">
+				<#else>
+					<li  class="selection_button_na">
+				</#if>
+					<a href="#dt" title="DT">DT</a></li>
+			</ul>
+		</div><!--menu-->
+		<div style="clear:both;"></div>
+	</div><!--header-->
+
+<div id="clearfix">
+
+<div id="page">
+		<div id="content">
+
+<div id="program-meta">
+	<h1><a name="program-meta"></a>Application Meta</h1>
+	<h3>jModeltest 2.1</h3>
+	(c) 2011-onwards D. Darriba, G.L. Taboada, R. Doallo and D. Posada,<br/>
+    (1) Department of Biochemistry, Genetics and Immunology<br/>
+        University of Vigo, 36310 Vigo, Spain.<br/>
+    (2) Department of Electronics and Systems<br/>
+        University of A Coruna, 15071 A Coruna, Spain.<br/>
+    e-mail: ddarriba@udc.es, dposada@uvigo.es<br/>
+<br/>
+	<hr/>
+	${date} <br/> ${system}<br/>
+	
+	<p></p> 
+	<table align="center">
+	<tr valign="top"><td>Citation:</td><td align="left"> Darriba D, Taboada GL, Doallo R and Posada D. 2012. "jModelTest 2: more models, new heuristics and parallel computing". Nature Methods 9, 772.</td></tr>
+    </table>
+	<p></p>
+
+	 
+	Notice: This program may contain errors. Please inspect results carefully.<br/>
+	 <br/>
+ 
+</div>
+
+<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
+
+	<h1><a name="settings"></a>Settings </h1>
+
+		 Arguments = ${arguments}<br/>
+		 Input Alignment: "${alignName}"<br/>
+		 NumTaxa = ${numTaxa}<br/>
+		 Length = ${seqLength}<br/> 
+		 Phyml version = ${phymlVersion}<br/>
+		 Phyml binary = ${phymlBinary}<br/>
+		 Candidate models = ${candidateModels}<br/>
+		  number of substitution schemes = ${substSchemes}<br/>
+		  <#if includeF == 1>
+		  including models with equal/unequal base frequencies (+F)<br/>
+		  <#else>
+		  including only models with equal base frequencies<br/>
+		  </#if>
+		  <#if includeI == 1>
+		  including models with/without a proportion of invariable sites (+I)<br/>
+		  <#else>
+		  including only models without a proportion of invariable sites<br/>
+		  </#if>
+		  <#if includeG == 1>
+		  including models with/without rate variation among sites (+G) (nCat = ${numCat})<br/>
+		  <#else>
+		  including only models without rate variation among sites<br/>
+		  </#if>
+		 Optimized free parameters (K) = ${freeParameters}<br/>
+		 
+		 Base tree for likelihood calculations = ${baseTree}<br/>
+		 <#if userTreeDef == 1>
+		 User tree (${userTreeFilename}) = ${userTree}<br/>
+		 </#if>
+		 Tree topology search operation = ${searchAlgorithm}<br/>
+
+<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
+
+<h1> <a name="results"></a>Model Optimization Results </h1>
+
+<div id="sorted-models">
+<table class="model-info">
+<tr><th> ID </th><th> Name </th><th> Partition </th><th> -lnL </th><th> p </th><th> fA </th><th> fC </th><th> fG </th><th> fT </th><th> ti/tv </th><th> R(a) </th><th> R(b) </th><th> R(c) </th><th> R(d) </th><th> R(e) </th><th> R(f) </th><th> p-inv </th><th> shape </th></tr>
+<#list sortedModels as model>
+<tr><td> ${model.index}</td><td><a href="http://www.phylowidget.org/full/?tree=${model.tree}&useBranchLengths=true">${model.name}</a></td><td> ${model.partition} </td><td> ${model.lnl} </td><td> ${model.k} </td><td> ${model.fA} </td><td> ${model.fC} </td><td> ${model.fG} </td><td> ${model.fT} </td><td> ${model.titv} </td><td> ${model.rA} </td><td> ${model.rB} </td><td> ${model.rC} </td><td> ${model.rD} </td><td> ${model.rE} </td><td> ${model.rF} </td><td> ${model.pInv} </td><td> ${model.shape} </td></tr>
+</#list>
+</table>
+</div><!--sorted-models-->
+<#if isTopologiesSummary == 1>
+  <div id="topologies">
+  <p>
+  There are ${numberOfTopologies} different topologies. The following table shows the models supporting each topology and the rank according to each Information Criterion, as well as Robinson-Foulds and Euclidean distances with the tree of the best-fit model.
+  </p>
+  <table class="topologies-info">
+  <tr><th class="col-id"> ID </th>
+      <th class="col-models"> Models </th>
+      <th class="col-topo"> Topology </th>
+      <th/>
+      <th> AIC </th>
+      <th> BIC </th>
+      <th> AICc </th>
+      <th> DT </th>
+  </tr>
+  <#list sortedTopologies as topology>
+  <tr>
+    <td rowspan="5" class="col-id"> ${topology.index}</td>
+    <td rowspan="5" class="col-models">
+    <div class="topo-scroll"> 
+      ${topology.models}
+    </div>
+    </td>
+    <td rowspan="5" class="col-topo">
+    <div class="topo-scroll">
+      <a href="http://www.phylowidget.org/full/?tree=${topology.tree}">${topology.tree}</a>
+    </div>
+    </td>
+    <th>RANK</th>
+    <#if isAIC == 1>
+      <td class="topo-rank">${topology.aicRank}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isBIC == 1>
+      <td class="topo-rank">${topology.bicRank}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isAICc == 1>
+      <td class="topo-rank">${topology.aiccRank}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isDT == 1>
+      <td class="topo-rank">${topology.dtRank}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    </tr>
+    <tr>
+    <th>Weight</th>
+    <#if isAIC == 1>
+      <td class="topo-rank">${topology.aicWeight}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isBIC == 1>
+      <td class="topo-rank">${topology.bicWeight}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isAICc == 1>
+      <td class="topo-rank">${topology.aiccWeight}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isDT == 1>
+      <td class="topo-rank">${topology.dtWeight}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    </tr>
+    <tr>
+    <th>RF</th>
+    <#if isAIC == 1>
+      <td class="topo-rank">${topology.aicRF}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isBIC == 1>
+      <td class="topo-rank">${topology.bicRF}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isAICc == 1>
+      <td class="topo-rank">${topology.aiccRF}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isDT == 1>
+      <td class="topo-rank">${topology.dtRF}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    </tr>
+    <tr>
+    <th>AVG Distance</th>
+    <#if isAIC == 1>
+      <td class="topo-rank">${topology.aicAvgDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isBIC == 1>
+      <td class="topo-rank">${topology.bicAvgDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isAICc == 1>
+      <td class="topo-rank">${topology.aiccAvgDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isDT == 1>
+      <td class="topo-rank">${topology.dtAvgDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    </tr>
+    <tr>
+    <th>Distance VAR</th>
+    <#if isAIC == 1>
+      <td class="topo-rank">${topology.aicVarDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isBIC == 1>
+      <td class="topo-rank">${topology.bicVarDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isAICc == 1>
+      <td class="topo-rank">${topology.aiccVarDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    <#if isDT == 1>
+      <td class="topo-rank">${topology.dtVarDistance}</td>
+    <#else>
+      <td class="topo-rank"> - </td>
+    </#if>
+    </tr>
+  </#list>
+  </table>
+  </div><!--sorted-models-->
+</#if>
+<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
+
+
+
+
+
+<#if isAIC == 1>
+
+<div class="selection"> 
+<h1> <a name="aic"></a>AIC Selection Results </h1>
+<div class="selection-upper"> 
+	<div class="selection_best_model">
+		<h2 style="text-align: center;"> Model selected </h2>
+		<table class="model_info">
+		<tr><th>   Model </th><td colspan="2">${bestAicModel.name}</tr>
+		<tr><th>   partition </th><td colspan="2"> ${bestAicModel.partition}</tr>
+		<tr><th>   -lnL </th><td colspan="2"> ${bestAicModel.lnl}</tr>
+		<tr><th>   K </th><td colspan="2"> ${bestAicModel.k}</tr>
+		<tr><th>   freqA </th><td> ${bestAicModel.fA}</td><th>   R(a) </th><td> ${bestAicModel.rA} </td></tr>
+		<tr><th>   freqC </th><td> ${bestAicModel.fC}</td><th>   R(b) </th><td> ${bestAicModel.rB} </td></tr>
+		<tr><th>   freqG </th><td> ${bestAicModel.fG}</td><th>   R(c) </th><td> ${bestAicModel.rC} </td></tr>
+		<tr><th>   freqT </th><td> ${bestAicModel.fT}</td><th>   R(d) </th><td> ${bestAicModel.rD} </td></tr>
+		<tr><th>   ti/tv </th><td> ${bestAicModel.titv} </td><th>   R(e) </th><td> ${bestAicModel.rE} </td></tr>
+		<tr><th></th><td></td><th>   R(f) </th><td> ${bestAicModel.rF} </td></tr>
+		<tr><th>   p-inv </th><td> ${bestAicModel.pInv}</td><th>   gamma </th><td> ${bestAicModel.shape} </td></tr>
+		</table>
+	</div> <!--selection_best_model-->
+<div class="selection_best_tree">
+
+	<h2 style="text-align: center;"> Best model tree </h2>
+	
+		<div class="newick-tree">
+		${bestAicModel.tree}
+		</div><!--best-tree-newick-->
+	<a href="http://www.phylowidget.org/full/?tree=${bestAicModel.tree}&useBranchLengths=true">Display best model tree in PhyloWidget</a>
+	</div><!--selection_best_tree-->
+</div><!--selection-upper-->
+
+<div class="selection-lower">
+<div class="selection_results">
+	<table class="selection_table">
+		<tr>
+		<th>Model</th><th> -lnL  </th><th>  K      </th><th>   AIC </th><th>delta</th><th>   weight</th><th> cumWeight</th>
+		</tr>
+		<#list aicModels as model>
+		<tr><td>
+		<a href="http://www.phylowidget.org/full/?tree=${model.tree}&useBranchLengths=true">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
+		</#list>
+		 </table>
+</div><!--selection_results-->
+<div class="selection-caption">
+<table class="selection_table"><tr><td>
+		-lnL:</td><td>negative log likelihod
+		 </td> </tr><tr><td>
+		 K:</td><td>	number of estimated parameters
+		 </td> </tr><tr><td>
+		 AIC:</td><td>	Akaike Information Criterion
+		 </td> </tr><tr><td>
+		 delta:	</td><td>AIC difference
+		 </td> </tr><tr><td>
+		 weight:</td><td>	AIC weight
+		 </td> </tr><tr><td>
+		 cumWeight:</td><td>cumulative AIC weight
+		 </td> </tr>
+	 </table>
+<h2>Confidence interval</h2>
+ <p class="confidence-list"> 
+There are ${aicConfidenceCount} models in the ${confidenceInterval}% confidence interval:<br/>
+${aicConfidenceList}
+</p>
+ </div><!--selection-caption-->
+  </div><!--selection-lower-->
+  
+  <div class="selection-distances">
+    <div class="euclidean-img">
+    	<img class="distances-img" src="${aicEuImagePath}"/><br/>
+    	Euclidean distances histogram from each model optimized tree to <a href="http://www.phylowidget.org/full/?tree=${bestAicModel.tree}&useBranchLengths=true">${bestAicModel.name} tree</a>.
+    </div>
+    <div class="rf-img">
+    	<img class="distances-img" src="${aicRfImagePath}"/><br/>
+    	Robinson-Foulds distances histogram from the different topologies to <a href="http://www.phylowidget.org/full/?tree=${bestAicModel.tree}&useBranchLengths=false">${bestAicModel.name} topology</a>.
+    </div>
+    <div style="clear:both;"></div>
+  </div><!--selection-distances-->
+  
+<#if doAICAveragedPhylogeny == 1>
+<h2> Model Averaged Phylogeny </h2>
+
+<table style="text-align:left;">
+<tr><th>Selection criterion</th><td>AIC</td></tr>
+<tr><th>Confidence interval</th><td>${confidenceInterval}%</td></tr>
+<tr><th>Consensus type</th><td>${consensusType}</td></tr>
+</table>
+ 
+<div class="consensus-tree">
+ <div class="newick-tree">
+${aicConsensusTree}
+		</div><!--newick-tree-->
+ <a href="http://www.phylowidget.org/full/?tree=${aicConsensusTree}&useBranchLengths=true">Display consensus tree in PhyloWidget</a>
+</div><!--consensus-tree-->
+</#if>
+
+<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
+
+</div><!--selection-->
+
+</#if>
+
+<#if isAICc == 1>
+
+<div class="selection">   
+<h1> <a name="aicc"></a>AICc Selection Results </h1>
+<div class="selection-upper"> 
+	<div class="selection_best_model">
+		<h2 style="text-align: center;"> Model selected </h2>
+		<table class="model_info">
+		<tr><th>   Model </th><td colspan="2">${bestAiccModel.name}</tr>
+		<tr><th>   partition </th><td colspan="2"> ${bestAiccModel.partition}</tr>
+		<tr><th>   -lnL </th><td colspan="2"> ${bestAiccModel.lnl}</tr>
+		<tr><th>   K </th><td colspan="2"> ${bestAiccModel.k}</tr>
+		<tr><th>   freqA </th><td> ${bestAiccModel.fA}</td><th>   R(a) </th><td> ${bestAiccModel.rA} </td></tr>
+		<tr><th>   freqC </th><td> ${bestAiccModel.fC}</td><th>   R(b) </th><td> ${bestAiccModel.rB} </td></tr>
+		<tr><th>   freqG </th><td> ${bestAiccModel.fG}</td><th>   R(c) </th><td> ${bestAiccModel.rC} </td></tr>
+		<tr><th>   freqT </th><td> ${bestAiccModel.fT}</td><th>   R(d) </th><td> ${bestAiccModel.rD} </td></tr>
+		<tr><th>   ti/tv </th><td> ${bestAiccModel.titv} </td><th>   R(e) </th><td> ${bestAiccModel.rE} </td></tr>
+		<tr><th></th><td></td><th>   R(f) </th><td> ${bestAiccModel.rF} </td></tr>
+		<tr><th>   p-inv </th><td> ${bestAiccModel.pInv}</td><th>   gamma </th><td> ${bestAiccModel.shape} </td></tr>
+		</table>
+	</div> <!--selection_best_model-->
+<div class="selection_best_tree">
+
+	<h2 style="text-align: center;"> Best model tree </h2>
+	
+		<div class="newick-tree">
+		${bestAiccModel.tree}
+		</div><!--best-tree-newick-->
+	<a href="http://www.phylowidget.org/full/?tree=${bestAiccModel.tree}&useBranchLengths=true">Display best model tree in PhyloWidget</a>
+	</div><!--selection_best_tree-->
+</div><!--selection-upper-->
+
+<div class="selection-lower">
+<div class="selection_results">
+	<table class="selection_table">
+		<tr>
+		<th>Model</th><th> -lnL  </th><th>  K      </th><th>   AICc </th><th>delta</th><th>   weight</th><th> cumWeight</th>
+		</tr>
+		<#list aiccModels as model>
+		<tr><td>
+		<a href="http://www.phylowidget.org/full/?tree=${model.tree}&useBranchLengths=true">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
+		</#list>
+		 </table>
+</div><!--selection_results-->
+<div class="selection-caption">
+<table class="selection_table"><tr><td>
+		-lnL:</td><td>negative log likelihod
+		 </td> </tr><tr><td>
+		 K:</td><td>	number of estimated parameters
+		 </td> </tr><tr><td>
+		 AICc:</td><td>	Corrected Akaike Information Criterion
+		 </td> </tr><tr><td>
+		 delta:	</td><td>AICc difference
+		 </td> </tr><tr><td>
+		 weight:</td><td>	AICc weight
+		 </td> </tr><tr><td>
+		 cumWeight:</td><td>cumulative AICc weight
+		 </td> </tr>
+	 </table>
+<h2>Confidence interval</h2>
+ <p class="confidence-list"> 
+There are ${aiccConfidenceCount} models in the ${confidenceInterval}% confidence interval:<br/>
+${aiccConfidenceList}
+</p>
+ </div><!--selection-caption-->
+  </div><!--selection-lower-->
+  
+  <div class="selection-distances">
+    <div class="euclidean-img">
+    	<img class="distances-img" src="${aiccEuImagePath}"/><br/>
+    	Euclidean distances histogram from each model optimized tree to <a href="http://www.phylowidget.org/full/?tree=${bestAiccModel.tree}&useBranchLengths=true">${bestAiccModel.name} tree</a>.
+    </div>
+    <div class="rf-img">
+    	<img class="distances-img" src="${aiccRfImagePath}"/><br/>
+    	Robinson-Foulds distances histogram from the different topologies to <a href="http://www.phylowidget.org/full/?tree=${bestAiccModel.tree}&useBranchLengths=false">${bestAiccModel.name} topology</a>.
+    </div>
+    <div style="clear:both;"></div>
+  </div><!--selection-distances-->
+
+<#if doAICcAveragedPhylogeny == 1>
+<h2> Model Averaged Phylogeny </h2>
+
+<table style="text-align:left;">
+<tr><th>Selection criterion</th><td>AICc</td></tr>
+<tr><th>Confidence interval</th><td>${confidenceInterval}%</td></tr>
+<tr><th>Consensus type</th><td>${consensusType}</td></tr>
+</table>
+ 
+<div class="consensus-tree">
+ <div class="newick-tree">
+${aiccConsensusTree}
+		</div><!--newick-tree-->
+ <a href="http://www.phylowidget.org/full/?tree=${aiccConsensusTree}&useBranchLengths=true">Display consensus tree in PhyloWidget</a>
+</div><!--consensus-tree-->
+</#if>
+
+</div><!--selection-->
+
+<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
+
+</#if>
+
+
+
+
+<#if isBIC == 1>
+
+<div class="selection">   
+<h1> <a name="bic"></a>BIC Selection Results </h1>
+<div class="selection-upper"> 
+	<div class="selection_best_model">
+		<h2 style="text-align: center;"> Model selected </h2>
+		<table class="model_info">
+		<tr><th>   Model </th><td colspan="2">${bestBicModel.name}</tr>
+		<tr><th>   partition </th><td colspan="2"> ${bestBicModel.partition}</tr>
+		<tr><th>   -lnL </th><td colspan="2"> ${bestBicModel.lnl}</tr>
+		<tr><th>   K </th><td colspan="2"> ${bestBicModel.k}</tr>
+		<tr><th>   freqA </th><td> ${bestBicModel.fA}</td><th>   R(a) </th><td> ${bestBicModel.rA} </td></tr>
+		<tr><th>   freqC </th><td> ${bestBicModel.fC}</td><th>   R(b) </th><td> ${bestBicModel.rB} </td></tr>
+		<tr><th>   freqG </th><td> ${bestBicModel.fG}</td><th>   R(c) </th><td> ${bestBicModel.rC} </td></tr>
+		<tr><th>   freqT </th><td> ${bestBicModel.fT}</td><th>   R(d) </th><td> ${bestBicModel.rD} </td></tr>
+		<tr><th>   ti/tv </th><td> ${bestBicModel.titv} </td><th>   R(e) </th><td> ${bestBicModel.rE} </td></tr>
+		<tr><th></th><td></td><th>   R(f) </th><td> ${bestBicModel.rF} </td></tr>
+		<tr><th>   p-inv </th><td> ${bestBicModel.pInv}</td><th>   gamma </th><td> ${bestBicModel.shape} </td></tr>
+		</table>
+	</div> <!--selection_best_model-->
+<div class="selection_best_tree">
+
+	<h2 style="text-align: center;"> Best model tree </h2>
+	
+		<div class="newick-tree">
+		${bestBicModel.tree}
+		</div><!--best-tree-newick-->
+	<a href="http://www.phylowidget.org/full/?tree=${bestBicModel.tree}&useBranchLengths=true">Display best model tree in PhyloWidget</a>
+	</div><!--selection_best_tree-->
+</div><!--selection-upper-->
+
+<div class="selection-lower">
+<div class="selection_results">
+	<table class="selection_table">
+		<tr>
+		<th>Model</th><th> -lnL  </th><th>  K      </th><th>   BIC </th><th>delta</th><th>   weight</th><th> cumWeight</th>
+		</tr>
+		<#list bicModels as model>
+		<tr><td>
+		<a href="http://www.phylowidget.org/full/?tree=${model.tree}&useBranchLengths=true">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
+		</#list>
+		 </table>
+</div><!--selection_results-->
+<div class="selection-caption">
+<table class="selection_table"><tr><td>
+		-lnL:</td><td>negative log likelihod
+		 </td> </tr><tr><td>
+		 K:</td><td>	number of estimated parameters
+		 </td> </tr><tr><td>
+		 BIC:</td><td>	Bayesian Information Criterion
+		 </td> </tr><tr><td>
+		 delta:	</td><td>BIC difference
+		 </td> </tr><tr><td>
+		 weight:</td><td>	BIC weight
+		 </td> </tr><tr><td>
+		 cumWeight:</td><td>cumulative BIC weight
+		 </td> </tr>
+	 </table>
+<h2>Confidence interval</h2>
+ <p class="confidence-list"> 
+There are ${bicConfidenceCount} models in the ${confidenceInterval}% confidence interval:<br/>
+${bicConfidenceList}
+</p>
+  </div><!--selection-caption-->
+  </div><!--selection-lower-->
+
+  <div class="selection-distances">
+    <div class="euclidean-img">
+    	<img class="distances-img" src="${bicEuImagePath}"/><br/>
+    	Euclidean distances histogram from each model optimized tree to <a href="http://www.phylowidget.org/full/?tree=${bestBicModel.tree}&useBranchLengths=true">${bestBicModel.name} tree</a>.
+    </div>
+    <div class="rf-img">
+    	<img class="distances-img" src="${bicRfImagePath}"/><br/>
+    	Robinson-Foulds distances histogram from the different topologies to <a href="http://www.phylowidget.org/full/?tree=${bestBicModel.tree}&useBranchLengths=false">${bestBicModel.name} topology</a>.
+    </div>
+    <div style="clear:both;"></div>
+  </div><!--selection-distances-->
+
+<#if doBICAveragedPhylogeny == 1>
+<h2> Model Averaged Phylogeny </h2>
+
+<table style="text-align:left;">
+<tr><th>Selection criterion</th><td>BIC</td></tr>
+<tr><th>Confidence interval</th><td>${confidenceInterval}%</td></tr>
+<tr><th>Consensus type</th><td>${consensusType}</td></tr>
+</table>
+ 
+<div class="consensus-tree">
+ <div class="newick-tree">
+${bicConsensusTree}
+		</div><!--newick-tree-->
+ <a href="http://www.phylowidget.org/full/?tree=${bicConsensusTree}&useBranchLengths=true">Display consensus tree in PhyloWidget</a>
+</div><!--consensus-tree-->
+</#if>
+
+<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
+
+</div><!--selection-->
+
+</#if>
+
+
+
+<#if isDT == 1>
+
+<div class="selection">   
+<h1> <a name="dt"></a>Decision Theory Selection Results </h1>
+<div class="selection-upper">
+	<div class="selection_best_model">
+		<h2 style="text-align: center;"> Model selected </h2>
+		<table class="model_info">
+		<tr><th>   Model </th><td colspan="2">${bestDtModel.name}</tr>
+		<tr><th>   partition </th><td colspan="2"> ${bestDtModel.partition}</tr>
+		<tr><th>   -lnL </th><td colspan="2"> ${bestDtModel.lnl}</tr>
+		<tr><th>   K </th><td colspan="2"> ${bestDtModel.k}</tr>
+		<tr><th>   freqA </th><td> ${bestDtModel.fA}</td><th>   R(a) </th><td> ${bestDtModel.rA} </td></tr>
+		<tr><th>   freqC </th><td> ${bestDtModel.fC}</td><th>   R(b) </th><td> ${bestDtModel.rB} </td></tr>
+		<tr><th>   freqG </th><td> ${bestDtModel.fG}</td><th>   R(c) </th><td> ${bestDtModel.rC} </td></tr>
+		<tr><th>   freqT </th><td> ${bestDtModel.fT}</td><th>   R(d) </th><td> ${bestDtModel.rD} </td></tr>
+		<tr><th>   ti/tv </th><td> ${bestDtModel.titv} </td><th>   R(e) </th><td> ${bestDtModel.rE} </td></tr>
+		<tr><th></th><td></td><th>   R(f) </th><td> ${bestDtModel.rF} </td></tr>
+		<tr><th>   p-inv </th><td> ${bestDtModel.pInv}</td><th>   gamma </th><td> ${bestDtModel.shape} </td></tr>
+		</table>
+	</div> <!--selection_best_model-->
+<div class="selection_best_tree">
+
+	<h2 style="text-align: center;"> Best model tree </h2>
+	
+		<div class="newick-tree">
+		${bestDtModel.tree}
+		</div><!--best-tree-newick-->
+	<a href="http://www.phylowidget.org/full/?tree=${bestDtModel.tree}&useBranchLengths=true">Display best model tree in PhyloWidget</a>
+	</div><!--selection_best_tree-->
+</div><!--selection-upper-->
+
+<div class="selection-lower">
+<div class="selection_results">
+	<table class="selection_table">
+		<tr>
+		<th>Model</th><th> -lnL  </th><th>  K      </th><th>   DT </th><th>delta</th><th>   weight</th><th> cumWeight</th>
+		</tr>
+		<#list dtModels as model>
+		<tr><td>
+		<a href="http://www.phylowidget.org/full/?tree=${model.tree}&useBranchLengths=true">${model.name}</a> </td><td>${model.lnl}</td><td>${model.k}</td><td>${model.value}</td><td>${model.delta}</td><td>${model.weight}</td><td>${model.cumWeight}</td></tr>
+		</#list>
+		 </table>
+</div><!--selection_results-->
+<div class="selection-caption">
+<table class="selection_table"><tr><td>
+		-lnL:</td><td>negative log likelihod
+		 </td> </tr><tr><td>
+		 K:</td><td>	number of estimated parameters
+		 </td> </tr><tr><td>
+		 DT:</td><td>	Akaike Information Criterion
+		 </td> </tr><tr><td>
+		 delta:	</td><td>DT difference
+		 </td> </tr><tr><td>
+		 weight:</td><td>	DT weight
+		 </td> </tr><tr><td>
+		 cumWeight:</td><td>cumulative DT weight
+		 </td> </tr>
+	 </table>
+<h2>Confidence interval</h2>
+ <p class="confidence-list"> 
+There are ${dtConfidenceCount} models in the ${confidenceInterval}% confidence interval:<br/>
+${dtConfidenceList}
+</p>
+ </div><!--selection-caption-->
+  </div><!--selection-lower-->
+  
+  <div class="selection-distances">
+    <div class="euclidean-img">
+    	<img class="distances-img" src="${dtEuImagePath}"/><br/>
+    	Euclidean distances histogram from each model optimized tree to <a href="http://www.phylowidget.org/full/?tree=${bestDtModel.tree}&useBranchLengths=true">${bestDtModel.name} tree</a>.
+    </div>
+    <div class="rf-img">
+    	<img class="distances-img" src="${dtRfImagePath}"/><br/>
+    	Robinson-Foulds distances histogram from the different topologies to <a href="http://www.phylowidget.org/full/?tree=${bestDtModel.tree}&useBranchLengths=false">${bestDtModel.name} topology</a>.
+    </div>
+    <div style="clear:both;"></div>
+  </div><!--selection-distances-->
+  
+<#if doDTAveragedPhylogeny == 1>
+<h2> Model Averaged Phylogeny </h2>
+
+<table style="text-align:left;">
+<tr><th>Selection criterion</th><td>DT</td></tr>
+<tr><th>Confidence interval</th><td>${confidenceInterval}%</td></tr>
+<tr><th>Consensus type</th><td>${consensusType}</td></tr>
+</table>
+ 
+<div class="consensus-tree">
+ <div class="newick-tree">
+${dtConsensusTree}
+		</div><!--newick-tree-->
+ <a href="http://www.phylowidget.org/full/?tree=${dtConsensusTree}&useBranchLengths=true">Display consensus tree in PhyloWidget</a>
+</div><!--consensus-tree-->
+</#if>
+
+<p class="back-to-top"><a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /> Back to top <img src="resources/topIcon.gif" alt="Back to top" class="top" /></a></p>
+
+</div><!--selection-->
+
+</#if>
+
+
+
+
+
+</div><!--/content-->
+
+	</div><!--/page-->
+	</div><!--/clearfix-->
+
+</div><!--/container2-->
+</div><!--/container1-->
+
+<div id="footer">
+<div id="footerinner">
+<p class="poweredBy">
+<span class="buttons">
+<a href="http://code.google.com/p/jmodeltest2" title="Home" class="home"><img src="resources/homeIcon.gif" alt="Back to home" class="home" /></a> 
+<a href="#" onclick="scrollTo(0,0);return false;" title="Back to top" class="top"><img src="resources/topIcon.gif" alt="Back to top" class="top" /></a>
+</span>
+<a href="http://code.google.com/p/jmodeltest2" rel="external">jModelTest 2.1</a>. D.Darriba, G.L.Taboada, R.Doallo and D.Posada
+</p>
+<div id="contact">
+    <a href="https://groups.google.com/forum/#!forum/jmodeltest">Forum</a>
+	-
+	<a href="http://groups.google.com/group/jmodeltest">Discussion group</a>
+	-
+	<a href="mailto:ddarriba@udc.es">Contact</a>
+</div>
+ 
+</div><!--/footerinner-->
+</div><!--/footer-->
+
+</body>
+</html>
