@@ -336,13 +336,20 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	}
 
 	private void progressBarCancel(ActionEvent e) {
+		this.setEnabled(false);
 		try {
-			frameCalcLike.getRunPhyml().interruptThread();
-			frameCalcLike.cancelTask();
-			setVisible(false);
+			int option;
+            option = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel?",
+	                    "Cancel Execution", JOptionPane.YES_NO_OPTION);
+	        if (option == JOptionPane.YES_OPTION) {
+				frameCalcLike.getRunPhyml().interruptThread();
+				frameCalcLike.cancelTask();
+				setVisible(false);
+	        }
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
+		this.setEnabled(true);
 	}
 
 	@Override
