@@ -79,13 +79,14 @@ public class FrameMain extends JModelTestFrame {
 	private JScrollPane phymlScrollPane = new JScrollPane();
 	private JTextPane mainEditorPane = new JTextPane();
 	private JTextArea phymlEditorPane = new JTextArea();
-	
+
 	private JPanel StatusPanel = new JPanel();
 	private JLabel LabelStatusLikelihoods = new JLabel();
 	private JLabel LabelStatusData = new JLabel();
 	private JMenuBar menuBar = new JMenuBar();
 	private JMenu menuFile = new JMenu();
 	private JMenuItem menuFileOpenDataFile = new JMenuItem();
+	private JMenuItem menuFileOpenCkpFile = new JMenuItem();
 	private JSeparator menuFileSeparator1 = new JSeparator();
 	private JMenuItem menuFileQuit = new JMenuItem();
 	private JMenu menuEdit = new JMenu();
@@ -170,6 +171,15 @@ public class FrameMain extends JModelTestFrame {
 		menuFileOpenDataFile.setText("Load DNA alignment");
 		menuFileOpenDataFile.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_O, HOTKEY_MODIFIER));
+
+		menuFileOpenCkpFile
+				.setToolTipText("Load a Checkpoint file from a previous run");
+		menuFileOpenCkpFile
+				.setBorder(new BorderUIResource.EmptyBorderUIResource(
+						new java.awt.Insets(3, 3, 6, 3)));
+		menuFileOpenCkpFile.setVisible(true);
+//		menuFileOpenCkpFile.setEnabled(false);
+		menuFileOpenCkpFile.setText("Load Checkpoint file");
 
 		menuFileSeparator1
 				.setBorder(new BorderUIResource.EmptyBorderUIResource(
@@ -373,10 +383,11 @@ public class FrameMain extends JModelTestFrame {
 				HOTKEY_MODIFIER));
 		menuHelpDiscussionGroup.setVisible(true);
 		menuHelpDiscussionGroup.setText("Discussion group");
-		menuHelpDiscussionGroup.setBorder(new BorderUIResource.EmptyBorderUIResource(
-				new java.awt.Insets(5, 5, 5, 5)));
-		menuHelpDiscussionGroup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G,
-				HOTKEY_MODIFIER));
+		menuHelpDiscussionGroup
+				.setBorder(new BorderUIResource.EmptyBorderUIResource(
+						new java.awt.Insets(5, 5, 5, 5)));
+		menuHelpDiscussionGroup.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_G, HOTKEY_MODIFIER));
 		menuAboutCredits.setVisible(true);
 		menuAboutCredits.setText("Credits");
 		menuAboutCredits.setBorder(new BorderUIResource.EmptyBorderUIResource(
@@ -403,15 +414,15 @@ public class FrameMain extends JModelTestFrame {
 		tabbedPane.setSize(590, 610);
 		tabbedPane.setLocation(20, 10);
 		tabbedPane.setVisible(true);
-		
+
 		scrollPane.setVisible(true);
 		scrollPane.setAutoscrolls(true);
 
 		phymlScrollPane.setVisible(true);
 		phymlScrollPane.setAutoscrolls(true);
-		DefaultCaret caret = (DefaultCaret)phymlEditorPane.getCaret();
+		DefaultCaret caret = (DefaultCaret) phymlEditorPane.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-		
+
 		mainEditorPane.setMargin(new Insets(5, 5, 5, 5));
 		mainEditorPane.setFont(XManager.FONT_CONSOLE);
 
@@ -430,8 +441,8 @@ public class FrameMain extends JModelTestFrame {
 		phymlEditorPane.setAutoscrolls(true);
 		phymlEditorPane.setVisible(true);
 		ModelTest.setPhymlConsole(new TextOutputStream(new PrintStream(
-					new DocumentOutputStream(phymlEditorPane.getDocument()))));
-		
+				new DocumentOutputStream(phymlEditorPane.getDocument()))));
+
 		StatusPanel.setPreferredSize(new java.awt.Dimension(592, 30));
 		StatusPanel.setBorder(new BorderUIResource.EtchedBorderUIResource(1,
 				XManager.INNER_BORDER_COLOR, XManager.OUTER_BORDER_COLOR));
@@ -466,6 +477,7 @@ public class FrameMain extends JModelTestFrame {
 		menuBar.add(menuAbout);
 
 		menuFile.add(menuFileOpenDataFile);
+		menuFile.add(menuFileOpenCkpFile);
 		menuFile.add(menuFileSeparator1);
 		menuFile.add(menuFileQuit);
 
@@ -495,7 +507,7 @@ public class FrameMain extends JModelTestFrame {
 
 		menuHelp.add(menuHelpOpen);
 		menuHelp.add(menuHelpDiscussionGroup);
-		
+
 		menuAbout.add(menuAboutWWW);
 		menuAbout.add(menuAboutCredits);
 		menuAbout.add(menuAboutSeparator);
@@ -528,6 +540,13 @@ public class FrameMain extends JModelTestFrame {
 				.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent e) {
 						menuFileOpenDataFileActionPerformed(e);
+					}
+				});
+
+		menuFileOpenCkpFile
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent e) {
+						menuFileOpenCkpFileActionPerformed(e);
 					}
 				});
 
@@ -648,12 +667,13 @@ public class FrameMain extends JModelTestFrame {
 				menuAboutWWWActionPerformed(e);
 			}
 		});
-		
-		menuHelpDiscussionGroup.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent e) {
-				menuAboutDiscussionGroupActionPerformed(e);
-			}
-		});
+
+		menuHelpDiscussionGroup
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent e) {
+						menuAboutDiscussionGroupActionPerformed(e);
+					}
+				});
 
 		menuAboutCredits.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -755,13 +775,70 @@ public class FrameMain extends JModelTestFrame {
 							"  number of sequences: " + options.getNumTaxa());
 					ModelTest.getMainConsole().println(
 							"  number of sites: " + options.getNumSites());
+					menuFileOpenCkpFile.setEnabled(true);
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(this, "The specified file \""
 							+ dataFileName
 							+ "\" cannot be read as an alignment",
 							"jModelTest error", JOptionPane.ERROR_MESSAGE);
 					ModelTest.getMainConsole().println(" failed.\n");
+					menuFileOpenCkpFile.setEnabled(false);
 				}
+			} else {
+				JOptionPane.showMessageDialog(this, "The specified file \""
+						+ dataFileName + "\" cannot be found",
+						"jModelTest error", JOptionPane.ERROR_MESSAGE);
+				ModelTest.getMainConsole().println(" failed.\n");
+				menuFileOpenCkpFile.setEnabled(false);
+			}
+		}
+	}
+
+	private void menuFileOpenCkpFileActionPerformed(java.awt.event.ActionEvent e) {
+		FileDialog fc = new FileDialog(this, "Load Checkpoint file",
+				FileDialog.LOAD);
+		fc.setDirectory(System.getProperty("user.dir"));
+		fc.setVisible(true);
+
+		String dataFileName = fc.getFile();
+
+		if (dataFileName != null) // menu not canceled
+		{
+			String dataFileNameComplete = fc.getDirectory() + dataFileName;
+			ModelTest.getMainConsole().print(
+					"Loading checkpoint from \"" + dataFileName + "\"...");
+
+			File inputFile = new File(dataFileNameComplete);
+			if (inputFile.exists()) // file exists
+			{
+				ModelTest.loadCheckpoint(inputFile);
+				// options.setInputFile(inputFile);
+				// try {
+				// ModelTestService.readAlignment(inputFile,
+				// options.getAlignmentFile());
+				//
+				// options.setAlignment(AlignmentReader
+				// .readAlignment(new PrintWriter(System.err), options
+				// .getAlignmentFile().getAbsolutePath(), true));
+				//
+				// LabelStatusData.setText(dataFileName + "  ");
+				// LabelStatusData.setForeground(new java.awt.Color(102, 102,
+				// 153));
+				// menuAnalysisCalculateLikelihoods.setEnabled(true);
+				// enableMenuShowModelTable(false);
+				// enableMenuHtmlOutput(false);
+				// ModelTest.getMainConsole().println(" OK.");
+				// ModelTest.getMainConsole().println(
+				// "  number of sequences: " + options.getNumTaxa());
+				// ModelTest.getMainConsole().println(
+				// "  number of sites: " + options.getNumSites());
+				// } catch (Exception e1) {
+				// JOptionPane.showMessageDialog(this, "The specified file \""
+				// + dataFileName
+				// + "\" cannot be read as an alignment",
+				// "jModelTest error", JOptionPane.ERROR_MESSAGE);
+				// ModelTest.getMainConsole().println(" failed.\n");
+				// }
 			} else {
 				JOptionPane.showMessageDialog(this, "The specified file \""
 						+ dataFileName + "\" cannot be found",
@@ -903,16 +980,22 @@ public class FrameMain extends JModelTestFrame {
 																 * selected
 																 */
 			{
-				Tree bestAIC = ModelTest.getMinAIC() != null? ModelTest.getMinAIC().getTree() : null;
-				Tree bestAICc = ModelTest.getMinAICc() != null? ModelTest.getMinAICc().getTree() : null;
-				Tree bestBIC = ModelTest.getMinBIC() != null? ModelTest.getMinBIC().getTree() : null;
-				Tree bestDT = ModelTest.getMinDT() != null? ModelTest.getMinDT().getTree() : null;
+				Tree bestAIC = ModelTest.getMinAIC() != null ? ModelTest
+						.getMinAIC().getTree() : null;
+				Tree bestAICc = ModelTest.getMinAICc() != null ? ModelTest
+						.getMinAICc().getTree() : null;
+				Tree bestBIC = ModelTest.getMinBIC() != null ? ModelTest
+						.getMinBIC().getTree() : null;
+				Tree bestDT = ModelTest.getMinDT() != null ? ModelTest
+						.getMinDT().getTree() : null;
 
-				TreeSummary treeSummary = new TreeSummary(bestAIC, bestAICc, bestBIC, bestDT, ModelTest.getCandidateModels());
-				
+				TreeSummary treeSummary = new TreeSummary(bestAIC, bestAICc,
+						bestBIC, bestDT, ModelTest.getCandidateModels());
+
 				HtmlReporter.buildReport(options,
 						ModelTest.getCandidateModels(),
-						new File(dialog.getDirectory() + dialog.getFile()), treeSummary);
+						new File(dialog.getDirectory() + dialog.getFile()),
+						treeSummary);
 			}
 		} catch (Exception f) {
 			f.printStackTrace();
@@ -1017,8 +1100,9 @@ public class FrameMain extends JModelTestFrame {
 					"Error loading webpage", JOptionPane.ERROR_MESSAGE);
 		}
 	}
-		
-	private void menuAboutDiscussionGroupActionPerformed(java.awt.event.ActionEvent e) {
+
+	private void menuAboutDiscussionGroupActionPerformed(
+			java.awt.event.ActionEvent e) {
 		try {
 			if (Desktop.isDesktopSupported()) {
 				Desktop desktop = Desktop.getDesktop();
@@ -1033,6 +1117,7 @@ public class FrameMain extends JModelTestFrame {
 					"Error loading webpage", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+
 	private void menuAboutWWWActionPerformed(java.awt.event.ActionEvent e) {
 		try {
 			if (Desktop.isDesktopSupported()) {
@@ -1074,11 +1159,11 @@ public class FrameMain extends JModelTestFrame {
 			about += "Department of Electronics and Systems\n";
 			about += "University of A Coruna, 15071 A Coruna, Spain.\n";
 			about += "e-mail: ddarriba@udc.es, dposada@uvigo.es\n\n";
-			about += "Citation: Darriba D, Taboada GL, Doallo R and Posada D. 2012.\n" +
-          "\"jModelTest 2: more models, new heuristics and parallel computing\".\n" +
-          "Nature Methods 9(8), 772.\n";
-			JOptionPane.showMessageDialog(new JFrame(), about,
-					"jModelTest", JOptionPane.INFORMATION_MESSAGE,
+			about += "Citation: Darriba D, Taboada GL, Doallo R and Posada D. 2012.\n"
+					+ "\"jModelTest 2: more models, new heuristics and parallel computing\".\n"
+					+ "Nature Methods 9(8), 772.\n";
+			JOptionPane.showMessageDialog(new JFrame(), about, "jModelTest",
+					JOptionPane.INFORMATION_MESSAGE,
 					XManager.makeIcon("JMT48", "JMT2"));
 		} catch (Exception f) {
 			f.printStackTrace();
@@ -1132,5 +1217,4 @@ public class FrameMain extends JModelTestFrame {
 	public void selectedMenuResultsBLasParameters(boolean selected) {
 		menuResultsBLasParameters.setSelected(selected);
 	}
-	
 }

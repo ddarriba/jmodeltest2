@@ -35,6 +35,7 @@ public abstract class ModelTestConfiguration {
     
     public static final String HTML_LOG = "html-logging";
     public static final String PHYML_LOG = "phyml-logging";
+    public static final String CKP_LOG = "checkpointing";
     public static final String LOG_DIR = "log-dir";
     public static final String EXE_DIR = "exe-dir";
     public static final String GLOBAL_PHYML_EXE = "global-phyml-exe";
@@ -76,6 +77,10 @@ public abstract class ModelTestConfiguration {
     
     public static boolean isPhymlLogEnabled() {
     	return getProperty(PHYML_LOG).equalsIgnoreCase("enabled");
+    }
+    
+    public static boolean isCkpEnabled() {
+    	return !getProperty(CKP_LOG).equalsIgnoreCase("disabled");
     }
     
     public static String getLogDir() {
