@@ -17,12 +17,19 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 package es.uvigo.darwin.jmodeltest.observer;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
+import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
@@ -109,6 +116,20 @@ public class ConsoleProgressObserver implements Observer {
 						stream.println("\t (" + completedModels + "/" + totalModels + ")");
 					}
 				}
+				
+				if (ModelTestConfiguration.isCkpEnabled()) {
+					try {
+						OutputStream file = new FileOutputStream(
+								options.getCkpFile());
+						OutputStream buffer = new BufferedOutputStream(file);
+						ObjectOutput output = new ObjectOutputStream(buffer);
+						output.writeObject(ModelTest.getCandidateModels());
+						output.close();
+					} catch (IOException ex) {
+						System.err.println("Cannot perform output.");
+					}
+				}
+				
 				break;
 				
 			case ProgressInfo.REOPTIMIZATION_INIT:

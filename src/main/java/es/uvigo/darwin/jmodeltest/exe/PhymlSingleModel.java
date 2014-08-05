@@ -76,11 +76,10 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	}
 
 	public boolean compute() {
+		notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index,
+				model, null);
 		if (model.getLnL() < 1e-5 || ignoreGaps) {
 			// run phyml
-			notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_INIT, index,
-					model, null);
-
 			startTime = System.currentTimeMillis();
 
 			commandLine = writePhyml3CommandLine(model, justGetJCTree, options,
@@ -94,20 +93,19 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			endTime = System.currentTimeMillis();
 
 			model.setComputationTime(endTime - startTime);
-
-			// completed
-			if (!interrupted) {
-				int value = 0;
-				if (ignoreGaps) {
-					value = ProgressInfo.VALUE_IGAPS_OPTIMIZATION;
-				} else {
-					value = ProgressInfo.VALUE_REGULAR_OPTIMIZATION;
-				}
-				notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED,
-						value, model,
-						Utilities.calculateRuntime(startTime, endTime));
-
+		}
+		// completed
+		if (!interrupted) {
+			int value = 0;
+			if (ignoreGaps) {
+				value = ProgressInfo.VALUE_IGAPS_OPTIMIZATION;
+			} else {
+				value = ProgressInfo.VALUE_REGULAR_OPTIMIZATION;
 			}
+			notifyObservers(ProgressInfo.SINGLE_OPTIMIZATION_COMPLETED,
+					value, model,
+					Utilities.calculateRuntime(startTime, endTime));
+
 		}
 		return !interrupted;
 	}

@@ -761,7 +761,7 @@ public class Frame_CalcLike extends JModelTestFrame {
 					options);
 
 			setVisible(false);
-
+			
 			// scroll to the bottom
 			XManager.getInstance()
 					.getPane()
@@ -769,6 +769,8 @@ public class Frame_CalcLike extends JModelTestFrame {
 							XManager.getInstance().getPane().getDocument()
 									.getLength());
 			options.createLogFile();
+			options.createCkpFile();
+			
 			// run phyml
 			this.task = new ComputeLikelihoodTask();
 			this.runPhyml = task.getValue();
@@ -917,6 +919,12 @@ public class Frame_CalcLike extends JModelTestFrame {
 		}
 
 		public Object construct() {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			this.runPhyml.execute();
 			return runPhyml;
 		}

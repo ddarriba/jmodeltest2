@@ -27,6 +27,7 @@ import java.util.Vector;
 
 import pal.alignment.Alignment;
 import pal.datatype.DataType;
+import pal.tree.TreeParseException;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.model.ModelConstants;
@@ -57,6 +58,7 @@ public class ApplicationOptions implements Serializable {
 
 	private File inputDataFile, inputTreeFile;
 	private File alignmentFile, treeFile;
+	private File ckpFile;
 	private File logFile;
 	private Alignment alignment;
 	private boolean isAmbiguous;
@@ -138,6 +140,26 @@ public class ApplicationOptions implements Serializable {
 									// consider
 	private ApplicationOptions() { }
 
+	public void createCkpFile() {
+		if (ckpFile != null && ckpFile.exists())
+			return;
+		
+		try {
+			if (executionName == null) {
+				executionName = Utilities.getCurrentTime("yyyyMMddHHmmss");
+			}
+			if (ModelTestConfiguration.isCkpEnabled() && getInputFile() != null) {
+				ckpFile = new File(ModelTestConfiguration.getLogDir() + File.separator + getInputFile().getName() 
+						+ "." + executionName + ".ckp");
+			} else {
+				ckpFile = File.createTempFile("jmodeltest", ".ckp");
+				ckpFile.deleteOnExit();
+			}
+		} catch (IOException e) {
+			System.err.println("Error creating checkpointing file");
+		}
+	}
+	
 	public void createLogFile() {
 		try {
 			if (executionName == null) {
@@ -355,6 +377,39 @@ public class ApplicationOptions implements Serializable {
 				ModelConstants.modelCode[modelNo], modelParameters, pF, pT, pV,
 				pR, pI, pG, ModelConstants.numTransitions[modelNo],
 				ModelConstants.numTransversions[modelNo]);
+		
+		if (ModelTest.getLoadedModels() != null && ModelTest.getLoadedModels().length > 0) {
+			for (Model model : ModelTest.getLoadedModels()) {
+				if (model.getName().equals(ModelTest.getCandidateModels()[order].getName()) 
+						&& model.getLnL() > 0.0) {
+					/* load from checkpoint */
+					Model otherModel = ModelTest.getCandidateModels()[order];
+					otherModel.setLnL(model.getLnL());
+					otherModel.setLnLIgnoringGaps(model.getLnLIgnoringGaps());
+					otherModel.setShape(model.getShape());
+					otherModel.setfA(model.getfA());
+					otherModel.setfC(model.getfC());
+					otherModel.setfG(model.getfG());
+					otherModel.setfT(model.getfT());
+					otherModel.setRa(model.getRa());
+					otherModel.setRb(model.getRb());
+					otherModel.setRc(model.getRc());
+					otherModel.setRd(model.getRd());
+					otherModel.setRe(model.getRe());
+					otherModel.setRf(model.getRf());
+					otherModel.setPinv(model.getPinv());
+					otherModel.setKappa(model.getKappa());
+					otherModel.setTitv(model.getTitv());
+					try {
+						otherModel.setTreeString(model.getTreeString());
+					} catch (TreeParseException e) {
+						e.printStackTrace();
+					}
+					model.setLnL(0.0);
+					break;
+				}
+			}
+		}
 	}
 
 	public void loadModelConstraints(Model currentModel, int order,
@@ -416,6 +471,39 @@ public class ApplicationOptions implements Serializable {
 		}
 		ModelTest.getCandidateModels()[order] = new Model(order + 1, modelName,
 				partition, modelParameters, pF, pT, pV, pR, pI, pG, 0, 0);
+		
+		if (ModelTest.getLoadedModels() != null && ModelTest.getLoadedModels().length > 0) {
+			for (Model model : ModelTest.getLoadedModels()) {
+				if (model.getName().equals(ModelTest.getCandidateModels()[order].getName()) 
+						&& model.getLnL() > 0.0) {
+					/* load from checkpoint */
+					Model otherModel = ModelTest.getCandidateModels()[order];
+					otherModel.setLnL(model.getLnL());
+					otherModel.setLnLIgnoringGaps(model.getLnLIgnoringGaps());
+					otherModel.setShape(model.getShape());
+					otherModel.setfA(model.getfA());
+					otherModel.setfC(model.getfC());
+					otherModel.setfG(model.getfG());
+					otherModel.setfT(model.getfT());
+					otherModel.setRa(model.getRa());
+					otherModel.setRb(model.getRb());
+					otherModel.setRc(model.getRc());
+					otherModel.setRd(model.getRd());
+					otherModel.setRe(model.getRe());
+					otherModel.setRf(model.getRf());
+					otherModel.setPinv(model.getPinv());
+					otherModel.setKappa(model.getKappa());
+					otherModel.setTitv(model.getTitv());
+					try {
+						otherModel.setTreeString(model.getTreeString());
+					} catch (TreeParseException e) {
+						e.printStackTrace();
+					}
+					model.setLnL(0.0);
+					break;
+				}
+			}
+		}
 	}
 
 	public File getInputFile() {
@@ -528,6 +616,10 @@ public class ApplicationOptions implements Serializable {
 		return treeFile;
 	}
 
+	public File getCkpFile() {
+		return ckpFile;
+	}
+	
 	public File getLogFile() {
 		return logFile;
 	}

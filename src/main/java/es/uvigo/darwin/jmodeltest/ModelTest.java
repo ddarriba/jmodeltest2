@@ -18,9 +18,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 package es.uvigo.darwin.jmodeltest;
 
 import java.awt.GraphicsEnvironment;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -125,6 +130,7 @@ public class ModelTest {
 	private static RunConsense consensusDT;
 
 	private static Model[] candidateModels;
+	private static Model[] loadedModels;
 	private static Model minAIC, minAICc, minBIC, minDT, minHLRT, minDLRT;
 
 	private static String hostname;
@@ -167,6 +173,7 @@ public class ModelTest {
 			execMode = ExecMode.CONSOLE;
 			ParseArguments();
 			options.createLogFile();
+			options.createCkpFile();
 			if (options.doingSimulations) {
 				Simulation sim = new Simulation(options);
 				sim.run();
@@ -182,6 +189,30 @@ public class ModelTest {
 	 * main ************************************ * Starts the application * * *
 	 ***********************************************************************/
 
+	public static boolean loadCheckpoint (File ckpFile) {
+		try {
+			InputStream file = new FileInputStream(ckpFile);
+			InputStream buffer = new BufferedInputStream(file);
+			ObjectInput input = new ObjectInputStream(buffer);
+			loadedModels = (Model[]) input.readObject();
+			int numModels = 0;
+			for (Model model : loadedModels) {
+				if (model.getLnL() > 0.0) numModels++;
+			}
+			MAIN_CONSOLE.println(" ok!");
+			MAIN_CONSOLE.println("Loaded "+ numModels +" models");
+			ApplicationOptions.getInstance().setNumModels(loadedModels.length);
+			input.close();
+		} catch (ClassNotFoundException ex) {
+			MAIN_CONSOLE.println(" cannot perform input.");
+			return false;
+		} catch (IOException ex) {
+			MAIN_CONSOLE.println(" cannot perform input.");
+			return false;
+		}
+		return true;
+	}
+	
 	public static void main(String[] args) {
 		// initializing MPJ environment (if available)
 		System.err.println("[MPI] Testing MPI environment... (" + hostname
@@ -540,6 +571,7 @@ public class ModelTest {
 		int i, j;
 		String arg = "";
 		String error = "\nCOMMAND LINE ERROR: ";
+		File ckpFile = null;
 		boolean isInputFile = false;
 		boolean getPhylip = false;
 		try {
@@ -626,6 +658,15 @@ public class ModelTest {
 					}
 				}
 
+				else if (arg.equals("-ckp")) {
+					if (i < arguments.length) {
+						ckpFile = new File(arguments[i++]);
+					} else {
+						System.err.println(error
+								+ "-ckp option requires a checkpoint filename.");
+						PrintUsage();
+					}
+				}
 				else if (arg.equals("-f")) {
 					options.doF = true;
 				}
@@ -1075,6 +1116,16 @@ public class ModelTest {
 				}
 				finalize(0);
 			}
+			
+			if (ckpFile != null) {
+				if (!loadCheckpoint(ckpFile)) {
+					System.err.println("\nThe specified checkpoint file \""
+							+ options.getInputFile().getAbsolutePath()
+							+ "\" cannot be read");
+					finalize(0);
+				}
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1573,6 +1624,13 @@ public class ModelTest {
 		ModelTest.candidateModels = candidateModels;
 	}
 
+	/**
+	 * @return the loadedModels
+	 */
+	public static Model[] getLoadedModels() {
+		return loadedModels;
+	}
+	
 	/**
 	 * @return the candidateModels
 	 */

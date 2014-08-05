@@ -25,6 +25,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
@@ -43,6 +49,7 @@ import javax.swing.plaf.BorderUIResource;
 
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
+import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.exe.ProcessManager;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
@@ -463,6 +470,19 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 								+ completedModels + "/" + totalModels);
 					}
 
+					if (ModelTestConfiguration.isCkpEnabled()) {
+						try {
+							OutputStream file = new FileOutputStream(
+									options.getCkpFile());
+							OutputStream buffer = new BufferedOutputStream(file);
+							ObjectOutput output = new ObjectOutputStream(buffer);
+							output.writeObject(ModelTest.getCandidateModels());
+							output.close();
+						} catch (IOException ex) {
+							System.err.println("Cannot perform output.");
+						}
+					}
+					
 					progressBarLike.setValue(completedModels);
 				} catch (NullPointerException e) {
 					// Ignore...
