@@ -588,7 +588,7 @@ public class ModelTest {
 					}
 					System.err.println("");
 
-					PrintUsage();
+					CommandLineError();
 					System.exit(1);
 				}
 
@@ -601,7 +601,7 @@ public class ModelTest {
 					} else {
 						System.err.println(error
 								+ "-d option requires an input filename.");
-						PrintUsage();
+						CommandLineError();
 					}
 				}
 
@@ -642,19 +642,19 @@ public class ModelTest {
 								System.err
 										.println(error
 												+ "-s substitution types have to be 3,5,7,11 only.");
-								PrintUsage();
+								CommandLineError();
 							}
 						} catch (NumberFormatException e) {
 							System.err
 									.println(error
 											+ "-s option requires a number for the substitution types: 3,5,7,11.");
-							PrintUsage();
+							CommandLineError();
 						}
 					} else {
 						System.err
 								.println(error
 										+ "-s option requires a number for the substitution types: 3,5,7,11.");
-						PrintUsage();
+						CommandLineError();
 					}
 				}
 
@@ -664,7 +664,7 @@ public class ModelTest {
 					} else {
 						System.err.println(error
 								+ "-ckp option requires a checkpoint filename.");
-						PrintUsage();
+						CommandLineError();
 					}
 				}
 				else if (arg.equals("-f")) {
@@ -685,13 +685,13 @@ public class ModelTest {
 							System.err
 									.println(error
 											+ "-g option requires a number of gamma categories.");
-							PrintUsage();
+							CommandLineError();
 						}
 					} else {
 						System.err
 								.println(error
 										+ "-g option requires a number of gamma categories.");
-						PrintUsage();
+						CommandLineError();
 					}
 				}
 
@@ -704,12 +704,12 @@ public class ModelTest {
 						} catch (NumberFormatException e) {
 							System.err.println(error
 									+ "-G option requires a threshold.");
-							PrintUsage();
+							CommandLineError();
 						}
 					} else {
 						System.err.println(error
 								+ "-G option requires a threshold.");
-						PrintUsage();
+						CommandLineError();
 					}
 				}
 
@@ -726,13 +726,13 @@ public class ModelTest {
 							System.err
 									.println(error
 											+ "-H argument is invalid (AIC, BIC, AICc).");
-							PrintUsage();
+							CommandLineError();
 						}
 					} else {
 						System.err
 								.println(error
 										+ "-H option requires an argument (AIC, BIC, AICc).");
-						PrintUsage();
+						CommandLineError();
 					}
 				} else if (arg.equals("-t")) {
 					if (i < arguments.length) {
@@ -755,16 +755,16 @@ public class ModelTest {
 									.println(error
 											+ "-t option requires a type of base tree for likelihod calculations: "
 											+ "\"fixed\", \"BIONJ\" or \"ML\" only");
-							PrintUsage();
+							CommandLineError();
 						}
 					} else {
 						System.err
 								.println(error
 										+ "-t option requires a type of base tree for likelihod calculations: "
 										+ "fixed, BIONJ or ML");
-						PrintUsage();
+						CommandLineError();
 					}
-				} else if (arg.equals("-getphylip")) {
+				} else if (arg.equals("-getPhylip")) {
 					getPhylip = true;
 				}
 
@@ -778,7 +778,7 @@ public class ModelTest {
 						System.err
 								.println(error
 										+ "-u option requires an file name for the tree file");
-						PrintUsage();
+						CommandLineError();
 					}
 				}
 
@@ -789,7 +789,7 @@ public class ModelTest {
 						System.err
 								.println(error
 										+ "-n option requires a name for the execution");
-						PrintUsage();
+						CommandLineError();
 					}
 				}
 				
@@ -808,14 +808,14 @@ public class ModelTest {
 									.println(error
 											+ "-S option requires a type of tree topology search operation: "
 											+ "\"NNI\", \"SPR\" or \"BEST\" only");
-							PrintUsage();
+							CommandLineError();
 						}
 					} else {
 						System.err
 								.println(error
 										+ "-S option requires a type of tree topology search operation: "
 										+ "\"NNI\", \"SPR\", \"BEST\"");
-						PrintUsage();
+						CommandLineError();
 					}
 				}
 
@@ -862,14 +862,18 @@ public class ModelTest {
 							System.err
 									.println(error
 											+ "-c option requires a number (0-1) for the model selection confidence interval.");
-							PrintUsage();
+							CommandLineError();
 						}
 					} else {
 						System.err
 								.println(error
 										+ "-c option requires a number (0-1) for the model selection confidence interval.");
-						PrintUsage();
+						CommandLineError();
 					}
+				}
+
+				else if (arg.equals("-help")) {
+					PrintUsage();
 				}
 
 				else if (arg.equals("-hLRT")) {
@@ -894,7 +898,7 @@ public class ModelTest {
 							System.err
 									.println(error
 											+ "-O option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
-							PrintUsage();
+							CommandLineError();
 						}
 
 						char[] valid = validString.toCharArray();
@@ -902,7 +906,7 @@ public class ModelTest {
 							System.err
 									.println(error
 											+ "-O option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
-							PrintUsage();
+							CommandLineError();
 						} else {
 							testingOrder = new Vector<String>();
 							for (j = 0; j < type.length(); j++) {
@@ -948,13 +952,13 @@ public class ModelTest {
 							System.err
 									.println(error
 											+ "-h option requires a number (0-1) for the hLRT confidence interval.");
-							PrintUsage();
+							CommandLineError();
 						}
 					} else {
 						System.err
 								.println(error
 										+ "-h option requires a number (0-1) for the hLRT confidence interval.");
-						PrintUsage();
+						CommandLineError();
 					}
 				}
 
@@ -974,7 +978,7 @@ public class ModelTest {
 						System.err
 								.println(error
 										+ "-sims option requires a name for the simulations files");
-						PrintUsage();
+						CommandLineError();
 					}
 
 				} else if (arg.equals("-machinesfile")) {
@@ -987,7 +991,7 @@ public class ModelTest {
 										.println(error
 												+ "Machines file does not exists or it is not readable");
 							}
-							PrintUsage();
+							CommandLineError();
 						}
 
 						boolean hostsError = false;
@@ -1040,12 +1044,12 @@ public class ModelTest {
 							System.err
 									.println(error
 											+ "Machines file does not exists or it is not readable");
-							PrintUsage();
+							CommandLineError();
 						}
 					} else {
 						System.err.println(error
 								+ "-machinesfile option requires a filename");
-						PrintUsage();
+						CommandLineError();
 					}
 				} else if (arg.equals("-tr")) {
 					if (HOSTS_TABLE != null) {
@@ -1064,26 +1068,26 @@ public class ModelTest {
 								System.err
 										.println(error
 												+ "-tr option requires the number of processors to compute.");
-								PrintUsage();
+								CommandLineError();
 							}
 						} else {
 							System.err
 									.println(error
 											+ "-tr option requires the number of processors to compute.");
-							PrintUsage();
+							CommandLineError();
 						}
 					}
 				} else {
 					System.err.println(error + "the argument \" " + arg
 							+ "\" is unknown. Check its syntax.");
-					PrintUsage();
+					CommandLineError();
 				}
 
 			} // while
 			if (!isInputFile) {
 				System.err.println(error
 						+ "Input File is required (-d argument)");
-				PrintUsage();
+				CommandLineError();
 			}
 			if (getPhylip) {
 				MAIN_CONSOLE.print("\n\nReading data file \"" + options.getInputFile().getName()
@@ -1134,55 +1138,111 @@ public class ModelTest {
 		options.doBIC |= !(options.doAIC || options.doAICc || options.doDT);
 	}
 
+	static public void CommandLineError() {
+		System.err.println("\njModelTest has finished with an error status. Please run with -help argument for info about the usage\n");
+		System.exit(1);
+	}
+	
 	/****************************
 	 * PrintUsage **************************** * Prints command line usage * *
 	 ************************************************************************/
 	static public void PrintUsage() {
 		if (MPJ_ME == 0) {
-			String usage = "\njModelTest command usage"
-					+ "\n -d: input data file (e.g., -d data.phy)"
-					+ "\n -t: base tree for likelihood calculations (e.g., -t BIONJ)"
-					+ "\n     fixed  (common BIONJ-JC topology)"
-					+ "\n     BIONJ  (Neighbor-Joining topology)"
-					+ "\n     ML     (Maximum Likelihood topology) (default)"
-					+ "\n -u: user tree for likelihood calculations  (e.g., -u data.tre)"
-					+ "\n -n: execution name for appending to the log filenames (default: current time yyyyMMddhhmmss)"
-					+ "\n -getphylip: converts the input file into phylip format"
-					+ "\n -o: set output file (e.g., -o jmodeltest.out)"
-					+ "\n -s: number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)"
-					+ "\n -f: include models with unequals base frecuencies (e.g., -f) (default is false)"
-					+ "\n -i: include models with a proportion invariable sites (e.g., -i) (default is false)"
-					+ "\n -g: include models with rate variation among sites and number of categories (e.g., -g 8) (default is false & 4 categories)"
-					+ "\n -S: tree topology search operation option (NNI (fast), SPR (a bit slower), BEST (best of NNI and SPR)) (default is BEST)"
-					+ "\n -AIC: calculate the Akaike Information Criterion (e.g., -AIC) (default is false)"
-					+ "\n -AICc: calculate the corrected Akaike Information Criterion (e.g., -AICc) (default is false)"
-					+ "\n -BIC: calculate the Bayesian Information Criterion (e.g., -BIC) (default is false)"
-					+ "\n -DT: calculate the decision theory criterion (e.g., -DT) (default is false)"
-					+ "\n -p: calculate parameter importances (e.g., -p) (default is false)"
-					+ "\n -v: do model averaging and parameter importances (e.g., -v) (default is false)"
-					+ "\n -c: confidence interval (e.g., -c 90) (default is 100)"
-					+ "\n -w: write PAUP block (e.g., -w) (default is false)"
-					+ "\n -dLRT: do dynamical likelihood ratio tests (e.g., -dLRT)(default is false)"
-					+ "\n -hLRT: do hierarchical likelihood ratio tests (default is false)"
-					+ "\n -O: hypothesis order for the hLRTs (e.g., -hLRT -O gpftv) (default is ftvgp/ftvwgp/ftvwxgp)"
-					+ "\n        f=freq, t=titvi, v=2ti4tv(subst=3)/2ti(subst>3), w=2tv, x=4tv, g=gamma, p=pinv"
-					+ "\n -r: backward selection for the hLRT (e.g., -r) (default is forward)"
-					+ "\n -h: confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)"
-					+ "\n -a: estimate model-averaged phylogeny for each active criterion (e.g., -a) (default is false)"
-					+ "\n -z: strict consensus type for model-averaged phylogeny (e.g., -z) (default is majority rule)"
-					+ "\n -G: heuristic search. Requires a threshold > 0 (e.g., -G 0.1)"
-					+ "\n -H: information criterion for clustering search (AIC, AICc, BIC). (e.g., -H AIC) (default is BIC)"
-					+ "\n -uLnL: calculate delta AIC,AICc,BIC against unconstrained likelihood (e.g., -uLnL)"
-					+ "\n        (default is false if the input alignment has gaps or ambiguous characters)"
-					+ "\n -tr: number of threads to execute (default is "
+			System.err.println("\njModelTest command usage");
+			System.err.println(
+			    "java -jar jModelTest.jar -d sequenceFileName"
+			+ "\n                        [-getPhylip]"
+			+ "\n                        [-ckp checkpointFileName.ckp]"
+			+ "\n                        [-n executionName]"
+			+ "\n                        [-t fixed|BIONJ|ML] [-u userTreeFileName] [-o outputFileName]"
+			+ "\n                        [-S NNI|SPR|BEST]"
+			+ "\n                        [-AIC] [-AICc] [-BIC] [-DT] [-c confidenceInterval]"
+			+ "\n                        [-s 3|5|7|11|203]"
+			+ "\n                        [-f] [-i] [-g numberOfCategories]"
+			+ "\n                        [-uLNL]"
+			+ "\n                        [-dLRT] [-h confidenceInterval] [-hLRT] [-O {ftvwxgp}]"
+			+ "\n                        [-a] [-z] [-p] [-v] [-w]"
+			+ "\n                        [-tr numberOfThreads] [-machinesfile machinesFileName]"
+			);
+			String usage = 
+					  "\n     -a"
+					+ "\n         estimate model-averaged phylogeny for each active criterion (e.g., -a) (default is false)"
+					+ "\n\n     -AIC"
+					+ "\n         calculate the Akaike Information Criterion (e.g., -AIC) (default is false)"
+					+ "\n\n     -AICc"
+					+ "\n         calculate the corrected Akaike Information Criterion (e.g., -AICc) (default is false)"
+					+ "\n\n     -BIC"
+					+ "\n         calculate the Bayesian Information Criterion (e.g., -BIC) (default is false)"
+					+ "\n\n     -DT"
+					+ "\n         calculate the decision theory criterion (e.g., -DT) (default is false)"
+					+ "\n\n     -c confidenceInterval"
+					+ "\n         confidence interval (e.g., -c 90) (default is 100)"
+					+ "\n\n     -ckp checkpointFileName"
+					+ "\n         Loads a checkpointing file"
+					+ "\n\n     -d sequenceFileName"
+					+ "\n         input data file (e.g., -d data.phy)"
+					+ "\n\n     -dLRT"
+					+ "\n         do dynamical likelihood ratio tests (e.g., -dLRT)(default is false)"
+					+ "\n\n     -f"
+					+ "\n         include models with unequals base frecuencies (e.g., -f) (default is false)"
+					+ "\n\n     -g numberOfCategories"
+					+ "\n         include models with rate variation among sites and number of categories (e.g., -g 8) (default is false & 4 categories)"
+					+ "\n\n     -G threshold"
+					+ "\n         heuristic search. Requires a threshold > 0 (e.g., -G 0.1)"
+					+ "\n\n     -getphylip"
+					+ "\n         converts the input file into phylip format"
+					+ "\n\n     -h confidenceInterval"
+					+ "\n         confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)"
+					+ "\n\n     -H informationCriterion"
+					+ "\n         information criterion for clustering search (AIC, AICc, BIC). (e.g., -H AIC) (default is BIC)"
+					+ "\n\n     -help"
+					+ "\n         displays this help message"
+					+ "\n\n     -hLRT"
+					+ "\n         do hierarchical likelihood ratio tests (default is false)"
+					+ "\n\n     -i"
+					+ "\n         include models with a proportion invariable sites (e.g., -i) (default is false)"
+					+ "\n\n     -machinesfile manchinesFileName"
+					+ "\n         gets the processors per host from a machines file"
+					+ "\n\n     -n executionName"
+					+ "\n         execution name for appending to the log filenames (default: current time yyyyMMddhhmmss)"
+					+ "\n\n     -o outputFileName"
+					+ "\n         set output file (e.g., -o jmodeltest.out)"
+					+ "\n\n     -O hypothesisOrder"
+					+ "\n         hypothesis order for the hLRTs (e.g., -hLRT -O gpftv) (default is ftvwxgp)"
+					+ "\n            f=freq, t=titvi, v=2ti4tv(subst=3)/2ti(subst>3), w=2tv, x=4tv, g=gamma, p=pinv"
+					+ "\n\n     -p"
+					+ "\n         calculate parameter importances (e.g., -p) (default is false)"
+					+ "\n\n     -r"
+					+ "\n         backward selection for the hLRT (e.g., -r) (default is forward)"
+					+ "\n\n     -s numberOfSubstitutionSchemes"
+					+ "\n         number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)"
+					+ "\n\n     -S NNI|SPR|BEST"
+					+ "\n         tree topology search operation option (NNI (fast), SPR (a bit slower), BEST (best of NNI and SPR)) (default is BEST)"
+					+ "\n\n     -t fixed|BIONJ|ML"
+					+ "\n             base tree for likelihood calculations (e.g., -t BIONJ)"
+					+ "\n             fixed  (common BIONJ-JC topology)"
+					+ "\n             BIONJ  (Neighbor-Joining topology)"
+					+ "\n             ML     (Maximum Likelihood topology) (default)"
+					+ "\n\n     -tr numberOfThreads"
+					+ "\n         number of threads to execute (default is "
 					+ Runtime.getRuntime().availableProcessors()
 					+ ")"
-					+ "\n -machinesfile: gets the processors per host from a machines file"
-					+ "\n\n Command line: java -jar jModeltest.jar [arguments]";
+					+ "\n\n     -u treeFileName"
+					+ "\n         user tree for likelihood calculations  (e.g., -u data.tre)"
+					+ "\n\n     -uLnL"
+					+ "\n         calculate delta AIC,AICc,BIC against unconstrained likelihood (e.g., -uLnL)"
+					+ "\n\n        (default is false if the input alignment has gaps or ambiguous characters)"
+					+ "\n\n     -v"
+					+ "\n         do model averaging and parameter importances (e.g., -v) (default is false)"
+					+ "\n\n     -w"
+					+ "\n         write PAUP block (e.g., -w) (default is false)"
+					+ "\n\n     -z"
+					+ "\n         strict consensus type for model-averaged phylogeny (e.g., -z) (default is majority rule)"
+					+ "\n\n Command line: java -jar jModeltest.jar -d sequenceFileName [arguments]";
 			System.err.println(usage);
 			System.err.println(" ");
 		}
-		System.exit(1);
+		System.exit(0);
 	}
 
 	/****************************
