@@ -34,6 +34,7 @@ import java.io.PrintWriter;
 import java.net.URI;
 
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -48,6 +49,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.text.DefaultCaret;
 
@@ -173,13 +175,13 @@ public class FrameMain extends JModelTestFrame {
 				KeyEvent.VK_O, HOTKEY_MODIFIER));
 
 		menuFileOpenCkpFile
-				.setToolTipText("Load a Checkpoint file from a previous run");
+				.setToolTipText("Load a checkpoint file from a previous run");
 		menuFileOpenCkpFile
 				.setBorder(new BorderUIResource.EmptyBorderUIResource(
 						new java.awt.Insets(3, 3, 6, 3)));
 		menuFileOpenCkpFile.setVisible(true);
-//		menuFileOpenCkpFile.setEnabled(false);
-		menuFileOpenCkpFile.setText("Load Checkpoint file");
+		menuFileOpenCkpFile.setEnabled(false);
+		menuFileOpenCkpFile.setText("Load checkpoint file");
 
 		menuFileSeparator1
 				.setBorder(new BorderUIResource.EmptyBorderUIResource(
@@ -739,20 +741,22 @@ public class FrameMain extends JModelTestFrame {
 
 	private void menuFileOpenDataFileActionPerformed(
 			java.awt.event.ActionEvent e) {
-		FileDialog fc = new FileDialog(this, "Load DNA alignment",
-				FileDialog.LOAD);
-		fc.setDirectory(System.getProperty("user.dir"));
-		fc.setVisible(true);
 
-		String dataFileName = fc.getFile();
+		JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+		fc.setFileFilter(new FileNameExtensionFilter("Sequence alignment (*.phy, *.fas, *.nex)", "phy", "fas", "nex"));
+		
+		int returnVal = fc.showOpenDialog(this);
 
-		if (dataFileName != null) // menu not canceled
+		File inputFile = null;
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        	inputFile = fc.getSelectedFile();
+        }   
+
+		if (inputFile != null) // menu not canceled
 		{
-			String dataFileNameComplete = fc.getDirectory() + dataFileName;
 			ModelTest.getMainConsole().print(
-					"Reading data file \"" + dataFileName + "\"...");
+					"Reading data file \"" + inputFile.getName() + "\"...");
 
-			File inputFile = new File(dataFileNameComplete);
 			if (inputFile.exists()) // file exists
 			{
 				options.setInputFile(inputFile);
@@ -764,7 +768,7 @@ public class FrameMain extends JModelTestFrame {
 							.readAlignment(new PrintWriter(System.err), options
 									.getAlignmentFile().getAbsolutePath(), true));
 
-					LabelStatusData.setText(dataFileName + "  ");
+					LabelStatusData.setText(inputFile.getName() + "  ");
 					LabelStatusData.setForeground(new java.awt.Color(102, 102,
 							153));
 					menuAnalysisCalculateLikelihoods.setEnabled(true);
@@ -778,7 +782,7 @@ public class FrameMain extends JModelTestFrame {
 					menuFileOpenCkpFile.setEnabled(true);
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(this, "The specified file \""
-							+ dataFileName
+							+ inputFile.getAbsolutePath()
 							+ "\" cannot be read as an alignment",
 							"jModelTest error", JOptionPane.ERROR_MESSAGE);
 					ModelTest.getMainConsole().println(" failed.\n");
@@ -786,66 +790,43 @@ public class FrameMain extends JModelTestFrame {
 				}
 			} else {
 				JOptionPane.showMessageDialog(this, "The specified file \""
-						+ dataFileName + "\" cannot be found",
+						+ inputFile.getAbsolutePath() + "\" cannot be found",
 						"jModelTest error", JOptionPane.ERROR_MESSAGE);
 				ModelTest.getMainConsole().println(" failed.\n");
 				menuFileOpenCkpFile.setEnabled(false);
 			}
 		}
+		
 	}
 
 	private void menuFileOpenCkpFileActionPerformed(java.awt.event.ActionEvent e) {
-		FileDialog fc = new FileDialog(this, "Load Checkpoint file",
-				FileDialog.LOAD);
-		fc.setDirectory(System.getProperty("user.dir"));
-		fc.setVisible(true);
+		
+		JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+		fc.setFileFilter(new FileNameExtensionFilter("jModelTest checkpoint (*.ckp)", "ckp"));
+		
+		int returnVal = fc.showOpenDialog(this);
 
-		String dataFileName = fc.getFile();
+		File file = null;
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            file = fc.getSelectedFile();
+        }        
 
-		if (dataFileName != null) // menu not canceled
+		if (file != null) // menu not canceled
 		{
-			String dataFileNameComplete = fc.getDirectory() + dataFileName;
 			ModelTest.getMainConsole().print(
-					"Loading checkpoint from \"" + dataFileName + "\"...");
+					"Loading checkpoint from \"" + file.getName() + "\"...");
 
-			File inputFile = new File(dataFileNameComplete);
-			if (inputFile.exists()) // file exists
+			if (file.exists()) // file exists
 			{
-				ModelTest.loadCheckpoint(inputFile);
-				// options.setInputFile(inputFile);
-				// try {
-				// ModelTestService.readAlignment(inputFile,
-				// options.getAlignmentFile());
-				//
-				// options.setAlignment(AlignmentReader
-				// .readAlignment(new PrintWriter(System.err), options
-				// .getAlignmentFile().getAbsolutePath(), true));
-				//
-				// LabelStatusData.setText(dataFileName + "  ");
-				// LabelStatusData.setForeground(new java.awt.Color(102, 102,
-				// 153));
-				// menuAnalysisCalculateLikelihoods.setEnabled(true);
-				// enableMenuShowModelTable(false);
-				// enableMenuHtmlOutput(false);
-				// ModelTest.getMainConsole().println(" OK.");
-				// ModelTest.getMainConsole().println(
-				// "  number of sequences: " + options.getNumTaxa());
-				// ModelTest.getMainConsole().println(
-				// "  number of sites: " + options.getNumSites());
-				// } catch (Exception e1) {
-				// JOptionPane.showMessageDialog(this, "The specified file \""
-				// + dataFileName
-				// + "\" cannot be read as an alignment",
-				// "jModelTest error", JOptionPane.ERROR_MESSAGE);
-				// ModelTest.getMainConsole().println(" failed.\n");
-				// }
+				ModelTest.loadCheckpoint(file);
 			} else {
 				JOptionPane.showMessageDialog(this, "The specified file \""
-						+ dataFileName + "\" cannot be found",
+						+ file.getName() + "\" cannot be found",
 						"jModelTest error", JOptionPane.ERROR_MESSAGE);
 				ModelTest.getMainConsole().println(" failed.\n");
 			}
 		}
+		
 	}
 
 	private void menuFileQuitActionPerformed(java.awt.event.ActionEvent e) {
@@ -1153,7 +1134,7 @@ public class FrameMain extends JModelTestFrame {
 	private void menuAboutModelTestActionPerformed(java.awt.event.ActionEvent e) {
 		try {
 			String about = "jModelTest " + ModelTest.CURRENT_VERSION + "\n";
-			about += "(c) 2001-onwards D.Darriba, G.L.Taboada, R.Doallo and D.Posada\n";
+			about += "(c) 2011-onwards D.Darriba, G.L.Taboada, R.Doallo and D.Posada\n";
 			about += "Department of Biochemistry, Genetics and Immunology\n";
 			about += "University of Vigo, 36310 Vigo, Spain.\n";
 			about += "Department of Electronics and Systems\n";
