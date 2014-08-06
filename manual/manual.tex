@@ -501,88 +501,62 @@ Sets the confidence interval for the model selection process (default is 100)
 
 Sets the input data file. jModelTest makes use of the ALTER library for converting several alignment formats to PHYLIP.
 
-\item  {\bf -t} BASE\_TREE\_MODE
+\item  {\bf -dLRT}
 
-Base tree for likelihood calculations (e.g., -t BIONJ)
-\begin{itemize}
-     \item {\bf fixed}  Fixed BIONJ topology from JC model
-     \item {\bf BIONJ}  Neighbor-Joining topology for each model
-     \item {\bf ML}     Maximum Likelihood topology for each model (default)
-\end{itemize}
-
-\item  {\bf -u} TREE\_FILE
-
-Fixed tree for likelihood calculations defined by the user. If a user tree is defined with this command, -t argument is ignored.
-
-\item  {\bf -n} LOG\_SUFFIX
-
-Execution name appended to the log filenames. By default, current time is used: yyyyMMddhhmmss.
-
-\item  {\bf -getphylip}
-
-Converts the input file into phylip format and exits. For example, the following command will generate a new PHYLIP file named ``input.nex.phy''.
-\begin{lstlisting}
-$java -jar jModelTest.jar -d input.nex -getphylip
-\end{lstlisting}
-
-\item  {\bf -o} OUTPUT\_FILE
-
-Redirects the output to a file.
-
-\item  {\bf -s} {3,5,7,11,203}
-
-Sets the number of substitution schemes.
-\begin{itemize}
-     \item {\bf 3} JC/F81, K80/HKY, SYM/GTR (used by default).
-     \item {\bf 5} JC/F81, K80/HKY, TrNef/TrN, TPM1/TPM1uf, SYM/GTR.
-     \item {\bf 7} JC/F81, K80/HKY, TrNef/TrN, TPM1/TPM1uf, TIM1ef/TIM1, TVMef/TVM, SYM/GTR.
-     \item {\bf 11} All models defined in Table~\ref{table-models}.
-     \item {\bf 203} All possible GTR submatrices.
-\end{itemize}
+Perform dynamical likelihood ratio tests
 
 \item  {\bf -f}
 
 Include models with unequals base frecuencies.
 
-\item  {\bf -i}
-
-Include models with a proportion invariable sites.
-
 \item  {\bf -g} NUM\_OF\_RATE\_CATEGORIES
 
 Include models with rate variation among sites and sets the number of categories. Usually 4 categories are enough.
 
-\item  {\bf -S} TREE\_SEARCH\_OPERATION
+\item  {\bf -getPhylip}
 
-Defines the tree topology search operation option for Maximum-Likelihood search. 
-\begin{itemize}
-     \item {\bf NNI} Nearest Neighbour Interchange (fast).
-     \item {\bf SPR} Subtree Pruning and Regrafting (slower).
-     \item {\bf BEST} Best of NNI and SPR (slowest option) (used by default).
-\end{itemize}
+Converts the input file into phylip format and exits. For example, the following command will generate a new PHYLIP file named ``input.nex.phy''.
+\begin{lstlisting}
+$java -jar jModelTest.jar -d input.nex -getPhylip
+\end{lstlisting}
 
+\item  {\bf -G} THRESHOLD
 
-\item  {\bf -p}
+Heuristic search. Requires a threshold > 0 (e.g., -G 0.1)
 
-Calculate the parameter importances
+\item  {\bf -h} CONFIDENCE\_INTERVAL
 
-\item  {\bf -v}
+Sets the confidence level for the hLRTs (default is 0.01)
 
-Do model averaging and parameter importances
+\item  {\bf -help}
 
-\item  {\bf -w}
-
-Prints out the PAUP block
-
-\item  {\bf -dLRT}
-
-Perform dynamical likelihood ratio tests
+Displays a help message
 
 \item  {\bf -hLRT}
 
 Perform hierarchical likelihood ratio tests
 
-\item  {\bf -O}
+\item  {\bf -H}
+
+Information criterion for clustering search (AIC, AICc, BIC). (e.g., -H AIC) (default is BIC)
+
+\item  {\bf -i}
+
+Include models with a proportion invariable sites.
+
+\item  {\bf -machinesfile} MACHINES\_FILE
+
+Gets the processors per host from a machines file (for MPI execution)
+
+\item  {\bf -n} LOG\_SUFFIX
+
+Execution name appended to the log filenames. By default, current time is used: yyyyMMddhhmmss.
+
+\item  {\bf -o} OUTPUT\_FILE
+
+Redirects the output to a file.
+
+\item  {\bf -O} {ftvwxgp}
 
 Sets the hypothesis order for the hLRTs (e.g., -hLRT -O gpftv) (default is ftvwxgp)
 \begin{itemize}
@@ -595,37 +569,66 @@ Sets the hypothesis order for the hLRTs (e.g., -hLRT -O gpftv) (default is ftvwx
 \item {\bf p} proportion of invariable sites
 \end{itemize}
 
+\item  {\bf -p}
+
+Calculate the parameter importances
+
 \item  {\bf -r}
 
 Backward selection for the hLRT (default is forward)
 
-\item  {\bf -h} CONFIDENCE\_INTERVAL
+\item  {\bf -s} 3|5|7|11|203
 
-Sets the confidence level for the hLRTs (default is 0.01)
+Sets the number of substitution schemes.
+\begin{itemize}
+     \item {\bf 3} JC/F81, K80/HKY, SYM/GTR (used by default).
+     \item {\bf 5} JC/F81, K80/HKY, TrNef/TrN, TPM1/TPM1uf, SYM/GTR.
+     \item {\bf 7} JC/F81, K80/HKY, TrNef/TrN, TPM1/TPM1uf, TIM1ef/TIM1, TVMef/TVM, SYM/GTR.
+     \item {\bf 11} All models defined in Table~\ref{table-models}.
+     \item {\bf 203} All possible GTR submatrices.
+\end{itemize}
 
-\item  {\bf -z}
+\item  {\bf -S} NNI|SPR|BEST
 
-Strict consensus type for model-averaged phylogeny (default is majority rule)
+Defines the tree topology search operation option for Maximum-Likelihood search. 
+\begin{itemize}
+     \item {\bf NNI} Nearest Neighbour Interchange (fast).
+     \item {\bf SPR} Subtree Pruning and Regrafting (slower).
+     \item {\bf BEST} Best of NNI and SPR (slowest option) (used by default).
+\end{itemize}
 
-\item  {\bf -G} THRESHOLD
+\item  {\bf -t} fixed|BIONJ|ML
 
-Heuristic search. Requires a threshold > 0 (e.g., -G 0.1)
-
-\item  {\bf -H}
-
-Information criterion for clustering search (AIC, AICc, BIC). (e.g., -H AIC) (default is BIC)
-
-\item  {\bf -uLnL}
-
-Calculate delta AIC,AICc,BIC against unconstrained likelihood
+Base tree for likelihood calculations (e.g., -t BIONJ)
+\begin{itemize}
+     \item {\bf fixed}  Fixed BIONJ topology from JC model
+     \item {\bf BIONJ}  Neighbor-Joining topology for each model
+     \item {\bf ML}     Maximum Likelihood topology for each model (default)
+\end{itemize}
 
 \item  {\bf -tr} NUM\_THREADS
 
 Number of threads to execute (default is the number of logical processors in the machine)
 
-\item  {\bf -machinesfile} MACHINES\_FILE
+\item  {\bf -u} TREE\_FILE
 
-Gets the processors per host from a machines file (for MPI execution)
+Fixed tree for likelihood calculations defined by the user. If a user tree is defined with this command, -t argument is ignored.
+
+\item  {\bf -uLnL}
+
+Calculate delta AIC,AICc,BIC against unconstrained likelihood
+
+\item  {\bf -v}
+
+Do model averaging and parameter importances
+
+\item  {\bf -w}
+
+Prints out the PAUP block
+
+\item  {\bf -z}
+
+Strict consensus type for model-averaged phylogeny (default is majority rule)
 
 \end{itemize}
 
@@ -657,7 +660,13 @@ Note that, by default, jModelTest uses Maximum-Likelihood topologies as the base
 
 By default, jModelTest saves ``.ckp'' checkpointing files in the log directory. In case of an error occurs, the user can start again the process minimizing the loss of computation. The user is in charge of selecting the checkpointing file and running again jModelTest with the same parameters of the previous execution. Otherwise the results might be wrong.
 
-For finding the correct checkpointing file, if the execution had a user-defined name ``-n argument'', the checkpoing file will have the following format: log/[sequenceFileName].[executionName].ckp. For example, the following command:
+For finding the correct checkpointing file, if the execution had a user-defined name ``-n argument'', the checkpoing file will have the following format: 
+
+\begin{lstlisting}
+log/[sequenceFileName].[executionName].ckp
+\end{lstlisting}
+
+For example, the following command:
 
 \begin{lstlisting}
 $ java -jar jModelTest -d example-data/aP6.fas -n myTest -s 11 -f -i -g 4 -BIC -AIC
@@ -669,13 +678,17 @@ Will generate the checkpointing file in \$JMODELTEST\_HOME/log/aP6.fas.myTest.ck
 $ java -jar jModelTest -d example-data/aP6.fas -n myTest -s 11 -f -i -g 4 -BIC -AIC -ckp log/aP6.fas.myTest.ckp
 \end{lstlisting}
 
-If no execution name was provided, it is automatically generated according to the current date and time with the following format: yyyyMMddhhmmss (e.g., if current time is 17:05:00 August 3 2014, the execution name is 20140803170500, and the checkpointing generated file is log/[sequenceFileName].20140803170500.ckp).
+If no execution name was provided, it is automatically generated according to the current date and time with the following format: yyyyMMddhhmmss (e.g., if current time is 17:05:00 August 3 2014, the execution name is 20140803170500, and the checkpointing generated file is:
+
+\begin{lstlisting}
+log/[sequenceFileName].20140803170500.ckp).
+\end{lstlisting}
 
 When using the GUI instead of the command console interface, the checkpointing file can be loaded using the menu item ``File/Load checkpoint file'', that becomes enabled right after loading the alignment.
 
-\subsection{Finding the Best-fit Model for MrBayes Analysis}
+% \subsection{Finding the Best-fit Model for MrBayes Analysis}
 
-One common question is how to set the best-fit model obtained with jModelTest into MrBayes. The 3 substitution schemes option covers those models implemented in MrBayes. From the command console, the 3 substitution schemes mode is selected by default, so just make sure you are not modifying it with the ``-s'' argument.
+% One common question is how to set the best-fit model obtained with jModelTest into MrBayes. The 3 substitution schemes option covers those models implemented in MrBayes. From the command console, the 3 substitution schemes mode is selected by default, so just make sure you are not modifying it with the ``-s'' argument.
 
 From the GUI, one can choose between the different number of the substituion schemes in the execution settings window.
 
