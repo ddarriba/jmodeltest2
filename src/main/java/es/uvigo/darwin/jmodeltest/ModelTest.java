@@ -91,7 +91,7 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.1.5";
+	public static final String CURRENT_VERSION = "2.1.6";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
@@ -1189,7 +1189,7 @@ public class ModelTest {
 					+ "\n         include models with rate variation among sites and number of categories (e.g., -g 8) (default is false & 4 categories)"
 					+ "\n\n     -G threshold"
 					+ "\n         heuristic search. Requires a threshold > 0 (e.g., -G 0.1)"
-					+ "\n\n     -getphylip"
+					+ "\n\n     -getPhylip"
 					+ "\n         converts the input file into phylip format"
 					+ "\n\n     -h confidenceInterval"
 					+ "\n         confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)"

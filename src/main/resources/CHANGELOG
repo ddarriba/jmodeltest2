@@ -1,3 +1,9 @@
+06 Aug 2014 Version 2.1.6 Revision 20140806
+
+  * Added confirmation window when cancelling running jobs in the GUI
+  * Added automatic checkpointing files generation
+  * Added "-ckp" argument for loading checkpointing files
+
 05 Apr 2014 Version 2.1.5 Revision 20140405
 
   * Updated OS X binary
