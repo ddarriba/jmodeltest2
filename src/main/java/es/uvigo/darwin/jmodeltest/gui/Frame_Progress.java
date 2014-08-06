@@ -145,7 +145,8 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 
 	public void initComponents() {
 
-		// TOP LABEL
+		/* TOP LABEL */
+		
 		headerPanel.setSize(SECTION_WIDTH, HEADER_HEIGHT);
 		headerPanel.setLocation(H_MARGIN, V_MARGIN);
 		headerPanel.setBorder(new BorderUIResource.LineBorderUIResource(
@@ -165,7 +166,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 		timerLabel.setFont(XManager.FONT_CONSOLE);
 		timerLabel.setAlignmentX(RIGHT_ALIGNMENT);
 
-		// THREAD SECTION
+		/* THREAD SECTION */
 
 		int threadsPanelHeight = numberOfThreads * HEIGHT_PER_THREAD + 4
 				* V_INNER_MARGIN;
@@ -214,7 +215,8 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 			threadProgressBar[i].setVisible(true);
 		}
 
-		// BOTTOM SECTION
+		/* BOTTOM SECTION */
+		
 		int FOOTER_SECTION_VLOC = THREADS_SECTIONS_VLOC + threadsPanelHeight
 				+ V_MARGIN;
 		footerPanel.setSize(SECTION_WIDTH,
@@ -262,7 +264,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 		progressBarCancelButton.setLocation((SECTION_WIDTH - BUTTON_WIDTH) / 2,
 				PROGRESS_BAR_HEIGHT + V_INNER_MARGIN + progressBarVPosition);
 
-		// MAIN WINDOW
+		/* MAIN WINDOW */
 
 		setLocation(281, 80);
 		getContentPane().setLayout(null);
@@ -292,7 +294,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 				* V_MARGIN);
 		setResizable(false);
 
-		// event handling
+		/* event handling */
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				thisWindowClosing(e);
@@ -314,7 +316,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 		if (mShown)
 			return;
 
-		// resize frame to account for menubar
+		/* resize frame to account for menubar */
 		JMenuBar jMenuBar = getJMenuBar();
 		if (jMenuBar != null) {
 			int jMenuBarHeight = jMenuBar.getPreferredSize().height;
@@ -322,7 +324,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 			dimension.height += jMenuBarHeight;
 			setSize(dimension);
 
-			// move down components in layered pane
+			/* move down components in layered pane */
 			Component[] components = getLayeredPane().getComponentsInLayer(
 					JLayeredPane.DEFAULT_LAYER.intValue());
 			for (int i = 0; i < components.length; i++) {
@@ -335,20 +337,22 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 		mShown = true;
 	}
 
-	// Close the window when the close box is clicked
+	/* close the window when the close box is clicked */
 	private void thisWindowClosing(WindowEvent e) {
 		setVisible(false);
 		dispose();
-		// System.exit(0);
 	}
 
 	private void progressBarCancel(ActionEvent e) {
 		this.setEnabled(false);
 		try {
+			/* show confirm dialog */
+			Object[] options = {"Yes","No"};
 			int option;
-            option = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel?",
-	                    "Cancel Execution", JOptionPane.YES_NO_OPTION);
+			option = JOptionPane.showOptionDialog(null, "Are you sure you want to cancel?", 
+					"Cancel Execution", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
 	        if (option == JOptionPane.YES_OPTION) {
+	        	/* cancel execution */
 				frameCalcLike.getRunPhyml().interruptThread();
 				frameCalcLike.cancelTask();
 				setVisible(false);
@@ -464,7 +468,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 								+ completedModels + "/"
 								+ info.getNumModelsInStage());
 					} else {
-						// update total models
+						/* update total number of models */
 						totalModels = options.getNumModels();
 						progressBarLikeLabel.setText("Completed "
 								+ completedModels + "/" + totalModels);
@@ -485,7 +489,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 					
 					progressBarLike.setValue(completedModels);
 				} catch (NullPointerException e) {
-					// Ignore...
+					/* Ignore... */
 				}
 
 				String modelTab = (info.getModel().getName().length() > 10) ? "\t"
@@ -577,7 +581,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 
 					String baseTree = "";
 
-					// update gui status
+					/* update gui status */
 					if (!options.fixedTopology && !options.userTopologyExists)
 						baseTree = "(optimized trees)";
 					else
@@ -610,7 +614,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 						XManager.getInstance().enableMenuBIC(true);
 						XManager.getInstance().enableMenuDT(true);
 
-						// build results table
+						/* build results table */
 						XManager.getInstance().buildFrameResults();
 						XManager.getInstance().enableMenuShowModelTable(true);
 						XManager.getInstance().enableMenuHtmlOutput(true);
@@ -633,7 +637,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 						.setCaretPosition(
 								XManager.getInstance().getPane().getDocument()
 										.getLength());
-				// continue
+				/* continue */
 
 			case ProgressInfo.OPTIMIZATION_COMPLETED_INTERRUPTED:
 				ExternalExecutionManager.getInstance().killProcesses();
@@ -641,7 +645,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 				break;
 			}
 		} else {
-			// dispose
+			/* dispose */
 			setVisible(false);
 			dispose();
 		}
@@ -649,7 +653,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		// If the timer caused this event.
+		/* if the timer caused this event */
 		timerLabel.setText("Elapsed time: "
 				+ Utilities.calculateRuntimeMinutes(startTime,
 						System.currentTimeMillis()));
