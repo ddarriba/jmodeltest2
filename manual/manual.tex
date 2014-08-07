@@ -30,22 +30,26 @@
   stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
   stringstyle=\color{RubineRed},   % string literal style
   tabsize=2,                       % sets default tabsize to 2 spaces
-  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+  title=\lstname,                  % show the filename of files included with \lstinputlisting; also try caption instead of title
+  aboveskip=1em,
+  belowcaptionskip=0em,
+  belowskip=0em
 }
 
 \usepackage{hyperref}
 \hypersetup{
     colorlinks,
-    citecolor=black,
+    citecolor=Violet,
     filecolor=black,
     linkcolor=MidnightBlue,
     urlcolor=MidnightBlue
 }
 
 \begin{document}
-\title{jModelTest 2.0 Manual v0.1}
-\author{Diego Darriba, Guillermo L. Taboada, Ram\'on Doallo, David Posada}
-\date{August 2014}
+\providecommand{\versionnumber}{0.1.1}
+\title{jModelTest 2.0 Manual v\versionnumber}
+\author{Diego Darriba, David Posada}
+\date{\today}
 \maketitle
 
 \tableofcontents
@@ -194,443 +198,66 @@ These programs are protected by their own license and conditions, and using jMod
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Getting Started}
-
-\subsection{Operating Systems}
-
-Since jModelTest is a Java application, it can be used in every OS that can execute a Java Runtime Environment (JRE). The most common Operating Systems and many other include a JRE (OpenJDK, Sun JRE, ...), or at least it is possible to download one. However, jModelTest depends on third-party binaries (PhyML), that are distributed for Windows, Linux and OsX, and it is even possible to download PhyML sources (http://code.google.com/p/phyml) and compile them for a particular architecture.
-
-\subsection{Working with the repository}
-
-This tool is distributed under GPL v3 license. The source code is freely available at google code repository. You can checkout the repository at \url{http://code.google.com/p/jmodeltest2/source}.
-
-\subsection{User interfaces}
-
-jModelTest can be executed from two different user interfaces, GUI or Console. The Graphical User Interface (GUI) is intended for execution on common desktop computers with multicore processors -most users will probably use this. On the other hand, HPC environments, like multicore clusters, require a non-interactive processing (batch processes), so jModelTest has to be executed from the Command Console Interface. Results are given in plain text format, but an html log is also created.
-
-\subsubsection{Graphical User Interface}
-
-...to be written. Please check meanwhile the online tutorial in the project homepage.
-
-\subsubsection{Command Console Interface}
-
-\begin{enumerate}
-\item Execute the following command line:
-\begin{lstlisting}
-$ java -jar jModelTest.jar -d example-data/aP6.fas -g 4 -i -f -AIC -BIC -a
-\end{lstlisting}
-
-This will test all 88 models (gamma models with 4 rate categories), and then perform the model selection using Akaike (AIC) and Bayesian (BIC) criteria, calculating also a model averaged phylogeny (-a).
-
-See [ApplicationArguments Application Arguments] for information about supported arguments.
-
-\item This will generate the following output:
-
-\begin{enumerate}
-
-\item Header:
-
-\begin{lstlisting}
------------------------------ jModeltest 2.0 -----------------------------
-(c) 2011-onwards Diego Darriba, David Posada,
-Department of Biochemistry, Genetics and Immunology
-University of Vigo, 36310 Vigo, Spain. e-mail: ddarriba@udc.es, dposada@uvigo.es
---------------------------------------------------------------------------------
-Wed Oct 05 12:56:47 CEST 2011
-Linux 2.6.38-11-generic-pae, arch: i386, bits: 32, numcores: 2
-
-jModelTest 2.0  Copyright (C) 2011 Diego Darriba, David Posada
-This program comes with ABSOLUTELY NO WARRANTY
-This is free software, and you are welcome to redistribute it
-under certain conditions
- 
-Notice: This program may contain errors. Please inspect results carefully.
-\end{lstlisting}
-
-\item Execution options:
-
-\begin{lstlisting} 
-Arguments = -d example-data/aP6.fas -g 4 -i -f -AIC -BIC -a
-
-Reading data file "aP6.fas"... OK.
-  number of sequences: 6
-  number of sites: 631
- 
- 
----------------------------------------------------------------
-*                                                             *
-*        COMPUTATION OF LIKELIHOOD SCORES WITH PHYML          *
-*                                                             *
----------------------------------------------------------------
- 
-::Settings::
- Phyml version = 3.0
- Phyml binary = PhyML_3.0_linux32
- Candidate models = 24
-  number of substitution schemes = 3
-  including models with equal/unequal base frequencies (+F)
-  including models with/without a proportion of invariable sites (+I)
-  including models with/without rate variation among sites (+G) (nCat = 4)
- Optimized free parameters (K) = substitution parameters + 9 branch lengths + topology 
- Base tree for likelihood calculations = ML tree
- Tree topology search operation = NNI
-computing likelihood scores for 24 models with Phyml 3.0
-\end{lstlisting}
-
-\item Real time optimization results (progress):
-
-\begin{lstlisting}
-::Progress::
-
-Model 		 Exec. Time 	 Total Time 	 -lnL
--------------------------------------------------------------------------
-JC		00h:00:00:01	00h:00:00:01	1114,9772
-JC+G		00h:00:00:04	00h:00:00:05	1106,4431
-...
-GTR+G		00h:00:00:06	00h:00:06:07	1054,7203
-GTR+I+G		00h:00:01:02	00h:00:07:05	1051,8403
-\end{lstlisting}
-
-\item Sorted and complete optimization results:
-
-\begin{lstlisting}
-   Model = JC
-   partition = 000000
-   -lnL = 1114.9772
-   K = 10 
- 
-   Model = JC+I
-   partition = 000000
-   -lnL = 1103.1113
-   K = 11
-   p-inv = 0.9080 
-
-...
-
-   Model = GTR+I+G
-   partition = 012345
-   -lnL = 1051.8403
-   K = 20
-   freqA = 0.4235 
-   freqC = 0.1520 
-   freqG = 0.2022 
-   freqT = 0.2224 
-   R(a) [AC] =  0.8709
-   R(b) [AG] =  0.4152
-   R(c) [AT] =  0.6049
-   R(d) [CG] =  1.2523
-   R(e) [CT] =  0.9482
-   R(f) [GT] =  1.0000
-   p-inv = 0.5940
-   gamma shape = 0.0120 
- 
- 
-Computation of likelihood scores completed. It took 00h:00:07:05.
-\end{lstlisting}
-
-\item Selected Information Criteria (best model and all models sorted according to each criterion):
-
-\begin{lstlisting}
----------------------------------------------------------------
-*                                                             *
-*             AKAIKE INFORMATION CRITERION (AIC)              *
-*                                                             *
----------------------------------------------------------------
- 
- Model selected: 
-   Model = F81+I
-   partition = 000000
-   -lnL = 1053.5428
-   K = 14
-   freqA = 0.4200 
-   freqC = 0.1558 
-   freqG = 0.2015 
-   freqT = 0.2227 
-   p-inv = 0.9030 
- 
-ML tree (NNI) for the best AIC model = (((P5:0.01021829,P4:0.00719757):0.00151199,(P6:0.00680664,P1:0.00000003):0.00204596):0.01267608,P3:0.01665876,P2:0.00459802);
- 
- 
-* AIC MODEL SELECTION : Selection uncertainty
- 
-Model             -lnL    K         AIC      delta      weight cumWeight
------------------------------------------------------------------------- 
-F81+I        1053.5428   14   2135.0855     0.0000      0.4332    0.4332 
-HKY+I        1053.0700   15   2136.1401     1.0545      0.2557    0.6890 
-F81+I+G      1053.5430   15   2137.0859     2.0004      0.1594    0.8483
-...
-K80          1114.5049   11   2251.0098   115.9243   2.91e-026    1.0000 
-SYM          1114.4117   15   2258.8235   123.7380   5.85e-028    1.0000
-------------------------------------------------------------------------
--lnL:	negative log likelihod
- K:	number of estimated parameters
- AIC:	Akaike Information Criterion
- delta:	AIC difference
- weight:	AIC weight
- cumWeight:	cumulative AIC weight
- 
- 
-* AIC MODEL SELECTION : Confidence interval
- 
-There are 24 models in the 100% confidence interval: [ F81+I HKY+I F81+I+G HKY+I+G F81+G GTR+I HKY+G GTR+I+G GTR+G F81 HKY GTR JC+I K80+I JC+I+G K80+I+G JC+G K80+G SYM+I SYM+I+G SYM+G JC K80 SYM ] 
-\end{lstlisting}
-
-\item Consensus tree of the optimized phylogenies using the criterion weights:
- 
-\begin{lstlisting}
----------------------------------------------------------------
-*                                                             *
-*                    MODEL AVERAGED PHYLOGENY                 *
-*                                                             *
----------------------------------------------------------------
- 
-Selection criterion: . . . . AIC
-Confidence interval: . . . . 1.00
-Consensus type:. . . . . . . 50% majority rule
- 
- 
-Using 24 models in the 1.00 confidence interval = F81+I HKY+I F81+I+G HKY+I+G F81+G GTR+I HKY+G GTR+I+G GTR+G F81 HKY GTR JC+I K80+I JC+I+G K80+I+G JC+G K80+G SYM+I SYM+I+G SYM+G JC K80 SYM  
-
-Bipartitions included in the consensus tree
- 
-    123456
-    ****** ( 1.0 )
-    ****-- ( 1.0 )
-    **---- ( 0.94244 )
-    --**-- ( 1.0 )
-
- 
-                        +-----------6 P4
-                      +-8
-                      | +----------------5 P5
-+---------------------9
-|                     |  +-4 P1
-|                     +--7
-|                        +----------3 P6
-|
-+------2 P2
-|
-+---------------------------1 P3
-
- 
-(P3:0.016613,P2:0.004598,((P6:0.006790,P1:0.000000)1.00:0.002046,(P5:0.010191,P4:0.007198)0.94:0.001510)1.00:0.012665);
- 
-Note: this tree is unrooted. Branch lengths are the expected number of substitutions per site. Labels next to parentheses represent phylogenetic uncertainty due to model selection (see documentation)
-\end{lstlisting}
-
-\item Also a HTML log is automatically stored in the ``log'' directory.
-
-\end{enumerate}
-\end{enumerate}
-
-\subsection{High Performance Environments}
-
-\subsubsection{Shared memory architectures (multicore systems)}
-
-Both the GUI and Console interfaces can be used for shared memory architectures. See Graphical User Interface or Command Console Interface. In some dedicated HPC environments you can only use the console interface, for example when using a bath-queuing system like Oracle Grid Engine. Additionally, in the console version you can specify the number of threads you want to use using the -tr'' option. By default, the total number of cores in the machine is used.
-
-\subsubsection{Distributed memory architectures (HPC clusters)}
-
-\begin{enumerate}
-\item Besides the multithreading support, it is possible to run jModelTest in a cluster. This feature has been implemented using a Java message-passing (MPJ) library, MPJ Express (http://mpj-express.org/). To execute jModelTest in a cluster environment you have to:
-
-\begin{lstlisting}
-$ export $JMODELTEST_HOME=[path_to_jModelTest]
-$ cd $JMODELTEST_HOME
-$ tar zvxf mpj.tar.gz
-$ export MPJ_HOME=$JMODELTEST_HOME/mpj
-$ export PATH=$MPJ_HOME/bin:$PATH
-$ cp $JMODELTEST_HOME/extra/machines $JMODELTEST_HOME
-\end{lstlisting}
-
-You can also add the last two lines to ~/.bashrc to automatically set these variables at console startup.
-
-\item \$JMODELTEST\_HOME/machines file contains the set of computing nodes where the mpj processes will be executed. By default it points to the localhost machine, so you should change it if you want to run a parallel execution over a cluster machine, just writing on each line the particular computing nodes (e.g. see filecluster8.conf.template).
-
-\item Start the MPJ Express daemons:
-
-\begin{lstlisting}
-$ mpjboot machines
-\end{lstlisting}
-
-The application ``mpjboot'' should be in the execution path (it is located at \$MPJ\_HOME/bin). A ssh service must be running in the machines listed in the machines file. Moreover, port 10000 should be free. For more details refer to the MPJ Express documentation.
-
-\item Run jModelTest. For this, the jModelTest distribution provides a bash script: 'runjmodeltest-cluster.sh'
-
-The basic syntax is:
-
-./runjmodeltest-cluster.sh \$NUMBER\_OF\_PROCESSORS \$APPLICATION\_PARAMETERS
-
-\begin{lstlisting}
-$ ./runjmodeltest-cluster.sh 2 -d example-data/aP6.fas -s 11 -i -g 4 -f -AIC -a
-\end{lstlisting}
-
-\end{enumerate}
+\include{sec-quickstart}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Command Line Arguments}
+\section{Graphical User Interface}
+\label{sec:gui}
 
-\begin{itemize}
+\subsection{Launching the Graphical User Interface}
 
-\item  {\bf -a}
+The main distribution includes a script for launching the interface,  \emph{runjmodeltest-gui.sh}, located under the jModelTest home folder. Other possibility is running the following command line:
 
-Estimate model-averaged phylogeny for each active criterion
-
-\item  {\bf -AIC}
-
-Calculate the Akaike Information Criterion
-
-\item  {\bf -AICc}
-
-Calculate the corrected Akaike Information Criterion
-
-\item  {\bf -BIC}
-
-Calculate the Bayesian Information Criterion
-
-\item  {\bf -DT}
-
-Calculate the decision theory criterion
-
-\item  {\bf -c} CONFIDENCE\_INTERVAL
-
-Sets the confidence interval for the model selection process (default is 100)
-
-\item  {\bf -d} INPUT\_FILE
-
-Sets the input data file. jModelTest makes use of the ALTER library for converting several alignment formats to PHYLIP.
-
-\item  {\bf -dLRT}
-
-Perform dynamical likelihood ratio tests
-
-\item  {\bf -f}
-
-Include models with unequals base frecuencies.
-
-\item  {\bf -g} NUM\_OF\_RATE\_CATEGORIES
-
-Include models with rate variation among sites and sets the number of categories. Usually 4 categories are enough.
-
-\item  {\bf -getPhylip}
-
-Converts the input file into phylip format and exits. For example, the following command will generate a new PHYLIP file named ``input.nex.phy''.
 \begin{lstlisting}
-$java -jar jModelTest.jar -d input.nex -getPhylip
+$ java -jar jModelTest.jar
 \end{lstlisting}
 
-\item  {\bf -G} THRESHOLD
+Moreover, in Windows and MacOS X, it is often possible to double-click the jModelTest.jar file to launch the graphical interface.
 
-Heuristic search. Requires a threshold > 0 (e.g., -G 0.1)
+The following window will show on the screen:
 
-\item  {\bf -h} CONFIDENCE\_INTERVAL
+\begin{center}
+\includegraphics[width=.9\textwidth]{images/main-window}
+\end{center}
 
-Sets the confidence level for the hLRTs (default is 0.01)
+\subsection{Menu description}
 
-\item  {\bf -help}
+\begin{minipage}{1\textwidth}
+\small
+\begin{tabular}{l l l l}
+\hline
+{\bf Menu} & {\bf Submenu} & {\bf Description} & {\bf Enabled} \\
+\hline
+File \\
+& Load alignment & Load an input alignment & \\
+& Load checkpoint file & Load a previous snapshot \footnote{See Section~\ref{sec:ckp}} & (i) \\
+& Quit & Exit the program & \\
+\hline
+Analysis \\
+& Compute likelihood scores & Optimize the set of candidate models & (i) \\
+& Do AIC calculations & Calculate Akaike Information Criterion & (ii) \\
+& Do BIC calculations & Calculate Bayesian Information Criterion & (ii) \\
+& Do DT calculations & Calculate Decision Theory & (ii) \\
+& Do hLRT calculations & Calculate hierarchical likelihood ratio test & (ii) \footnote{This test is only available for 3,5,7 and 11 substitution schemes and for fixed topologies (fixed BIONJ-JC tree or user-defined topology)} \\
+& Model-averaged phylogeny & Calculate the consensus tree & (iii \& iv)  \\
+\hline
+Results \\
+& Show results table & Show a table with the selection results & (ii) \\
+& Build HTML log & Create an html webpage with the results & (ii) \\
+\hline
+Tools \\
+& LRT calculator & Likelihood Ratio Test for nexted models & \\
+\hline
+\end{tabular}
 
-Displays a help message
+\vspace{1em}
+(i) After loading an alignment (ii) After computing the likelihood scores (iii) If the base tree is not fixed (iv) After calculating an Information Criterion
+\end{minipage}
 
-\item  {\bf -hLRT}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Perform hierarchical likelihood ratio tests
-
-\item  {\bf -H}
-
-Information criterion for clustering search (AIC, AICc, BIC). (e.g., -H AIC) (default is BIC)
-
-\item  {\bf -i}
-
-Include models with a proportion invariable sites.
-
-\item  {\bf -machinesfile} MACHINES\_FILE
-
-Gets the processors per host from a machines file (for MPI execution)
-
-\item  {\bf -n} LOG\_SUFFIX
-
-Execution name appended to the log filenames. By default, current time is used: yyyyMMddhhmmss.
-
-\item  {\bf -o} OUTPUT\_FILE
-
-Redirects the output to a file.
-
-\item  {\bf -O} {ftvwxgp}
-
-Sets the hypothesis order for the hLRTs (e.g., -hLRT -O gpftv) (default is ftvwxgp)
-\begin{itemize}
-\item {\bf f} frequencies
-\item {\bf t} transition/transversion ratio
-\item {\bf v} 2ti4tv for subst=3 / 2ti for subst>3
-\item {\bf w} 2tv
-\item {\bf x} 4tv
-\item {\bf g} gamma
-\item {\bf p} proportion of invariable sites
-\end{itemize}
-
-\item  {\bf -p}
-
-Calculate the parameter importances
-
-\item  {\bf -r}
-
-Backward selection for the hLRT (default is forward)
-
-\item  {\bf -s} 3|5|7|11|203
-
-Sets the number of substitution schemes.
-\begin{itemize}
-     \item {\bf 3} JC/F81, K80/HKY, SYM/GTR (used by default).
-     \item {\bf 5} JC/F81, K80/HKY, TrNef/TrN, TPM1/TPM1uf, SYM/GTR.
-     \item {\bf 7} JC/F81, K80/HKY, TrNef/TrN, TPM1/TPM1uf, TIM1ef/TIM1, TVMef/TVM, SYM/GTR.
-     \item {\bf 11} All models defined in Table~\ref{table-models}.
-     \item {\bf 203} All possible GTR submatrices.
-\end{itemize}
-
-\item  {\bf -S} NNI|SPR|BEST
-
-Defines the tree topology search operation option for Maximum-Likelihood search. 
-\begin{itemize}
-     \item {\bf NNI} Nearest Neighbour Interchange (fast).
-     \item {\bf SPR} Subtree Pruning and Regrafting (slower).
-     \item {\bf BEST} Best of NNI and SPR (slowest option) (used by default).
-\end{itemize}
-
-\item  {\bf -t} fixed|BIONJ|ML
-
-Base tree for likelihood calculations (e.g., -t BIONJ)
-\begin{itemize}
-     \item {\bf fixed}  Fixed BIONJ topology from JC model
-     \item {\bf BIONJ}  Neighbor-Joining topology for each model
-     \item {\bf ML}     Maximum Likelihood topology for each model (default)
-\end{itemize}
-
-\item  {\bf -tr} NUM\_THREADS
-
-Number of threads to execute (default is the number of logical processors in the machine)
-
-\item  {\bf -u} TREE\_FILE
-
-Fixed tree for likelihood calculations defined by the user. If a user tree is defined with this command, -t argument is ignored.
-
-\item  {\bf -uLnL}
-
-Calculate delta AIC,AICc,BIC against unconstrained likelihood
-
-\item  {\bf -v}
-
-Do model averaging and parameter importances
-
-\item  {\bf -w}
-
-Prints out the PAUP block
-
-\item  {\bf -z}
-
-Strict consensus type for model-averaged phylogeny (default is majority rule)
-
-\end{itemize}
+\include{sec-arguments}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -657,6 +284,7 @@ $ java -jar jModelTest -d example-data/aP6.fas -s 11 -f -i -g 4 -AIC -BIC -AICc 
 Note that, by default, jModelTest uses Maximum-Likelihood topologies as the base trees for the model optimization, and checks both NNI and SPR algorithms for the topology search. This obtains the most accurate results, but it is also the most time consuming operation. According to the size of the input alignment, one can directly select one of the algorithms saving time in the computations. As a general rule, for a small number of taxa NNI algorithm would work better, as well as SPR is more suitable for a large number of taxa. The tree search operation can be set with ``-S'' argument (e.g., -t ML -S NNI).
 
 \subsection{Loading Checkpointing Files}
+\label{sec:ckp}
 
 By default, jModelTest saves ``.ckp'' checkpointing files in the log directory. In case of an error occurs, the user can start again the process minimizing the loss of computation. The user is in charge of selecting the checkpointing file and running again jModelTest with the same parameters of the previous execution. Otherwise the results might be wrong.
 
@@ -694,192 +322,7 @@ From the GUI, one can choose between the different number of the substituion sch
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Theoretical Background}
-
-All phylogenetic methods make assumptions, whether explicit or implicit, about the process of DNA substitution \citep{Felsenstein-1988}. Consequently, all the methods of phylogenetic inference depend on their underlying substitution models. To have confidence in inferences it is necessary to have confidence in the models \citep{Goldman-1993b}. Because of this, it makes sense to justify the use of a particular model. Statistical model selection is one way of doing this. For a review of model selection in phylogenetics see \citet{Sullivan-2005} and \citet{Johnson-2003}. The strategies includes in jModelTest include sequential likelihood ratio tests (LRTs), Akaike Information Criterion (AIC), Bayesian Information Criterion (BIC) and performance-based decision theory (DT).
-
-
-\subsection{Models of nucleotide substitution}
-
-Models of evolution are sets of assumptions about the process of nucleotide substitution. They describe the different probabilities of change from one nucleotide to another along a phylogenetic tree, allowing us to choose among different phylogenetic hypotheses to explain the data at hand. Comprehensive reviews of model of evolution are offered elsewhere. jmodeltest implementes all 203 types of reversible substitution matrices, with when combined with unequal/equal base frequencies, gamma-distributed among-site rate variation and a proportion of invariable sites makes a total of 1624 models. Some of the models have received names (see Table~\ref{table-models}):
-
-\begin{table}
-\label{table-models}
-\caption{Named substitution models jModelTest2 (a few of the 1624 possible). Any of these models can include invariable sites (+I), rate variation among sites (+G), or both (+I+G).}
-\footnotesize
-\begin{tabular}{l l l l l l}
-\hline
-{\bf Model} & {\bf Reference} & {\bf Free}   & {\bf Base}  & {\bf Substitution rates} & {\bf Substitution} \\
-            &                 & {\bf param.} & {\bf freq.} &                          & {\bf code} \\
-\hline
-JC & \citep{Jukes-1969} & 0 & equal & AC=AG=AT=CG=CT=GT & 000000 \\
-\hline
-F81 & \citep{Felsenstein-1981} & 3 & unequal & AC=AG=AT=CG=CT=GT & 000000 \\
-\hline
-K80 & \citep{Kimura-1980} & 1 & equal & AC=AT=CG=GT;AG=GT & 010010 \\
-\hline
-HKY & \citep{Hasegawa-1985} & 4 & unequal & AC=AT=CG=GT;AG=GT & 010010 \\
-\hline
-TrNef & \citep{Tamura-1993} & 2 & equal & AC=AT=CG=GT;AG;GT & 010020 \\
-\hline
-TrN & \citep{Tamura-1993} & 5 & unequal & AC=AT=CG=GT;AG;GT & 010020 \\
-\hline
-TPM1 & =K81 \citep{Kimura-1981} & 2 & equal & AC=GT;AG=CT;AT=CG & 012210 \\
-\hline
-TPM1uf & \citep{Kimura-1981} & 5 & unequal & AC=GT;AG=CT;AT=CG & 012210 \\
-\hline
-TPM2 & & 2 & equal & AC=AT;CG=GT;AG=CT & 010212 \\
-\hline
-TPM2uf & & 5 & unequal & AC=AT;CG=GT;AG=CT & 010212 \\
-\hline
-TPM3 & & 2 & equal & AC=AT;AG=GT;AG=CT & 012012 \\
-\hline
-TPM3uf & & 5 & unequal & AC=CG;AT=GT;AG=CT & 012012 \\
-\hline
-TIM1 & \citep{Posada-2003} & 3 & equal & AC=GT;AT=CG;AG;CT & 012230 \\
-\hline
-TIM1uf & \citep{Posada-2003} & 6 & unequal & AC=GT;AT=CG;AG;CT & 012230 \\
-\hline
-TIM2 & & 3 & equal & AC=AT;CG=GT;AG;CT & 010232 \\
-\hline
-TIM2uf & & 6 & unequal & AC=AT;CG=GT;AG;CT & 010232 \\
-\hline
-TIM3 & & 3 & equal & AC=CG;AT=GT;AG;CT & 012032 \\
-\hline
-TIM3uf & & 6 & unequal & AC=CG;AT=GT;AG;CT & 012032 \\
-\hline
-TVMef & \citep{Posada-2003} & 4 & equal & AC;CG;AT;GT;AG=CT & 012314 \\
-\hline
-TVM & \citep{Posada-2003} & 7 & unequal & AC;CG;AT;GT;AG=CT & 012314 \\
-\hline
-SYM & \citep{Zharkikh-1994} & 5 & equal & AC;CG;AT;GT;AG;CT & 012345 \\
-\hline
-GTR & =REV \citep{Tavare-1986} & 8 & unequal & AC;CG;AT;GT;AG;CT & 012345 \\
-\hline
-\end{tabular}
-\end{table}
-
-
-\subsection{Sequential Likelihood Ratio Tests (sLRT)}
-
-In traditional statistical theory, a widely accepted statistic for testing the goodness of fit of models is the likelihood ratio test (LRT): 
-\[
-LRT=2(l_1-l_0)
-\]
-where $l_1$ is the maximum likelihood under the more parameter-rich, complex model (alternative hypothesis) and $l_0$ is the maximum likelihood under the less parameter-rich simple model (null hypothesis).
- When the models compared are nested (the null hypothesis is a special case of the alternative hypothesis) and the null hypothesis is correct, the LRT statistic is asymptotically distributed as a χ2 with q degrees of freedom, where q is the difference in number of free parameters between the two models \citep{Kendall-1979, Goldman-1993b}. Note that, to preserve the nesting of the models, the likelihood scores need to be estimated upon the same tree. When some parameter is fixed at its boundary (p-inv, α), a mixed χ2 is used instead \citep{Ohta-1992, Goldman-2000}. The behavior of the χ2 approximation for the LRT has been investigated with quite a bit of detail \citep{Goldman-1993a, Goldman-1993b, Yang-1995, Whelan-1999, Goldman-2000}.
-
-\subsection{Hierarchical Likelihood Ratio Tests (hLRT)}
-
-Likelihood ratio tests can be carried out sequentially by adding parameters (forward selection) to a simple model (JC), or by removing parameters (backward selection) from a complex model (GTR+I+G) in a specific order or hierarchy (hLRT; see Figure below). The performance of hierarchical LRTs for phylogenetic model selection has been discussed by \citet{Posada-2004}.
-
-%[https://lh3.googleusercontent.com/-lNVbbGg8hBI/TrkAWteb2RI/AAAAAAAAAEM/4JD5OUlB8tw/s800/hLRT.png]
-
-Figure. Example of a particular forward hierarchy of likelihood ratio tests for 24 models. At any level the null hypothesis (model on top) is either accepted (A) or rejected (R). In this example the model selected is GTR+I.
-
-\subsection{Dynamical Likelihood Ratio Tests (dLRT)}
-
-Alternatively, the order in which parameters are added or removed can be selected automatically. One option to accomplish this is to add the parameter that maximizes a significant gain in likelihood during forward selection, or to add the parameter that minimizes a non-significant loss in likelihood during backward selection \citep{Posada-2001a}. In this case, the order of the tests is not specified a priori, but it will depend on the particular data.
-
-%[https://lh4.googleusercontent.com/-1fPFU_d0yzc/TrkA6q8o86I/AAAAAAAAAEg/DhuIX_Eutb4/s720/dLRT.png]
-
-Figure. Dynamical likelihood ratio tests for 24 models. At any level a hypothesis is either accepted (A) or rejected (R). In this example the model selected is GTR+I. Hypotheses tested are: F = base frequencies; S = substitution type; I = proportion of invariable sites; G = gamma rates.
-
-\subsection{Information Criteria}
-\subsubsection{Akaike Information Criterion}
-
-The Akaike information criterion (AIC, \citep{Akaike-1974} is an asymptotically unbiased estimator of the Kullback-Leibler information quantity \citep{Kullback-1951}. We can think of the AIC as the amount of information lost when we use a specific model to approximate the real process of molecular evolution. Therefore, the model with the smallest AIC is preferred. The AIC is computed as:
-
-\[
-AIC=-2l+2k
-\]
-
-where l is the maximum log-likelihood value of the data under this model and Ki is the number of free parameters in the model, including branch lengths if they were estimated \emph{de novo}. When sample size ($n$) is small compared to the number of parameters (say, $\frac{n}{K} < 40$) the use of a second order AIC, AICc \citep{Sugiura-1978, Hurvich-1989}, is recommended:
-
-\[
-AIC_c=AIC+\frac{(2k(k+1))}{(n-k-1)}
-\]
-
-The AIC compares several candidate models simultaneously, it can be used to compare both nested and non-nested models, and model-selection uncertainty can be easily quantified using the AIC differences and Akaike weights (see Model uncertainty below). \citet{Burnham-2003} provide an excellent introduction to the AIC and model selection in general.
-
-\subsubsection{Bayesian Information Criterion}
-
-An alternative to the use of the AIC is the Bayesian Information Criterion (BIC) (Schwarz 1978):
-
-\[
-BIC=-2l + k log(n)
-\]
-
-Given equal priors for all competing models, choosing the model with the smallest BIC is equivalent to selecting the model with the maximum posterior probability. Alternatively, Bayes factors for models of molecular evolution can be calculated using reversible jump MCMC \citep{Huelsenbeck-2004}. We can easily use the BIC instead of the AIC to calculate BIC differences or BIC weights.
-
-\subsubsection{Performance Based Selection}
-
-\citet{Minin-2003} developed a novel approach that selects models on the basis of their phylogenetic performance, measured as the expected error on branch lengths estimates weighted by their BIC. Under this decision theoretic framework (DT) the best model is the one with that minimizes the risk function:
-
-\[
-C_i \approx \sum_{j=1}^n||\hat{B_i} - \hat{B_j}||\frac{e^{\frac{-BIC_j}{2}}}{\sum_{j=1}^R(e^\frac{-BIC_i}{2})}
-\]
-
-where 
-
-\[
-||\hat{B_i} - \hat{B_j}||^2 = \sum_{l=1}^{2t-3}(\hat{B_{il}} - \hat{B_{jl}})^2
-\]
-
-and where t is the number of taxa. Indeed, simulations suggested that models selected with this criterion result in slightly more accurate branch length estimates than those obtained under models selected by the hLRTs \citep{Minin-2003, Abdo-2005}.
-
-\subsection{Model Uncertainty}
-
-The AIC, Bayesian and DT methods can rank the models, allowing us to assess how confident we are in the model selected. For these measures we could present their differences ($\Delta$). For example, for the $i^{th}$ model, the AIC (BIC, DT) difference is:
-
-\[
-\Delta_i = AIC_i - min(AIC)
-\]
-
-where $min(AIC)$ is the smallest AIC value among all candidate models. The AIC differences are easy to interpret and allow a quick comparison and ranking of candidate models. As a rough rule of thumb, models having $\Delta_i$ within 1-2 of the best model have substantial support and should receive consideration. Models having $\Delta_i$ within 3-7 of the best model have considerably less support, while models with $\Delta_i > 10$ have essentially no support. Very conveniently, we can use these differences to obtain the relative AIC (BIC) weight ($w_i$) of each model:
-
-\[
-\omega_i = \frac{e^{\frac{-1}{2 \Delta_i}}}{\sum_{r=1}^R(e^\frac{-1}{2 \Delta_r})}
-\]
-
-which can be interpreted, from a Bayesian perspective, as the probability that a model is the best approximation to the truth given the data. The weights for every model add to 1, so we can establish an approximate 95\% confidence set of models for the best models by summing the weights from largest to smallest from largest to smallest until the sum is 0.95 \citep{Burnham-1998, Burnham-2003}. This interval can also be set up stochastically (see above ``Model selection and averaging''). Note that this equation will not work for the DT (see the DT explanation on ``Model selection and averaging'').
-
-\subsection{Model Averaging}
-
-Often there is some uncertainty in selecting the best candidate model. In such cases, or just one when does not want to rely on a single model, inferences can be drawn from all models (or an optimal subset) simultaneously. This is known as model averaging or multimodel inference. See Posada and Buckley (2004a) and references therein for an explanation of application of these techniques in the context of phylogenetics.
-
-Within the AIC or Bayesian frameworks, it is straightforward to obtain a model-averaged estimate of any parameter \citep{Madigan-1994, Raftery-1996, Hoeting-1999, Wasserman-2000, Burnham-2003, Posada-2003}. For example, a model-averaged estimate of the substitution rate between adenine and cytosine using the Akaike weights for R candidate models would be:
-
-\[
-\widehat{\overline{\phi_{A-C}}} = \frac{\sum_{r=1}^R \omega_i I_{\phi_{A-C}}(M_i) \phi_{A-C_i}}{\omega_+(\phi_{A-C})}
-\]
-
-where
-
-\[
-\omega_+(\phi_{A-C}) = \sum_{i=1}^R \omega_i I_{\phi_{A-C}}(M_i)
-\]
-
-and
-
-\[
-I_{\phi_{A-C}}(M_i) = \left\{ 
-\begin{array}{c l}
-1 &  \mbox{$\phi_{A-C}$ is in model $M_i$}\\
-0 & \mbox{otherwise}
-\end{array}
-\right.
-\]
-
-Note that need to be careful when interpreting the relative importance of parameters. When the number of candidate models is less than the number of possible combinations of parameters, the presence-absence of some pairs of parameters can be correlated, and so their relative importances.
-
-\subsection{Model Averaged Phylogeny}
-
-Indeed, the averaged parameter could be the topology itself, so we could construct a model-averaged estimate of phylogeny. For example, one could estimate a ML tree for all models (or a best subset) and with those one could build a weighted consensus tree using the corresponding Akaike weights. See \citet{Posada-2004} for a practical example.
-
-\subsection{Parameter Importance}
-
-It is possible to estimate the relative importance of any parameter by summing the weights across all models that include the parameters we are interested in. For example, the relative importance of the substitution rate between adenine and cytosine across all candidate models is simply the denominator above, $\omega_+(\phi_{A-C})$
+\include{sec-theory}
 
 
 \bibliographystyle{natbib}
