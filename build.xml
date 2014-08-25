@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jModelTest" default="jar" basedir=".">
+	<property name="src" location="src/main/java" />
+	<property name="src.resources.dir" location="src/main/resources" />
+	<property name="bin" location="build/classes" />
+	<property name="lib" location="lib" />
+	<property name="html.template.dir" location="${src.resources.dir}/resources" />
+	<property name="dist" location="dist" />
+	<property name="exe" location="${dist}/exe/phyml" />
+	<property name="log" location="${dist}/log" />
+	<property name="jarfile" location="${dist}/${ant.project.name}.jar" />
+	<property name="compile.debug" value="false" />
+
+	<fileset id="lib.jars" dir="${lib}">
+		<include name="**/*.jar" />
+	</fileset>
+
+	<path id="lib.path">
+		<fileset refid="lib.jars" />
+	</path>
+
+	<!-- Stub install target.  Install should depend on the 'jar' target,
+         and copy the built objects to the 'dist' directory. -->
+	<target name="install" description="Install jar" depends="jar">
+	</target>
+
+	<target name="compile" description="Compile code">
+		<mkdir dir="${bin}" />
+		<mkdir dir="${lib}" />
+		<property environment="env" />
+		<property name="java6.boot.classpath" value="${env.JAVA6_BOOTCLASSES}" />
+		<javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no" 
+			target="1.6" source="1.6" bootclasspath="${java5.boot.classpath}"
+			classpathref="lib.path" debug="${compile.debug}"/>
+		<copy todir="${bin}/es">
+			<fileset dir="${src.resources.dir}/es" includes="**/*.xml,**/*.properties,**/*.gif,**/*.ico" />
+		</copy>
+
+	</target>
+
+	<target name="jar" depends="compile" description="Build jar">
+		<mkdir dir="${dist}" />
+		<jar jarfile="${jarfile}" basedir="${bin}" manifest="Manifest">
+			<!-- Merge library jars into final jar file
+            <zipgroupfileset refid="lib.jars"/>-->
+		</jar>
+		<mkdir dir="${dist}/lib" />
+		<copy todir="${dist}/lib">
+			<fileset id="lib.jars" dir="${lib}">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
+		<copy todir="${dist}">
+			<fileset dir="${src.resources.dir}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<mkdir dir="${log}" />
+		<chmod perm="755" dir="${dist}" includes="*.sh *.bat" />
+		<chmod perm="755" dir="${dist}/exe/phyml" includes="*" />
+	</target>
+
+	<target name="run" depends="jar" description="Run jar file">
+		<java jar="${jarfile}" fork="yes" failonerror="true" />
+	</target>
+
+	<target name="clean" description="Remove build and dist directories">
+		<delete dir="${bin}" />
+		<delete dir="${dist}" />
+	</target>
+</project>

@@ -1,0 +1,336 @@
+\documentclass[11pt,twoside,a4paper]{article}
+\usepackage{pslatex,palatino,avant,graphicx}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage[margin=2cm]{geometry}
+\usepackage{url}
+\usepackage[square,sort]{natbib}
+
+\usepackage{listings}
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{LimeGreen},  % comment style
+  % deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{BlueGreen},  % keyword style
+  % language=Java,                   % the language of the code
+  % numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  % numbersep=5pt,                   % how far the line-numbers are from the code
+  % numberstyle=\tiny\color{Gray},   % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{RubineRed},   % string literal style
+  tabsize=2,                       % sets default tabsize to 2 spaces
+  title=\lstname,                  % show the filename of files included with \lstinputlisting; also try caption instead of title
+  aboveskip=1em,
+  belowcaptionskip=0em,
+  belowskip=0em
+}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=Violet,
+    filecolor=black,
+    linkcolor=MidnightBlue,
+    urlcolor=MidnightBlue
+}
+
+\begin{document}
+\providecommand{\versionnumber}{0.1.1}
+\title{jModelTest 2.0 Manual v\versionnumber}
+\author{Diego Darriba, David Posada}
+\date{\today}
+\maketitle
+
+\tableofcontents
+
+\section{Overview}
+
+jModelTest is a tool to carry out statistical selection of best-fit models of nucleotide substitution. It implements five different model selection strategies: hierarchical and dynamical likelihood ratio tests (hLRT and dLRT), Akaike and Bayesian information criteria (AIC and BIC), and a decision theory method (DT). It also provides estimates of model selection uncertainty, parameter importances and model-averaged parameter estimates, including model-averaged tree topologies. jModelTest 2 includes High Performance Computing (HPC) capabilities and additional features like new strategies for tree optimization, model-averaged phylogenetic trees (both topology and branch lenght), heuristic filtering and automatic logging of user activity.
+
+\subsection{Download}
+
+The main project webpage is located at google code: \url{http://code.google.com/p/jmodeltest2}.
+
+Google Code downloads are now longer available. New distributions of jModelTest will be hosted in google drive.
+
+Online help is available at: \url{http://code.google.com/p/jmodeltest2/w/list}.
+
+Please use the jModelTest discussion group for any question: \url{http://groups.google.com/group/jmodeltest}.
+
+\subsection{Citation}
+
+When using jModelTest you should cite all these:
+
+\begin{itemize}
+\item Darriba D, Taboada GL, Doallo R, Posada D. 2012. jModelTest 2: more models, new heuristics and parallel computing. Nature Methods 9(8), 772.
+\item Guindon S and Gascuel O (2003). A simple, fast and accurate method to estimate large phylogenies by maximum-likelihood". Systematic Biology 52: 696-704. 
+\end{itemize}
+
+\subsection{Disclaimer}
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. The jModelTest distribution includes Phyml executables.
+
+These programs are protected by their own license and conditions, and using jModelTest implies agreeing with those conditions as well. 
+
+\subsection{Updates}
+
+\begin{itemize}
+
+	\item 06 Aug 2014 - Version 2.1.6
+
+	\begin{itemize}
+		\item Added confirmation window when cancelling running jobs in the GUI
+		\item Added automatic checkpointing files generation
+		\item Added ``-ckp'' argument for loading checkpointing files
+	\end{itemize}
+
+	\item 05 Apr 2014 - Version 2.1.5
+
+	\begin{itemize}
+		\item Updated OS X binary
+		\item Fixed bug with computation of JC model for ``fixed'' topology
+		\item Fixed bug with DT criterion computation
+		\item Added ``-n'' argument for naming executions (the name is included in the log filenames)
+		\item Added ``-getphylip'' argument for converting alignments into PHYLIP format with ALTER
+		\item Fixed bug in PhyML logging in GUI. Added a unique ID for every model in the log file
+		\item Added PAUP* block into log files if required (``-w'' argument)
+		\item Added more verbose error messages 
+	\end{itemize}
+
+	\item 10 Jul 2013 - Version 2.1.4
+
+	\begin{itemize}
+		\item Added phyml auto-logging.
+		\item Added phyml command lines for best-fit models.
+		\item Added phyml log tab in the GUI.
+		\item Removed sample size modes (and ``-n'' argument). Sample size is fixed to alignment size.
+		\item Fixed bug with relative paths when calling from a different path.
+		\item Fixed typos in the GUI. 
+	\end{itemize}
+
+	\item 05 Mar 2013 - Version 2.1.3
+
+	\begin{itemize}
+		\item Fixed bug with PAUP`*` command block.
+		\item Added the possibility to change Inforation Criterion used with the clustering algorithm for the 203 matrices.
+		\item Changed ``-o'' argument for the hypothesis order into ``-O''
+		\item Added ``-o'' argument for forwarding the standard output to a file: -o FILENAME 
+	\end{itemize}
+
+	\item 01 Jan 2013 Version 2.1.2 - Revision 20130103
+
+	\begin{itemize}
+		\item Fixed bug in paths with whitespaces.
+		\item Updated PhyML binaries. 
+	\end{itemize}
+
+	\item 31 Jul 2012 Version 2.1.1 - Revision 20120731
+
+	\begin{itemize}
+		\item Fixed bug with hLRT selection when attempting to use a user-defined topology. 
+	\end{itemize}
+
+	\item 11 Mar 2012 Version 2.1 - Revision 20120511
+
+	\begin{itemize}
+		\item Major updates:
+		\begin{itemize}
+			\item Exhaustive GTR submodels: All the 203 different partitions of the GTR rate matrix can be included in the candidate set of models. When combined with rate variation (+I,+G, +I+G) and equal/unequal base frequencies the total number of possible models is 203 x 8 = 1624. 
+			\item Hill climbing hierarchical clustering: Calculating the likelihood score for a large number of models can be extremely time-consuming. This hill-climbing algorithm implements a hierarchical clustering to search for the best-fit models within the full set of 1624 models, but optimizing at most 288 models while maintaining model selection accuracy. 
+			\item Heuristic filtering: Heuristic reduction of the candidate models set based on a similarity filtering threshold among the GTR rates and the estimates of among-site rate variation. 
+			\item Absolute model fit: Information criterion distances can be calculated for the best-fit model against the unconstrained multinomial model (based on site pattern frequencies). This is computed by default when the alignment does not contain missing data/ambiguities, but can also be approximated otherwise. 
+			\item Topological summary: Tree topologies supported by the different candidate models are summarized in the html log, including confidence intervals constructed from cumulative models weights, plus Robinson-Foulds and Euclidean distances to the best-fit tree for each. 
+		\end{itemize}
+		\item Minor updates:
+		\begin{itemize}
+			\item Corrected a bug in the fixed BIONJ-JC starting topology. F81+I+G was executed instead of JC.
+			\item ``Best'' is now the default tree search operation instead of NNI. ``Best'' computes both NNI and SPR algorithms and selects the best of them.
+			\item User can select the number of threads from GUI. 
+		\end{itemize}
+	\end{itemize}
+
+
+	\item 1 Feb 2012 - Version 2.0.2
+
+	\begin{itemize}
+		\item Added a selection summary at the end of the console output.
+		\item Corrected the table header in the DT results frame (sorting).
+		\item Corrected a bug in DT Criterion where selection could not take place with large alignments.
+		\item Corrected a bug with command console version, where the execution crashed with certain arguments.
+		\item Unified LOCALE for English format. 
+	\end{itemize}
+
+	\item 2 Nov 2011 - Version 2.0.1
+
+	\begin{itemize}
+		\item Improved thread scheduling algorithm.
+		\item OpenMP phyml patch for hybrid execution.
+		\item New argument (machinesfile) for hybrid execution on heterogeneous architectures, or heterogeneous resources distribution. 
+	\end{itemize}
+
+	\item 13 Oct 2011 - Revision 20111013
+
+	\begin{itemize}
+		\item Added conf/jmodeltest.conf file, where you can:
+			Enable/Disable the automatic logging:
+
+			    You might be running a huge dataset and you don't want to generate hundreds or thousands of log files. 
+
+			Set the PhyML binaries location:
+
+			    If you already have installed PhyML in your machine, you can setup jModelTest for use your own binaries. 
+
+		\item Enhanced the html log output. 
+	\end{itemize}
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{sec-quickstart}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Graphical User Interface}
+\label{sec:gui}
+
+\subsection{Launching the Graphical User Interface}
+
+The main distribution includes a script for launching the interface,  \emph{runjmodeltest-gui.sh}, located under the jModelTest home folder. Other possibility is running the following command line:
+
+\begin{lstlisting}
+$ java -jar jModelTest.jar
+\end{lstlisting}
+
+Moreover, in Windows and MacOS X, it is often possible to double-click the jModelTest.jar file to launch the graphical interface.
+
+The following window will show on the screen:
+
+\begin{center}
+\includegraphics[width=.9\textwidth]{images/main-window}
+\end{center}
+
+\subsection{Menu description}
+
+\begin{minipage}{1\textwidth}
+\small
+\begin{tabular}{l l l l}
+\hline
+{\bf Menu} & {\bf Submenu} & {\bf Description} & {\bf Enabled} \\
+\hline
+File \\
+& Load alignment & Load an input alignment & \\
+& Load checkpoint file & Load a previous snapshot \footnote{See Section~\ref{sec:ckp}} & (i) \\
+& Quit & Exit the program & \\
+\hline
+Analysis \\
+& Compute likelihood scores & Optimize the set of candidate models & (i) \\
+& Do AIC calculations & Calculate Akaike Information Criterion & (ii) \\
+& Do BIC calculations & Calculate Bayesian Information Criterion & (ii) \\
+& Do DT calculations & Calculate Decision Theory & (ii) \\
+& Do hLRT calculations & Calculate hierarchical likelihood ratio test & (ii) \footnote{This test is only available for 3,5,7 and 11 substitution schemes and for fixed topologies (fixed BIONJ-JC tree or user-defined topology)} \\
+& Model-averaged phylogeny & Calculate the consensus tree & (iii \& iv)  \\
+\hline
+Results \\
+& Show results table & Show a table with the selection results & (ii) \\
+& Build HTML log & Create an html webpage with the results & (ii) \\
+\hline
+Tools \\
+& LRT calculator & Likelihood Ratio Test for nexted models & \\
+\hline
+\end{tabular}
+
+\vspace{1em}
+(i) After loading an alignment (ii) After computing the likelihood scores (iii) If the base tree is not fixed (iv) After calculating an Information Criterion
+\end{minipage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{sec-arguments}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Common Use Cases}
+
+\subsection{Converting Alignment Files}
+
+jModelTest accepts several input alignment file formats. However, it makes use of the ALTER library for converting them into PHYLIP format, accepted by PhyML. If you want to validate your alignment, you can convert it into PHYLIP format using the ``-getPhylip'' argument. It will generate a new file appending ``.phy'' to the input alignment filename, and exit afterwards.
+
+\begin{lstlisting}
+$ java -jar jModelTest -d example-data/aP6.fas -getPhylip
+\end{lstlisting}
+
+In case there is something wrong in the input file, it will exit with the description of the error.
+
+\subsection{Basic Model Selection}
+
+Although jModelTest have many options, most of the users would like to perform a model selection among the 11 substitution schemes, including models with unequal frequencies, gamma rate variation and a proportion of invariable sites. The following command produces this operation, shows the selection results under the 4 available criteria, computes the model-averaged phylogenies (``-a''), computes the parameters importance (``-v'' and ``-p'') and writes the PAUP* block for the best-fit models (``-w''):
+
+\begin{lstlisting}
+$ java -jar jModelTest -d example-data/aP6.fas -s 11 -f -i -g 4 -AIC -BIC -AICc -DT -p -a -w
+\end{lstlisting}
+
+Note that, by default, jModelTest uses Maximum-Likelihood topologies as the base trees for the model optimization, and checks both NNI and SPR algorithms for the topology search. This obtains the most accurate results, but it is also the most time consuming operation. According to the size of the input alignment, one can directly select one of the algorithms saving time in the computations. As a general rule, for a small number of taxa NNI algorithm would work better, as well as SPR is more suitable for a large number of taxa. The tree search operation can be set with ``-S'' argument (e.g., -t ML -S NNI).
+
+\subsection{Loading Checkpointing Files}
+\label{sec:ckp}
+
+By default, jModelTest saves ``.ckp'' checkpointing files in the log directory. In case of an error occurs, the user can start again the process minimizing the loss of computation. The user is in charge of selecting the checkpointing file and running again jModelTest with the same parameters of the previous execution. Otherwise the results might be wrong.
+
+For finding the correct checkpointing file, if the execution had a user-defined name ``-n argument'', the checkpoing file will have the following format: 
+
+\begin{lstlisting}
+log/[sequenceFileName].[executionName].ckp
+\end{lstlisting}
+
+For example, the following command:
+
+\begin{lstlisting}
+$ java -jar jModelTest -d example-data/aP6.fas -n myTest -s 11 -f -i -g 4 -BIC -AIC
+\end{lstlisting}
+
+Will generate the checkpointing file in \$JMODELTEST\_HOME/log/aP6.fas.myTest.ckp, and in case of a sudden error in the execution, it can be continued using:
+
+\begin{lstlisting}
+$ java -jar jModelTest -d example-data/aP6.fas -n myTest -s 11 -f -i -g 4 -BIC -AIC -ckp log/aP6.fas.myTest.ckp
+\end{lstlisting}
+
+If no execution name was provided, it is automatically generated according to the current date and time with the following format: yyyyMMddhhmmss (e.g., if current time is 17:05:00 August 3 2014, the execution name is 20140803170500, and the checkpointing generated file is:
+
+\begin{lstlisting}
+log/[sequenceFileName].20140803170500.ckp).
+\end{lstlisting}
+
+When using the GUI instead of the command console interface, the checkpointing file can be loaded using the menu item ``File/Load checkpoint file'', that becomes enabled right after loading the alignment.
+
+% \subsection{Finding the Best-fit Model for MrBayes Analysis}
+
+% One common question is how to set the best-fit model obtained with jModelTest into MrBayes. The 3 substitution schemes option covers those models implemented in MrBayes. From the command console, the 3 substitution schemes mode is selected by default, so just make sure you are not modifying it with the ``-s'' argument.
+
+From the GUI, one can choose between the different number of the substituion schemes in the execution settings window.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{sec-theory}
+
+
+\bibliographystyle{natbib}
+%\bibliographystyle{achemnat}
+%\bibliographystyle{plainnat}
+%\bibliographystyle{abbrv}
+%\bibliographystyle{bioinformatics}
+%\bibliographystyle{plain}
+\bibliography{biblio}
+
+\end{document}

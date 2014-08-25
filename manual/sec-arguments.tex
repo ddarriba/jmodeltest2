@@ -1,0 +1,165 @@
+\section{Command Line Arguments}
+\label{sec:arguments}
+
+\begin{itemize}
+
+\item  {\bf -a}
+
+Estimate model-averaged phylogeny for each active criterion. See Section \ref{sec:consensus} for more details.
+
+\item  {\bf -AIC}
+
+Calculate the Akaike Information Criterion. See Section \ref{sec:aic}.
+
+\item  {\bf -AICc}
+
+Calculate the corrected Akaike Information Criterion. See Section \ref{sec:aic}.
+
+\item  {\bf -BIC}
+
+Calculate the Bayesian Information Criterion. See Section \ref{sec:bic}.
+
+\item  {\bf -DT}
+
+Calculate the decision theory criterion. See Section \ref{sec:dt}.
+
+\item  {\bf -c} confidenceInterval
+
+Sets the confidence interval for the model selection process (default is 100).
+
+\item  {\bf -d} inputFile
+
+Sets the input data file. jModelTest makes use of the ALTER library for converting several alignment formats to PHYLIP.
+
+\item  {\bf -dLRT}
+
+Perform dynamical likelihood ratio tests. See Section \ref{sec:dlrt} for more details.
+
+\item  {\bf -f}
+
+Include models with unequals base frecuencies.
+
+\item  {\bf -g} numberOfRateCategories
+
+Include models with rate variation among sites and sets the number of categories. Usually 4 categories are enough.
+
+\item  {\bf -getPhylip}
+
+Converts the input file into phylip format and exits. For example, the following command will generate a new PHYLIP file named ``input.nex.phy''.
+\begin{lstlisting}
+$java -jar jModelTest.jar -d input.nex -getPhylip
+\end{lstlisting}
+
+\item  {\bf -G} threshold
+
+Heuristic search. Requires a threshold > 0 (e.g., -G 0.1)
+
+\item  {\bf -h} confidenceInterval
+
+Sets the confidence level for the hLRTs (default is 0.01)
+
+\item  {\bf -help}
+
+Displays a help message
+
+\item  {\bf -hLRT}
+
+Perform hierarchical likelihood ratio tests. See Section \ref{sec:hlrt} for more details.
+
+\item  {\bf -H}
+
+Information criterion for clustering search (AIC, AICc, BIC). (e.g., -H AIC) (default is BIC)
+
+\item  {\bf -i}
+
+Include models with a proportion invariable sites.
+
+\item  {\bf -machinesfile} machinesFile
+
+Gets the processors per host from a machines file (for MPI execution).
+
+\item  {\bf -n} logSuffix
+
+Execution name appended to the log filenames. By default, current time is used: yyyyMMddhhmmss.
+
+\item  {\bf -o} outputFile
+
+Redirects the output to a file.
+
+\item  {\bf -O} {ftvwxgp}
+
+Sets the hypothesis order for the hLRTs (e.g., -hLRT -O gpftv) (default is ftvwxgp)
+\begin{itemize}
+\item {\bf f} frequencies
+\item {\bf t} transition/transversion ratio
+\item {\bf v} 2ti4tv for subst=3 / 2ti for subst>3
+\item {\bf w} 2tv
+\item {\bf x} 4tv
+\item {\bf g} gamma
+\item {\bf p} proportion of invariable sites
+\end{itemize}
+
+See Section \ref{sec:hlrt} for more details.
+
+\item  {\bf -p}
+
+Calculate the parameter importances. See Section \ref{sec:param-importances}.
+
+\item  {\bf -r}
+
+Backward selection for the hLRT (default is forward).
+
+\item  {\bf -s} 3|5|7|11|203
+
+Sets the number of substitution schemes.
+\begin{itemize}
+     \item {\bf 3} JC/F81, K80/HKY, SYM/GTR (used by default).
+     \item {\bf 5} JC/F81, K80/HKY, TrNef/TrN, TPM1/TPM1uf, SYM/GTR.
+     \item {\bf 7} JC/F81, K80/HKY, TrNef/TrN, TPM1/TPM1uf, TIM1ef/TIM1, TVMef/TVM, SYM/GTR.
+     \item {\bf 11} All models defined in Table~\ref{table-models}.
+     \item {\bf 203} All possible GTR submatrices.
+\end{itemize}
+
+\item  {\bf -S} NNI|SPR|BEST
+
+Defines the tree topology search operation option for Maximum-Likelihood search: 
+\begin{itemize}
+     \item {\bf NNI} Nearest Neighbour Interchange (fast).
+     \item {\bf SPR} Subtree Pruning and Regrafting (slower).
+     \item {\bf BEST} Best of NNI and SPR (slowest option) (used by default).
+\end{itemize}
+
+\item  {\bf -t} fixed|BIONJ|ML
+
+Base tree for likelihood calculations (e.g., -t BIONJ):
+\begin{itemize}
+     \item {\bf fixed}  Fixed BIONJ topology from JC model
+     \item {\bf BIONJ}  Neighbor-Joining topology for each model
+     \item {\bf ML}     Maximum Likelihood topology for each model (default)
+\end{itemize}
+
+\item  {\bf -tr} numberOfThreads
+
+Number of threads to execute (default is the number of logical processors in the machine).
+
+\item  {\bf -u} treeFile
+
+Fixed tree for likelihood calculations defined by the user. If a user tree is defined with this command, -t argument is ignored.
+
+\item  {\bf -uLnL}
+
+Calculate delta AIC,AICc,BIC against unconstrained likelihood.
+
+\item  {\bf -v}
+
+Do model averaging and parameter importances. See Section \ref{sec:model-averaging}.
+
+\item  {\bf -w}
+
+Prints out the PAUP block.
+
+\item  {\bf -z}
+
+Strict consensus type for model-averaged phylogeny (default is majority rule). See Section \ref{sec:consensus}.
+
+\end{itemize}
