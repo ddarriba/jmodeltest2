@@ -573,6 +573,7 @@ public class ModelTest {
 		String error = "\nCOMMAND LINE ERROR: ";
 		File ckpFile = null;
 		boolean isInputFile = false;
+		boolean isIcForHcSet = false;
 		boolean getPhylip = false;
 		try {
 			i = 0;
@@ -728,6 +729,7 @@ public class ModelTest {
 											+ "-H argument is invalid (AIC, BIC, AICc).");
 							CommandLineError();
 						}
+						isIcForHcSet = true;
 					} else {
 						System.err
 								.println(error
@@ -889,23 +891,37 @@ public class ModelTest {
 						String validString = "";
 
 						if (type.length() == 5) {
-							validString = "ftvgp";
+							validString = "fgptv";
 						} else if (type.length() == 6) {
-							validString = "ftvwgp";
+							validString = "fgptvw";
 						} else if (type.length() == 7) {
-							validString = "ftvwxgp";
+							validString = "fgptvwx";
 						} else {
 							System.err
 									.println(error
-											+ "-O option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
+											+ "-O option requires a 5, 6 or 7 specific letter string with the order of tests (default is ftvwxgp)"
+											+ "\n            f=freq, t=titvi, v=2ti4tv(subst=3)/2ti(subst>3), w=2tv, x=4tv, g=gamma, p=pinv"
+											+ "\n            this argument is used only if -hLRT argument is set"
+											+ "\n            'f','t','v','g','p' are mandatory in any order. 'w' is optional, and 'x' requires 'w' to be present"
+											+ "\n            thus, length should be 5, 6 *including 'w') or 7 (including both 'w' and 'x')"
+											+ "\n            e.g., -hLRT -O gpfvwxt"
+											);
 							CommandLineError();
 						}
 
 						char[] valid = validString.toCharArray();
 						if (!Arrays.equals(array, valid)) {
 							System.err
-									.println(error
-											+ "-O option requires a 5, 6 or 7 specific letter string with the order of tests (ftvgp/ftvwgp/ftvwxgp)");
+							.println(String.valueOf(array) + " " + String.valueOf(valid));
+							System.err
+							.println(error
+									+ "-O option requires a 5, 6 or 7 specific letter string with the order of tests (default is ftvwxgp)"
+									+ "\n            f=freq, t=titvi, v=2ti4tv(subst=3)/2ti(subst>3), w=2tv, x=4tv, g=gamma, p=pinv"
+									+ "\n            this argument is used only if -hLRT argument is set"
+									+ "\n            'f','t','v','g','p' are mandatory in any order. 'w' is optional, and 'x' requires 'w' to be present"
+									+ "\n            thus, length should be 5, 6 *including 'w') or 7 (including both 'w' and 'x')"
+									+ "\n            e.g., -hLRT -O gpfvwxt"
+									);
 							CommandLineError();
 						} else {
 							testingOrder = new Vector<String>();
@@ -1130,6 +1146,15 @@ public class ModelTest {
 				}
 			}
 			
+			if (testingOrder != null && !options.doHLRT) {
+				System.err.println("\nWARNING: Hypothesis testing order has been set, but hierarchical Likelihood Ratio Test was not selected with '-hLRT' parameter");
+				System.err.println("         Thus, this option has no effect\n");
+			}
+			
+			if (isIcForHcSet && options.getSubstTypeCode() != 4) {
+				System.err.println("\nWARNING: Information Criterion for hierarchical clustering has been specified, but hierarchical clustering applies only for 203 substitution schemes");
+				System.err.println("         Thus, this option has no effect\n");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1139,7 +1164,7 @@ public class ModelTest {
 	}
 
 	static public void CommandLineError() {
-		System.err.println("\njModelTest has finished with an error status. Please run with -help argument for info about the usage\n");
+		System.err.println("\nPlease run with -help argument for info about the usage\n");
 		System.exit(1);
 	}
 	
@@ -1194,11 +1219,13 @@ public class ModelTest {
 					+ "\n\n     -h confidenceInterval"
 					+ "\n         confidence level for the hLRTs (e.g., -a0.002) (default is 0.01)"
 					+ "\n\n     -H informationCriterion"
-					+ "\n         information criterion for clustering search (AIC, AICc, BIC). (e.g., -H AIC) (default is BIC)"
+					+ "\n         information criterion for clustering search (AIC, AICc, BIC). (default is BIC)"
+					+ "\n         this argument applies only for 203 substitution schemes (e.g., -s 203 -H AIC)"
 					+ "\n\n     -help"
 					+ "\n         displays this help message"
 					+ "\n\n     -hLRT"
 					+ "\n         do hierarchical likelihood ratio tests (default is false)"
+					+ "\n         hypothesis testing order can be specified with -O argument"
 					+ "\n\n     -i"
 					+ "\n         include models with a proportion invariable sites (e.g., -i) (default is false)"
 					+ "\n\n     -machinesfile manchinesFileName"
@@ -1210,6 +1237,10 @@ public class ModelTest {
 					+ "\n\n     -O hypothesisOrder"
 					+ "\n         hypothesis order for the hLRTs (e.g., -hLRT -O gpftv) (default is ftvwxgp)"
 					+ "\n            f=freq, t=titvi, v=2ti4tv(subst=3)/2ti(subst>3), w=2tv, x=4tv, g=gamma, p=pinv"
+					+ "\n            this argument is used only if -hLRT argument is set"
+					+ "\n            'f','t','v','g','p' are mandatory in any order. 'w' is optional, and 'x' requires 'w' to be present"
+					+ "\n            thus, length should be 5, 6 *including 'w') or 7 (including both 'w' and 'x')"
+					+ "\n            e.g., -hLRT -O gpfvwxt"
 					+ "\n\n     -p"
 					+ "\n         calculate parameter importances (e.g., -p) (default is false)"
 					+ "\n\n     -r"
@@ -1238,7 +1269,8 @@ public class ModelTest {
 					+ "\n         write PAUP block (e.g., -w) (default is false)"
 					+ "\n\n     -z"
 					+ "\n         strict consensus type for model-averaged phylogeny (e.g., -z) (default is majority rule)"
-					+ "\n\n Command line: java -jar jModeltest.jar -d sequenceFileName [arguments]";
+					+ "\n\n Command line: java -jar jModeltest.jar -d sequenceFileName [arguments]"
+					+ "\n\n Example: java -jar jModeltest.jar -d sequenceFileName -i -f -g 4 -BIC -AIC -AICc -DT -v -a -w";
 			System.err.println(usage);
 			System.err.println(" ");
 		}
