@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 import java.util.Vector;
 
 import mpi.MPI;
@@ -86,17 +87,19 @@ public class ModelTest {
 	/** The MPJ running state. */
 	public static boolean MPJ_RUN;
 
+	public static final Properties USERDEF_PROPERTIES;
+	
 	// application constant definitions
 	public static final int PRECISION = 4;
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.1.6";
+	public static final String CURRENT_VERSION = "2.1.6 v20140903";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
 	public static final String DISCUSSION_GROUP = "http://groups.google.com/group/jmodeltest";
-	public static final String CONFIG_FILE = "conf/jmodeltest.conf";
+	public static String CONFIG_FILE = "conf/jmodeltest.conf";
 	public static final String UNKNOWN_HOSTNAME = "UNKNOWN";
 
 	private static TextOutputStream MAIN_CONSOLE;
@@ -140,6 +143,7 @@ public class ModelTest {
 	public static boolean buildGUI = true;
 
 	static {
+		USERDEF_PROPERTIES = new Properties();
 		InetAddress addr;
 		try {
 			addr = InetAddress.getLocalHost();
@@ -1077,12 +1081,48 @@ public class ModelTest {
 							CommandLineError();
 						}
 					}
-				} else {
+
+				} else if (arg.equals("--set-local-config")) {
+					if (i < arguments.length) {
+						String localConfigFile = arguments[i++];
+						File testFile = new File(localConfigFile);
+						if (!(testFile.exists() && testFile.canRead())) {
+							System.err.println(error
+									+ "Config file " + localConfigFile +" does not exist or cannot be read.");
+							CommandLineError();
+						}
+						ModelTest.CONFIG_FILE = testFile.getAbsolutePath();
+					} else {
+						System.err.println(error
+								+ "--set-local-config option requires a config file.");
+						CommandLineError();
+					}
+				}  else if (arg.equals("--set-property")) {
+					if (i < arguments.length) {
+						String propertyDef = arguments[i++];
+						if (propertyDef.indexOf("=") == -1) {
+							System.err.println(error
+									+ "--set-property option requires a property definition with the following format:");
+							System.err.println("                    --set-property <property_name>=<property_value>");
+							System.err.println("              e.g., --set-property log-dir=myHome/myLogDir");
+							CommandLineError();
+						}
+						String propertyName = propertyDef.split("=")[0].trim();
+						String propertyValue = propertyDef.split("=")[1].trim();
+						USERDEF_PROPERTIES.setProperty(propertyName, propertyValue);
+					} else {
+						System.err.println(error
+								+ "--set-property option requires a property definition.");
+						System.err.println(error
+								+ "e.g., --set-property log-dir=myHome/myLogDir");
+						CommandLineError();
+					}
+				}
+				else {
 					System.err.println(error + "the argument \" " + arg
 							+ "\" is unknown. Check its syntax.");
 					CommandLineError();
 				}
-
 			} // while
 			if (!isInputFile) {
 				System.err.println(error
@@ -1216,6 +1256,10 @@ public class ModelTest {
 					+ "\n         backward selection for the hLRT (e.g., -r) (default is forward)"
 					+ "\n\n     -s numberOfSubstitutionSchemes"
 					+ "\n         number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)"
+					+ "\n\n     --set-local-config localConfigurationFile"
+					+ "\n         set a local configuration file in replacement of conf/jmodeltest.conf"
+					+ "\n\n     --set-property propertyName=propertyValue"
+					+ "\n         set a new value for a property contained in the configuration file (conf/jmodeltest.conf)"
 					+ "\n\n     -S NNI|SPR|BEST"
 					+ "\n         tree topology search operation option (NNI (fast), SPR (a bit slower), BEST (best of NNI and SPR)) (default is BEST)"
 					+ "\n\n     -t fixed|BIONJ|ML"
@@ -1253,9 +1297,9 @@ public class ModelTest {
 	static public void printHeader(TextOutputStream stream) {
 		// we can set styles using the editor pane
 		// I am using doc to stream ....
-		stream.print("------------------------------- ");
+		stream.print("-------------------------- ");
 		stream.print("jModeltest " + CURRENT_VERSION);
-		stream.println(" -------------------------------");
+		stream.println(" --------------------------");
 		stream.println("(c) 2011-onwards D. Darriba, G.L. Taboada, R. Doallo and D. Posada,");
 		stream.println("(1) Department of Biochemistry, Genetics and Immunology");
 		stream.println("    University of Vigo, 36310 Vigo, Spain.");

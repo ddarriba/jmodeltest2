@@ -46,10 +46,35 @@ public abstract class ModelTestConfiguration {
     static {
         APPLICATION_PROPERTIES = new Properties();
         try {
-        	FileInputStream prop = new FileInputStream(PATH + ModelTest.CONFIG_FILE);
+        	FileInputStream prop = new FileInputStream(convertPathToAbsolute(ModelTest.CONFIG_FILE));
             APPLICATION_PROPERTIES.load(prop);
+            /* load also user definitions */
+            for (Object key : ModelTest.USERDEF_PROPERTIES.keySet()) {
+            	String strKey = (String) key;
+            	if (strKey.equals(LOG_DIR) || strKey.equals(EXE_DIR)) {
+            		File fDir = new File(ModelTest.USERDEF_PROPERTIES.getProperty(strKey));
+            		if (!fDir.exists()) {
+            			System.err.println("\nCOMMAND LINE ERROR: Unexistent directory " + fDir.getAbsolutePath());
+            			ModelTest.CommandLineError();
+            		} else if (!(fDir.isDirectory() && fDir.canRead()) || (strKey.equals(LOG_DIR) && !fDir.canWrite())) {
+            			System.err.println("\nCOMMAND LINE ERROR: Argument " + fDir.getAbsolutePath() 
+            					+ " is not a directory or you have not the required permissions on it");
+            			ModelTest.CommandLineError();
+        			}
+            		APPLICATION_PROPERTIES.setProperty(strKey, fDir.getAbsolutePath());
+            	} else {
+            		APPLICATION_PROPERTIES.setProperty(strKey, ModelTest.USERDEF_PROPERTIES.getProperty(strKey));
+            	}
+            }
+            
+            String logDir = getProperty(LOG_DIR);
+        	if (logDir == null) {
+        		APPLICATION_PROPERTIES.setProperty(HTML_LOG, "disabled");
+        		APPLICATION_PROPERTIES.setProperty(PHYML_LOG, "disabled");
+        		APPLICATION_PROPERTIES.setProperty(CKP_LOG, "disabled");
+        	}
         } catch (IOException e) {
-            System.err.println("Configuration file ("+ PATH + ModelTest.CONFIG_FILE +") cannot be resolved");
+            System.err.println("Configuration file ("+ convertPathToAbsolute(ModelTest.CONFIG_FILE) +") cannot be resolved");
             System.exit(-1);
         }
     }
