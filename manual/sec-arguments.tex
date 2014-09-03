@@ -129,6 +129,19 @@ Defines the tree topology search operation option for Maximum-Likelihood search:
      \item {\bf BEST} Best of NNI and SPR (slowest option) (used by default).
 \end{itemize}
 
+\item  {\bf --set-local-config} configFile
+\label{pp:args-config}
+
+Allows the user to set a local configuration file in replacement of conf/jmodeltest.conf.
+See Section~\ref{sec:config} for more details.
+
+\item  {\bf --set-property} propertyName=propertyValue
+
+Allows the user to set a especific value for a property in replacement of the existing parameter in conf/jmodeltest.conf.
+See Section~\ref{sec:config} for more details.
+
+e.g., --set-property log-dir=myHome/myLogDirectory
+
 \item  {\bf -t} fixed|BIONJ|ML
 
 Base tree for likelihood calculations (e.g., -t BIONJ):
