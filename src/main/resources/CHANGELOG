@@ -1,3 +1,9 @@
+03 Sep 2014 Version 2.1.6 Revision 20140903
+
+  * Added "--set-local-config" and "--set-property" arguments
+    (check the manual)
+  * Added the complete revision number in jModelTest header
+
 06 Aug 2014 Version 2.1.6 Revision 20140806
 
   * Added confirmation window when cancelling running jobs in the GUI
