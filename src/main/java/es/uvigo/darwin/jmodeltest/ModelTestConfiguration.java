@@ -80,7 +80,7 @@ public abstract class ModelTestConfiguration {
     }
     
     public static String getProperty(String key) {
-    	return APPLICATION_PROPERTIES.getProperty(key);
+    	return APPLICATION_PROPERTIES.getProperty(key, "n/a");
     }
     
     public static String getExeDir() {
@@ -105,7 +105,7 @@ public abstract class ModelTestConfiguration {
     }
     
     public static boolean isCkpEnabled() {
-    	return !getProperty(CKP_LOG).equalsIgnoreCase("disabled");
+    	return getProperty(CKP_LOG).equalsIgnoreCase("enabled");
     }
     
     public static String getLogDir() {
