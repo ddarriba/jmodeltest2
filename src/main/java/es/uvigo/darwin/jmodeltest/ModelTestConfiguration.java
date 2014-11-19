@@ -3,6 +3,8 @@ package es.uvigo.darwin.jmodeltest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
@@ -13,11 +15,10 @@ public abstract class ModelTestConfiguration {
 		if (Utilities.isWindows()) {
 			// change wrong path separators
 			path.replace('/', '\\');
-		} else {
+		}
 		File fPath = new File(path);
-    	if (!fPath.isAbsolute()) {
-    		path = PATH + path;
-    	}
+		if (!fPath.isAbsolute()) {
+			path = PATH + path;
 		}
 		return path;
 	}
@@ -27,11 +28,10 @@ public abstract class ModelTestConfiguration {
     
     public static final boolean DEFAULT_GLOBAL_PHYML = false;
     
-    private static final String JAR_PATH = ModelTest.class.getProtectionDomain().getCodeSource().getLocation().getFile()
-    		.replace("%20", " ");
-    public static final String PATH = JAR_PATH.replaceFirst(new File(JAR_PATH).getName(),"");
-    public static final String DEFAULT_EXE_DIR = PATH + "exe" + File.separator + "phyml";
-    public static final String DEFAULT_LOG_DIR = PATH + "log";
+    private static String JAR_PATH;
+    public static String PATH;
+    public static String DEFAULT_EXE_DIR;
+    public static String DEFAULT_LOG_DIR;
     
     public static final String HTML_LOG = "html-logging";
     public static final String PHYML_LOG = "phyml-logging";
@@ -45,7 +45,18 @@ public abstract class ModelTestConfiguration {
     
     static {
         APPLICATION_PROPERTIES = new Properties();
+        
         try {
+        	try {
+        		File f = new File(ModelTest.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+        		JAR_PATH = f.getAbsolutePath();
+        		PATH = JAR_PATH.replaceFirst(new File(JAR_PATH).getName(),"");
+        		DEFAULT_EXE_DIR = PATH + "exe" + File.separator + "phyml";
+        		DEFAULT_LOG_DIR = PATH + "log";
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         	FileInputStream prop = new FileInputStream(convertPathToAbsolute(ModelTest.CONFIG_FILE));
             APPLICATION_PROPERTIES.load(prop);
             /* load also user definitions */
@@ -67,8 +78,7 @@ public abstract class ModelTestConfiguration {
             	}
             }
             
-            String logDir = getProperty(LOG_DIR);
-        	if (logDir == null) {
+        	if (!existsKey(LOG_DIR)) {
         		APPLICATION_PROPERTIES.setProperty(HTML_LOG, "disabled");
         		APPLICATION_PROPERTIES.setProperty(PHYML_LOG, "disabled");
         		APPLICATION_PROPERTIES.setProperty(CKP_LOG, "disabled");
@@ -79,13 +89,19 @@ public abstract class ModelTestConfiguration {
         }
     }
     
+    public static boolean existsKey(String key) {
+	return !(getProperty(key).equals("n/a"));
+    }
+
     public static String getProperty(String key) {
     	return APPLICATION_PROPERTIES.getProperty(key, "n/a");
     }
     
     public static String getExeDir() {
-    	String exeDir = getProperty(EXE_DIR);
-    	if (exeDir == null) {
+    	String exeDir;
+	if (existsKey(EXE_DIR)) {
+		exeDir = getProperty(EXE_DIR);
+	} else {
     		exeDir = DEFAULT_EXE_DIR;
     	}
     	return convertPathToAbsolute(exeDir);
@@ -93,7 +109,7 @@ public abstract class ModelTestConfiguration {
         
     public static boolean isGlobalPhymlBinary() {
     	String propValue = getProperty(GLOBAL_PHYML_EXE); 
-    	return (propValue != null && propValue.equalsIgnoreCase("true"));
+    	return (existsKey(propValue) && getProperty(GLOBAL_PHYML_EXE).equalsIgnoreCase("true"));
     }
     
     public static boolean isHtmlLogEnabled() {

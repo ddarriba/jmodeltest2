@@ -131,8 +131,13 @@ public class AICc extends InformationCriterion {
 		else
 			K = model.getK() - options.getNumBranches();
 
-		double aicc = 2 * (model.getLnL() + K)
+		double aicc;
+		if ((options.getSampleSize() - K - 1) == 0) {
+			aicc = 0;
+		} else {
+			aicc = 2 * (model.getLnL() + K)
 				+ (2 * K * (K + 1) / (double) (options.getSampleSize() - K - 1));
+		}
 		return aicc;
 	}
 	
@@ -143,8 +148,13 @@ public class AICc extends InformationCriterion {
 		else
 			K = k - options.getNumBranches();
 
-		double aicc = 2 * (lnL + K)
+		double aicc;
+		if ((options.getSampleSize() - K - 1) == 0) {
+			aicc = 0;
+		} else {
+			aicc = 2 * (lnL + K)
 				+ (2 * K * (K + 1) / (double) (options.getSampleSize() - K - 1));
+		}
 		System.out.println("AICC 2 IS " + aicc);
 		return aicc;
 	}
