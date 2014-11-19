@@ -53,6 +53,7 @@ import es.uvigo.darwin.jmodeltest.io.TextInputStream;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ConsoleProgressObserver;
+import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.selection.AIC;
 import es.uvigo.darwin.jmodeltest.selection.AICc;
 import es.uvigo.darwin.jmodeltest.selection.BIC;
@@ -162,6 +163,16 @@ public class ModelTest {
 			options.createLogFile();
 			execMode = ExecMode.GUI;
 			XManager.getInstance();
+			// Check binary
+	    	if (!ModelTestConfiguration.isGlobalPhymlBinary()) {
+				if (!RunPhyml.phymlBinary.exists()) {
+					Utilities
+					.printRed("ERROR: PhyML binary cannot be found: " + RunPhyml.phymlBinary.getAbsolutePath() + "\n");
+				} else if (!RunPhyml.phymlBinary.canExecute()) {
+					Utilities
+					.printRed("ERROR: PhyML binary exists, but it cannot be executed: " + RunPhyml.phymlBinary.getAbsolutePath() + "\n");
+				}
+			}
 		} else {
 			System.err.println("");
 			System.err.println("ERROR: You are trying to run a GUI interface in a headless server.");
@@ -176,6 +187,20 @@ public class ModelTest {
 			MAIN_CONSOLE = new TextOutputStream(System.out);
 			execMode = ExecMode.CONSOLE;
 			ParseArguments();
+			
+			// Check binary
+        	if (!ModelTestConfiguration.isGlobalPhymlBinary()) {
+				if (!RunPhyml.phymlBinary.exists()) {
+					System.err.println(" ");
+					System.err.println("ERROR: PhyML binary cannot be found: " + RunPhyml.phymlBinary.getAbsolutePath());
+					finalize(-1);
+				} else if (!RunPhyml.phymlBinary.canExecute()) {
+					System.err.println(" ");
+					System.err.println("ERROR: PhyML binary exists, but it cannot be executed: " + RunPhyml.phymlBinary.getAbsolutePath());
+					finalize(-1);
+				}
+			}
+        	
 			options.createLogFile();
 			options.createCkpFile();
 			if (options.doingSimulations) {

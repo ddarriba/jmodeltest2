@@ -7,6 +7,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
+import es.uvigo.darwin.jmodeltest.exe.RunPhyml;
+import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
 public abstract class ModelTestConfiguration {
@@ -83,6 +85,7 @@ public abstract class ModelTestConfiguration {
         		APPLICATION_PROPERTIES.setProperty(PHYML_LOG, "disabled");
         		APPLICATION_PROPERTIES.setProperty(CKP_LOG, "disabled");
         	}
+        	
         } catch (IOException e) {
             System.err.println("Configuration file ("+ convertPathToAbsolute(ModelTest.CONFIG_FILE) +") cannot be resolved");
             System.exit(-1);
@@ -99,13 +102,13 @@ public abstract class ModelTestConfiguration {
     
     public static String getExeDir() {
     	String exeDir;
-	if (existsKey(EXE_DIR)) {
-		exeDir = getProperty(EXE_DIR);
-	} else {
-    		exeDir = DEFAULT_EXE_DIR;
-    	}
-    	return convertPathToAbsolute(exeDir);
-    }
+		if (existsKey(EXE_DIR)) {
+			exeDir = getProperty(EXE_DIR);
+		} else {
+			exeDir = DEFAULT_EXE_DIR;
+		}
+		return convertPathToAbsolute(exeDir);
+	}
         
     public static boolean isGlobalPhymlBinary() {
     	String propValue = getProperty(GLOBAL_PHYML_EXE); 
