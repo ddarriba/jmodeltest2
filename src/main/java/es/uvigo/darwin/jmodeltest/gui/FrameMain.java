@@ -58,6 +58,7 @@ import edu.stanford.ejalbert.BrowserLauncher;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.ModelTestService;
+import es.uvigo.darwin.jmodeltest.exe.RunPhyml;
 import es.uvigo.darwin.jmodeltest.io.DocumentOutputStream;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
@@ -878,14 +879,30 @@ public class FrameMain extends JModelTestFrame {
 		}
 	}
 
-	public void menuEditClearActionPerformed(java.awt.event.ActionEvent e) {
+	public void initPanelInfo() {
 		try {
 			mainEditorPane.setText("");
 			ModelTest.printHeader(ModelTest.getMainConsole());
+			ModelTest.printNotice(ModelTest.getMainConsole());
 			ModelTest.printCitation(ModelTest.getMainConsole());
+			
+			// Check binary
+        	if (!ModelTestConfiguration.isGlobalPhymlBinary()) {
+				if (!RunPhyml.phymlBinary.exists()) {
+					Utilities
+					.printRed("ERROR: PhyML binary cannot be found: " + RunPhyml.phymlBinary.getAbsolutePath());
+				} else if (!RunPhyml.phymlBinary.canExecute()) {
+					Utilities
+					.printRed("ERROR: PhyML binary exists, but it cannot be executed: " + RunPhyml.phymlBinary.getAbsolutePath());
+				}
+			}
 		} catch (Exception f) {
 			f.printStackTrace();
 		}
+	}
+	
+	public void menuEditClearActionPerformed(java.awt.event.ActionEvent e) {
+		initPanelInfo();
 	}
 
 	private void menuEditSaveConsoleActionPerformed(java.awt.event.ActionEvent e) {
@@ -994,14 +1011,18 @@ public class FrameMain extends JModelTestFrame {
 
 	private void menuAnalysisCalculateLikelihoodsActionPerformed(
 			java.awt.event.ActionEvent e) {
-		try {
-			Frame_CalcLike Likeframe = new Frame_CalcLike();
-			Likeframe.initComponents();
-			InitialFocusSetter.setInitialFocus(Likeframe,
-					Likeframe.RunButtonCalcLike);
-			Likeframe.setVisible(true);
-		} catch (Exception f) {
-			f.printStackTrace();
+		boolean err = !ModelTestConfiguration.isGlobalPhymlBinary() && (!RunPhyml.phymlBinary.exists() || !RunPhyml.phymlBinary.canExecute());
+
+    	if (!err) {
+			try {
+				Frame_CalcLike Likeframe = new Frame_CalcLike();
+				Likeframe.initComponents();
+				InitialFocusSetter.setInitialFocus(Likeframe,
+						Likeframe.RunButtonCalcLike);
+				Likeframe.setVisible(true);
+			} catch (Exception f) {
+				f.printStackTrace();
+			}
 		}
 	}
 
