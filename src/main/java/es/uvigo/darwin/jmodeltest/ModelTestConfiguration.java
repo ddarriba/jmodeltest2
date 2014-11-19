@@ -17,10 +17,11 @@ public abstract class ModelTestConfiguration {
 		if (Utilities.isWindows()) {
 			// change wrong path separators
 			path.replace('/', '\\');
-		}
-		File fPath = new File(path);
-		if (!fPath.isAbsolute()) {
-			path = PATH + path;
+		} else {
+			File fPath = new File(path);
+			if (!fPath.isAbsolute()) {
+				path = PATH + path;
+			}
 		}
 		return path;
 	}
