@@ -64,6 +64,8 @@ public class AICc extends InformationCriterion {
 			}
 		}
 
+		validResults = min > 0;
+		
 		// Calculate Akaike differences
 		sumExp = 0;
 		for (int i = 0; i < numModels; i++) {

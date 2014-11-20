@@ -1,3 +1,10 @@
+20 Nov 2014 Version 2.1.7 Revision 20141120
+
+  * Fixed bug with special characters in paths
+  * Added initial check of PhyML binaries
+  * Added notification in case AICc produces negative values
+  * Allow for environment variables on configuration file
+
 03 Sep 2014 Version 2.1.6 Revision 20140903
 
   * Added "--set-local-config" and "--set-property" arguments
