@@ -61,6 +61,8 @@ public abstract class InformationCriterion {
 	protected double atitv, akappa, apinvI, ashapeG, apinvIG, ashapeIG;
 	protected double aRa, aRb, aRc, aRd, aRe, aRf;
 
+	protected boolean validResults;
+	
 	public List<Model> getConfidenceModels() {
 		return confidenceModels;
 	}
@@ -81,7 +83,8 @@ public abstract class InformationCriterion {
 		doModelAveraging = mdoModelAveraging;
 		confidenceInterval = minterval;
 		confidenceModels = new ArrayList<Model>();
-
+		validResults = true;
+		
 		doCheckAgainstULK = (getType() != IC_DT
 				&& (options.getNumPatterns() > 0) && (options
 				.getUnconstrainedLnL() > 1e-10));
@@ -613,7 +616,7 @@ public abstract class InformationCriterion {
 						options, false, -1));
 		if (getValue(minModel) < 0.0) {
 			stream.println(" ");
-			stream.println("WARNING! Criterion has negative values. Please check whether your sample size is big enough compared to the number of parameters (K)");
+			stream.println("WARNING! Criterion has zero or negative values. Please check whether your sample size is big enough compared to the number of parameters (K)");
 		}
 	}
 
@@ -621,6 +624,10 @@ public abstract class InformationCriterion {
 		return numModels;
 	}
 
+	public boolean isValid() {
+		return validResults;
+	}
+	
 	public abstract void compute();
 
 	public abstract double computeSingle(Model model);

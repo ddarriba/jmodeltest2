@@ -95,7 +95,7 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.1.6 v20140903";
+	public static final String CURRENT_VERSION = "2.1.7 v20141120";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
@@ -357,14 +357,8 @@ public class ModelTest {
 						getCandidateModels());
 			}
 		} else {
-			// if (options.getSubstTypeCode() == 4) {
-			// runPhyml = new RunPhymlClustering(new
-			// ConsoleProgressObserver(options),
-			// options, getCandidateModels());
-			// } else {
 			runPhyml = new RunPhymlThread(new ConsoleProgressObserver(options),
 					options, getCandidateModels());
-			// }
 		}
 		runPhyml.execute();
 
@@ -501,27 +495,33 @@ public class ModelTest {
 							+ "\tRa\tRb\tRc\tRd\tRe\tRf\tpInv \tgamma");
 			MAIN_CONSOLE
 					.println("----------------------------------------------------------------------------------------------------------------------------------------");
+
+			boolean icValid = true;
 			if (myAIC != null) {
 				Model minModel = myAIC.getMinModel();
 				MAIN_CONSOLE.println("AIC \t" + getModelRow(minModel));
+				icValid &= myAIC.isValid();
 				// MAIN_CONSOLE.println("average \t" +
 				// getModelAverageRow(myAIC));
 			}
 			if (myBIC != null) {
 				Model minModel = myBIC.getMinModel();
 				MAIN_CONSOLE.println("BIC \t" + getModelRow(minModel));
+				icValid &= myBIC.isValid();
 				// MAIN_CONSOLE.println("average \t" +
 				// getModelAverageRow(myBIC));
 			}
 			if (myAICc != null) {
 				Model minModel = myAICc.getMinModel();
 				MAIN_CONSOLE.println("AICc \t" + getModelRow(minModel));
+				icValid &= myAICc.isValid();
 				// MAIN_CONSOLE.println("average \t" +
 				// getModelAverageRow(myAICc));
 			}
 			if (myDT != null) {
 				Model minModel = myDT.getMinModel();
 				MAIN_CONSOLE.println("DT \t" + getModelRow(minModel));
+				icValid &= myDT.isValid();
 				// MAIN_CONSOLE.println("average \t" +
 				// getModelAverageRow(myDT));
 
@@ -529,7 +529,10 @@ public class ModelTest {
 				MAIN_CONSOLE.println("Program is done.");
 
 			}
-
+			if (!icValid) {
+				MAIN_CONSOLE.println("* There might not be information enough to achieve reliable results. Please inspect the results carefully.");
+			}
+			
 			if (ModelTestConfiguration.isHtmlLogEnabled()) {
 				HtmlReporter.buildReport(options,
 						ModelTest.getCandidateModels(), null, treeSummary);

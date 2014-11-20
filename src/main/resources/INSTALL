@@ -1,16 +1,26 @@
 Basic Installation
 ==================
 
-1. Requirements:
+No proper installation is required. However, you should keep in mind the following:
 
-* Apache ant 
-	http://ant.apache.org/manual/install.html
-* Java JDK 1.6 
-	http://www.java.com/en/download
+1. Decompress the tarball
 
-2. In a command-line window type:
+   Your OS might allow you to execute jar files directly from the compressed file.
+   However, this will probably lead to errors if PhyML binaries cannot be executed
+   or temporary files cannot be created.
 
-$ cd $JMODELTEST_HOME
-$ ant jar
+   In Linux/OS X from command console:
 
-3. The distribution will be built in $JMODELTEST_HOME/dist/
+      $ tar zvxf jmodeltest-2.1.x-yyyymmdd.tar.gz
+
+2. GUI: Run jModelTest.jar, either double clicking or from a command console:
+
+      $ cd $JMODELTEST_HOME
+      $ java -jar jModelTest.jar
+
+3. COMMAND LINE: Run jModelTest.jar with -help argument for information about the
+   arguments:
+
+      $ java -jar jModelTest.jar -help
+
+4. Check the README file or the pdf manual (available at the homepage)

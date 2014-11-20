@@ -243,15 +243,26 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			// any error message?
 			StreamGobbler errorGobbler = new StreamGobbler(
 					proc.getErrorStream(), "ERROR", System.err, ModelTest.getPhymlConsole());
-			// any output?
-			FileOutputStream logFile = new FileOutputStream(
-					options.getLogFile(), true);
-			StreamGobbler outputGobbler = new StreamGobbler(
-					proc.getInputStream(), "PHYML", logFile, ModelTest.getPhymlConsole());
 
-			// kick them off
+			// any output?
+			boolean logging = options.getLogFile().exists()
+					&& options.getLogFile().canWrite();
+			StreamGobbler outputGobbler = null;
+			FileOutputStream logFile = null;
+			if (logging) {
+					
+				logFile = new FileOutputStream(
+						options.getLogFile(), true);
+				outputGobbler = new StreamGobbler(
+						proc.getInputStream(), "PHYML", logFile,
+						ModelTest.getPhymlConsole());
+
+				// kick them off
+				outputGobbler.start();
+			} else {
+				ModelTestConfiguration.disablePhymlLog();
+			}
 			errorGobbler.start();
-			outputGobbler.start();
 
 			// any error???
 			int exitVal = proc.waitFor();
@@ -261,26 +272,39 @@ public class PhymlSingleModel extends Observable implements Runnable {
 				System.out.println("ExitValue: " + exitVal);
 
 			// print command line to phmyl logfile
-			PrintWriter printout = new PrintWriter(logFile);
-			printout.println(" ");
-			printout.println("Command line used for process "+ outputGobbler.getRunId() +":");
-			String uCommand = commandLine.replace(options.getAlignmentFile().getAbsolutePath(), 
-					options.getInputFile().getAbsolutePath());
-			if (options.userTopologyExists) {
-				uCommand = uCommand.replace(options.getTreeFile().getAbsolutePath(), 
-						options.getInputTreeFile().getAbsolutePath());
+			PrintWriter printout = null;
+			if (logging) {
+				printout = new PrintWriter(logFile);
+				printout.println(" ");
+				printout.println("Command line used for process "
+						+ outputGobbler.getRunId() + ":");
 			}
-			printout.println("    " + RunPhyml.phymlBinary.getAbsolutePath() + " "
-					+ uCommand);
-			printout.println(" ");
-			printout.flush();
-			printout.close();
+			String uCommand = commandLine.replace(options.getAlignmentFile()
+					.getAbsolutePath(), options.getInputFile()
+					.getAbsolutePath());
+			if (options.userTopologyExists) {
+				uCommand = uCommand.replace(options.getTreeFile()
+						.getAbsolutePath(), options.getInputTreeFile()
+						.getAbsolutePath());
+			}
+			if (logging) {
+				printout.println("    "
+						+ RunPhyml.phymlBinary.getAbsolutePath() + " "
+						+ uCommand);
+				printout.println(" ");
+				printout.flush();
+				printout.close();
+			}
 			
 			// print to console
 			if (ModelTest.getPhymlConsole() != null) {
 				synchronized (ModelTest.getPhymlConsole()) {
 					ModelTest.getPhymlConsole().println(" ");
+					if (logging) {
 					ModelTest.getPhymlConsole().println("Command line used for process "+ outputGobbler.getRunId() +":");
+					} else {
+						ModelTest.getPhymlConsole().println("Command line used for process:");
+					}
 					ModelTest.getPhymlConsole().println("    " + RunPhyml.phymlBinary.getAbsolutePath() + " "
 							+ uCommand);
 					ModelTest.getPhymlConsole().println(" ");

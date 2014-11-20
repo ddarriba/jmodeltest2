@@ -3,17 +3,32 @@ package es.uvigo.darwin.jmodeltest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import es.uvigo.darwin.jmodeltest.exe.RunPhyml;
-import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
 public abstract class ModelTestConfiguration {
 
 	private static String convertPathToAbsolute(String path) {
+		Map<String, String> envMap = System.getenv();
+    	String pattern = "\\$\\{([A-Za-z0-9]+)\\}";
+    	Pattern expr = Pattern.compile(pattern);
+    	Matcher matcher = expr.matcher(path);
+    	while (matcher.find()) {
+    	    String envValue = envMap.get(matcher.group(1).toUpperCase());
+    	    if (envValue == null) {
+    	        envValue = "";
+    	    } else {
+    	        envValue = envValue.replace("\\", "\\\\");
+    	    }
+    	    Pattern subexpr = Pattern.compile(Pattern.quote(matcher.group(0)));
+    	    path = subexpr.matcher(path).replaceAll(envValue);
+    	}
+    	
 		if (Utilities.isWindows()) {
 			// change wrong path separators
 			path.replace('/', '\\');
@@ -110,7 +125,19 @@ public abstract class ModelTestConfiguration {
 		}
 		return convertPathToAbsolute(exeDir);
 	}
-        
+    
+    public static void disableCkpLog() {
+    	APPLICATION_PROPERTIES.setProperty(CKP_LOG, "disabled");
+    }
+    
+    public static void disablePhymlLog() {
+    	APPLICATION_PROPERTIES.setProperty(PHYML_LOG, "disabled");
+    }
+    
+    public static void disableHtmlLog() {
+    	APPLICATION_PROPERTIES.setProperty(HTML_LOG, "disabled");
+    }
+    
     public static boolean isGlobalPhymlBinary() {
     	String propValue = getProperty(GLOBAL_PHYML_EXE); 
     	return (existsKey(propValue) && getProperty(GLOBAL_PHYML_EXE).equalsIgnoreCase("true"));
@@ -133,6 +160,7 @@ public abstract class ModelTestConfiguration {
     	if (logDir == null) {
     		logDir = DEFAULT_LOG_DIR;
     	}
+    	
     	return convertPathToAbsolute(logDir);
     }
     
