@@ -1,3 +1,8 @@
+20 Feb 2015 Version 2.1.7 Revision 20150220
+
+  * Fixed bug in ML tree search operation. Console version
+    was using NNI moves instead of "BEST" by default.
+
 20 Nov 2014 Version 2.1.7 Revision 20141120
 
   * Fixed bug with special characters in paths

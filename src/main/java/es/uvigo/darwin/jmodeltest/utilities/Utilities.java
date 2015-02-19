@@ -123,7 +123,7 @@ public final class Utilities {
 	}
 
 	public static String calculateRuntimeMinutes(long startTime, long endTime) {
-		long seconds = (long) Math.round((endTime - startTime) / 1000.0);
+		long seconds = Math.round((endTime - startTime) / 1000.0);
 		int hours = (int) (seconds / 3600.0);
 		int rest1 = (int) (seconds % (3600.0));
 		int minutes = (int) (rest1 / 60.0);
@@ -145,7 +145,7 @@ public final class Utilities {
 	}
 	
 	public static String displayRuntime(long time) {
-		long decimes = (long) Math.round(time / 100.0);
+		long decimes = Math.round(time / 100.0);
 		int hours = (int) (decimes / 36000.0);
 		int rest1 = (int) (decimes % 36000.0);
 		int minutes = (int) (rest1 / 600.0);
@@ -330,7 +330,7 @@ public final class Utilities {
 		if (originalPath == null)
 			return "";
 
-		StringBuffer s = new StringBuffer((String) originalPath);
+		StringBuffer s = new StringBuffer(originalPath);
 
 		for (int i = 0; i < s.length(); i++) {
 			if (s.charAt(i) == ' ')
@@ -349,7 +349,7 @@ public final class Utilities {
 		if (originalPath == null)
 			return "";
 
-		StringBuffer s = new StringBuffer((String) originalPath);
+		StringBuffer s = new StringBuffer(originalPath);
 
 		for (int i = 0; i < s.length(); i++) {
 			if (s.charAt(i) == ' ') {
