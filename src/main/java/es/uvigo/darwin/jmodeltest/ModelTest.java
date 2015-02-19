@@ -71,7 +71,7 @@ import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
  * 
  * Description: Main class for selecting models of nucleotide substitition
  * 
- * @author Diego Darriba, University of Vigo / University of A Coru�a, Spain
+ * @author Diego Darriba, University of Vigo / University of A Coruna, Spain
  *         ddarriba@udc.es
  * @author David Posada, University of Vigo, Spain dposada@uvigo.es |
  *         darwin.uvigo.es
@@ -95,7 +95,7 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.1.7 v20141120";
+	public static final String CURRENT_VERSION = "2.1.7 v20150220";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";

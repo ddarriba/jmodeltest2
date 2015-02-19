@@ -34,7 +34,9 @@
 		<property name="java6.boot.classpath" value="${env.JAVA6_BOOTCLASSES}" />
 		<javac srcdir="${src.dir}" destdir="${bin.dir}" includeAntRuntime="no" 
 			target="1.6" source="1.6" bootclasspath="${java5.boot.classpath}"
-			classpathref="lib.path" debug="${compile.debug}"/>
+			classpathref="lib.path" debug="${compile.debug}">
+			<compilerarg value="-Xlint:all"/>
+		</javac>
 		<copy todir="${bin.dir}/es">
 			<fileset dir="${src.resources.dir}/es" includes="**/*.xml,**/*.properties,**/*.gif,**/*.ico" />
 		</copy>
