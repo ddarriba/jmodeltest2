@@ -149,7 +149,7 @@ The AIC, Bayesian and DT methods can rank the models, allowing us to assess how 
 where $min(AIC)$ is the smallest AIC value among all candidate models. The AIC differences are easy to interpret and allow a quick comparison and ranking of candidate models. As a rough rule of thumb, models having $\Delta_i$ within 1-2 of the best model have substantial support and should receive consideration. Models having $\Delta_i$ within 3-7 of the best model have considerably less support, while models with $\Delta_i > 10$ have essentially no support. Very conveniently, we can use these differences to obtain the relative AIC (BIC) weight ($w_i$) of each model:
 
 \[
-\omega_i = \frac{e^{\frac{-1}{2 \Delta_i}}}{\sum_{r=1}^R(e^\frac{-1}{2 \Delta_r})}
+\omega_i = \frac{e^{\frac{-\Delta_i}{2}}}{\sum_{r=1}^R(e^\frac{-\Delta_r}{2})}
 \]
 
 which can be interpreted, from a Bayesian perspective, as the probability that a model is the best approximation to the truth given the data. The weights for every model add to 1, so we can establish an approximate 95\% confidence set of models for the best models by summing the weights from largest to smallest from largest to smallest until the sum is 0.95 \citep{Burnham-1998, Burnham-2003}. This interval can also be set up stochastically (see above ``Model selection and averaging''). Note that this equation will not work for the DT (see the DT explanation on ``Model selection and averaging'').
