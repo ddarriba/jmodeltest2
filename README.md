@@ -8,8 +8,6 @@ Download
 
 New distributions of jModelTest will be hosted in google drive: https://drive.google.com/folderview?id=0ByrkKOPtF_n_OUs3d0dNcnJPYXM#list
 
-In case you don't know how to proceed, please check the Download Instructions in the wiki.
-
 --------
 NEWS!
 --------
