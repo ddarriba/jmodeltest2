@@ -31,6 +31,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.PushbackReader;
+import java.io.StringReader;
 import java.net.URI;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -59,6 +61,7 @@ import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.ModelTestService;
 import es.uvigo.darwin.jmodeltest.exe.RunPhyml;
+import es.uvigo.darwin.jmodeltest.io.AlignmentReader;
 import es.uvigo.darwin.jmodeltest.io.DocumentOutputStream;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
@@ -66,7 +69,6 @@ import es.uvigo.darwin.jmodeltest.tree.TreeSummary;
 import es.uvigo.darwin.jmodeltest.utilities.InitialFocusSetter;
 import es.uvigo.darwin.jmodeltest.utilities.PrintUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
-import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 /* This class sets the main GUI */
 public class FrameMain extends JModelTestFrame {
@@ -762,12 +764,13 @@ public class FrameMain extends JModelTestFrame {
 			{
 				options.setInputFile(inputFile);
 				try {
-					ModelTestService.readAlignment(inputFile,
+					String alnStr = ModelTestService.readAlignment(inputFile,
 							options.getAlignmentFile());
 
+					PushbackReader pr = new PushbackReader(
+							new StringReader(alnStr));
 					options.setAlignment(AlignmentReader
-							.readAlignment(new PrintWriter(System.err), options
-									.getAlignmentFile().getAbsolutePath(), true));
+							.createAlignment(new PrintWriter(System.err), pr, true));
 
 					LabelStatusData.setText(inputFile.getName() + "  ");
 					LabelStatusData.setForeground(new java.awt.Color(102, 102,

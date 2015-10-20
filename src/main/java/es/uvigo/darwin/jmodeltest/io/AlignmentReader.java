@@ -17,15 +17,21 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package es.uvigo.darwin.jmodeltest.io;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.PushbackReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import pal.alignment.Alignment;
+import pal.alignment.ReadAlignment;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
+import es.uvigo.darwin.jmodeltest.exception.AlignmentParseException;
 
 public abstract class AlignmentReader {
 	private static ApplicationOptions options = ApplicationOptions
@@ -47,8 +53,7 @@ public abstract class AlignmentReader {
 			options.setNumSites(Integer.parseInt(reader.nextToken()));
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(new JFrame(),
-					"Could not read the input alignment",
-					"jModelTest error",
+					"Could not read the input alignment", "jModelTest error",
 					JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -65,5 +70,70 @@ public abstract class AlignmentReader {
 					JOptionPane.ERROR_MESSAGE);
 	}
 
+	/**
+	 * Creates an alignment instance.
+	 * 
+	 * @param out
+	 *            the out
+	 * @param pr
+	 *            the pushback reader which contains the alignment
+	 * @param debug
+	 *            the debug state
+	 * 
+	 * @return the alignment
+	 * 
+	 * @throws AlignmentParseException
+	 *             the alignment parse exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occured.
+	 */
+	public static Alignment createAlignment(PrintWriter out, PushbackReader pr,
+			boolean debug) throws AlignmentParseException, IOException {
+
+		if (debug) {
+			out.println("");
+			out.println("**********************************************************");
+			out.println("  Reading alignment...");
+		}
+		Alignment alignment = null;
+		try {
+			alignment = new ReadAlignment(pr);
+		} catch (pal.alignment.AlignmentParseException e) {
+			throw new AlignmentParseException(e.getMessage());
+		}
+
+		List<String> seqNames = new ArrayList<String>(
+				alignment.getSequenceCount());
+		for (int i = 0; i < alignment.getSequenceCount(); i++) {
+			seqNames.add(alignment.getIdentifier(i).getName());
+		}
+
+		String currString;
+		int size = alignment.getSequenceCount();
+		for (int i = 0; i < size; i++) {
+			currString = seqNames.get(i);
+			for (int j = i + 1; j < size; j++) {
+				if (seqNames.get(j).equals(currString)) {
+					throw new AlignmentParseException(
+							"ERROR: There are duplicated taxa names in the alignment: "
+									+ currString);
+				}
+			}
+		}
+		
+		if (debug) {
+			for (int i = 0; i < alignment.getSequenceCount(); i++) {
+				out.println("    Sequence #" + (i + 1) + ": "
+						+ alignment.getIdentifier(i).getName());
+			}
+			out.println("   Alignment contains " + alignment.getSequenceCount()
+					+ " sequences of length " + alignment.getSiteCount());
+			out.println("");
+			out.println("**********************************************************");
+			out.println("");
+		}
+
+		return alignment;
+	}
 } // class AlignmentReader
 

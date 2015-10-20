@@ -20,6 +20,8 @@ package es.uvigo.darwin.jmodeltest.utilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.PushbackReader;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -31,6 +33,7 @@ import es.uvigo.darwin.jmodeltest.ModelTestService;
 import es.uvigo.darwin.jmodeltest.exe.RunConsense;
 import es.uvigo.darwin.jmodeltest.exe.RunPhyml;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlThread;
+import es.uvigo.darwin.jmodeltest.io.AlignmentReader;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ConsoleProgressObserver;
@@ -41,7 +44,6 @@ import es.uvigo.darwin.jmodeltest.selection.DT;
 import es.uvigo.darwin.jmodeltest.selection.HLRT;
 import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
 import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
-import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 public class Simulation {
 	private ApplicationOptions options;
@@ -132,11 +134,14 @@ public class Simulation {
 
 //				File outputFile = File
 //						.createTempFile("jmodeltest", "input.aln");
-				ModelTestService.readAlignment(file, options.getAlignmentFile());
+				String alnStr = ModelTestService.readAlignment(file, options.getAlignmentFile());
 
-				options.setAlignment(AlignmentReader.readAlignment(
+				PushbackReader pr = new PushbackReader(
+						new StringReader(alnStr));
+				options.setAlignment(AlignmentReader.createAlignment(
 						new PrintWriter(System.err),
-						options.getAlignmentFile().getAbsolutePath(), true)); // file
+						pr, 
+						true)); // file
 
 				outConsole.println(" OK.");
 				outConsole.println("  number of sequences: "
@@ -276,6 +281,9 @@ public class Simulation {
 		}
 
 		outConsole.println("\n=> This run has finished.\n");
+		
+		treeConsole.close();
+		
 		System.err.println("OK.");
 	}
 
@@ -472,5 +480,12 @@ public class Simulation {
 			IC_mmi_parms.printf("\t%s", CheckNAsim(ic.getAshapeIG()));
 			IC_mmi_parms.println(" ");
 		}
+		
+		ICtre.close();
+		IC_mmi_mtre.close();
+		IC_mmi_atre.close();
+		IC_parms.close();
+		IC_imp_parms.close();
+		IC_mmi_parms.close();
 	}
 }

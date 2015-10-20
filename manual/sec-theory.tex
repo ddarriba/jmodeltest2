@@ -7,8 +7,7 @@ All phylogenetic methods make assumptions, whether explicit or implicit, about t
 
 Models of evolution are sets of assumptions about the process of nucleotide substitution. They describe the different probabilities of change from one nucleotide to another along a phylogenetic tree, allowing us to choose among different phylogenetic hypotheses to explain the data at hand. Comprehensive reviews of model of evolution are offered elsewhere. jmodeltest implementes all 203 types of reversible substitution matrices, with when combined with unequal/equal base frequencies, gamma-distributed among-site rate variation and a proportion of invariable sites makes a total of 1624 models. Some of the models have received names (see Table~\ref{table-models}):
 
-\begin{table}
-\label{table-models}
+\begin{table}[h!]
 \caption{Named substitution models jModelTest2 (a few of the 1624 possible). Any of these models can include invariable sites (+I), rate variation among sites (+G), or both (+I+G).}
 \footnotesize
 \begin{tabular}{l l l l l l}
@@ -61,6 +60,7 @@ SYM & \citep{Zharkikh-1994} & 5 & equal & AC;CG;AT;GT;AG;CT & 012345 \\
 GTR & =REV \citep{Tavare-1986} & 8 & unequal & AC;CG;AT;GT;AG;CT & 012345 \\
 \hline
 \end{tabular}
+\label{table-models}
 \end{table}
 
 
@@ -79,7 +79,9 @@ where $l_1$ is the maximum likelihood under the more parameter-rich, complex mod
 
 Likelihood ratio tests can be carried out sequentially by adding parameters (forward selection) to a simple model (JC), or by removing parameters (backward selection) from a complex model (GTR+I+G) in a specific order or hierarchy (hLRT; see Figure below). The performance of hierarchical LRTs for phylogenetic model selection has been discussed by \citet{Posada-2004}.
 
-%[https://lh3.googleusercontent.com/-lNVbbGg8hBI/TrkAWteb2RI/AAAAAAAAAEM/4JD5OUlB8tw/s800/hLRT.png]
+\begin{center}
+\includegraphics[width=.9\textwidth]{images/hLRT.png}
+\end{center}
 
 Figure. Example of a particular forward hierarchy of likelihood ratio tests for 24 models. At any level the null hypothesis (model on top) is either accepted (A) or rejected (R). In this example the model selected is GTR+I.
 
@@ -88,7 +90,9 @@ Figure. Example of a particular forward hierarchy of likelihood ratio tests for 
 
 Alternatively, the order in which parameters are added or removed can be selected automatically. One option to accomplish this is to add the parameter that maximizes a significant gain in likelihood during forward selection, or to add the parameter that minimizes a non-significant loss in likelihood during backward selection \citep{Posada-2001a}. In this case, the order of the tests is not specified a priori, but it will depend on the particular data.
 
-%[https://lh4.googleusercontent.com/-1fPFU_d0yzc/TrkA6q8o86I/AAAAAAAAAEg/DhuIX_Eutb4/s720/dLRT.png]
+\begin{center}
+\includegraphics[width=.9\textwidth]{images/dLRT.png}
+\end{center}
 
 Figure. Dynamical likelihood ratio tests for 24 models. At any level a hypothesis is either accepted (A) or rejected (R). In this example the model selected is GTR+I. Hypotheses tested are: F = base frequencies; S = substitution type; I = proportion of invariable sites; G = gamma rates.
 

@@ -21,20 +21,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.PushbackReader;
 import java.io.Serializable;
-import java.util.Calendar;
+import java.io.StringReader;
 import java.util.Vector;
 
 import pal.alignment.Alignment;
 import pal.datatype.DataType;
 import pal.tree.TreeParseException;
+import es.uvigo.darwin.jmodeltest.exception.AlignmentParseException;
+import es.uvigo.darwin.jmodeltest.io.AlignmentReader;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.model.ModelConstants;
 import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
-import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
-import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 /**
  * This class gathers the parameters of a single execution of jModelTest 2. It
@@ -192,10 +193,13 @@ public class ApplicationOptions implements Serializable {
 			workDataFile.deleteOnExit();
 		}
 		try {
-			ModelTestService.readAlignment(inputDataFile, alignmentFile);
+			String alnStr = ModelTestService.readAlignment(inputDataFile, alignmentFile);
 
-			setAlignment(AlignmentReader.readAlignment(new PrintWriter(
-					System.err), alignmentFile.getAbsolutePath(), true));
+			PushbackReader pr = new PushbackReader(
+					new StringReader(alnStr));
+			setAlignment(
+					AlignmentReader.createAlignment(
+							new PrintWriter(System.err), pr, true));
 		} catch (AlignmentParseException e) {
 			e.printStackTrace();
 		}
@@ -683,8 +687,8 @@ public class ApplicationOptions implements Serializable {
 	public void setMachinesFile(File machinesFile) throws FileNotFoundException {
 		if (ModelTest.HOSTS_TABLE.containsKey(ModelTest.getHostname())) {
 
-			setNumberOfThreads((Integer) ModelTest.HOSTS_TABLE.get(ModelTest
-					.getHostname()));
+			setNumberOfThreads(
+					ModelTest.HOSTS_TABLE.get(ModelTest.getHostname()));
 
 		} else {
 			System.err.println("");

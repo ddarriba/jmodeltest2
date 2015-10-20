@@ -27,10 +27,10 @@ import javax.management.RuntimeErrorException;
 import mpi.MPI;
 import mpi.Request;
 import mpi.Status;
+import es.uvigo.darwin.jmodeltest.exception.InternalException;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
-import es.uvigo.darwin.prottest.util.exception.ProtTestInternalException;
 
 public class Distributor extends Observable implements Runnable {
 
@@ -87,7 +87,7 @@ public class Distributor extends Observable implements Runnable {
 					try {
 						Thread.sleep(200);
 					} catch (InterruptedException e) {
-						throw new ProtTestInternalException(
+						throw new InternalException(
 								"Thread interrupted");
 					}
 				}

@@ -52,6 +52,7 @@ public class ConsoleProgressObserver implements Observer {
 	}
 
 	@Override
+	@SuppressWarnings("fallthrough")
 	public synchronized void update(Observable o, Object arg) {
 
 		if (arg != null) {

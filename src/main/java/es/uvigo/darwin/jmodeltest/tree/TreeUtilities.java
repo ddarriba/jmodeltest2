@@ -29,7 +29,6 @@ import pal.tree.SplitSystem;
 import pal.tree.SplitUtils;
 import pal.tree.Tree;
 import pal.tree.TreeParseException;
-import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 
 public class TreeUtilities {
 

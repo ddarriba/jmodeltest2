@@ -51,8 +51,8 @@ public class Frame_hLRT extends JModelTestFrame {
 	
 	private JPanel PanelSettings = new JPanel();
 	private JTextField TextFieldConfidenceLevelhLRT = new JTextField();
-	private JList HypothesisList = new JList();
-	private DefaultListModel listModel = new DefaultListModel();
+	private JList<String> HypothesisList = new JList<String>();
+	private DefaultListModel<String> listModel = new DefaultListModel<String>();
 	private JButton ButtonListUp = new JButton();
 	private JButton ButtonListDown = new JButton();
 	private JButton CancelButtonhLRT = new JButton();
@@ -336,8 +336,8 @@ public class Frame_hLRT extends JModelTestFrame {
     	if (a >= 0 && b >= 0 
     			&& a < listModel.getSize()
     			&& b < listModel.getSize()) {
-	        Object aObject = listModel.getElementAt(a);
-	        Object bObject = listModel.getElementAt(b);
+	        String aObject = listModel.getElementAt(a);
+	        String bObject = listModel.getElementAt(b);
 	        listModel.set(a, bObject);
 	        listModel.set(b, aObject);
 	    	}
@@ -492,7 +492,7 @@ public class Frame_hLRT extends JModelTestFrame {
 			forward = false;
 	
 		for (i=0; i< listModel.getSize(); i++) {
-			ModelTest.testingOrder.setElementAt((String)listModel.getElementAt(i),i);
+			ModelTest.testingOrder.setElementAt(listModel.getElementAt(i),i);
 		}
 	
 		/* check whether 2tv goes before 4tv */

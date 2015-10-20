@@ -19,16 +19,13 @@ package es.uvigo.darwin.jmodeltest.utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -38,8 +35,6 @@ import javax.swing.text.Document;
 import pal.alignment.Alignment;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.gui.XManager;
-import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
-import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 public final class Utilities {
 
@@ -490,22 +485,5 @@ public final class Utilities {
 			normalizedShannonEntropy = -1.0*meanShannonEntropy/maxShannonEntropy;
 			return (double)numSites*(double)numTaxa*normalizedShannonEntropy; //NxL x averaged Shannon entropy
 		}
-	}
-	
-	public static double calculateShannonSampleSize (File alignmentFile, boolean doJustShannonEntropy) {
-		Alignment alignment = null;
-		try {
-			alignment = AlignmentReader.readAlignment(
-					new PrintWriter(System.err),
-					alignmentFile.getAbsolutePath(), false);
-		} catch (AlignmentParseException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return (calculateShannonSampleSize(alignment, doJustShannonEntropy));
 	}
 } // end of class

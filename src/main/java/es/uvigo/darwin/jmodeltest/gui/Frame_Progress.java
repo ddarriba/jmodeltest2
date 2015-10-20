@@ -364,6 +364,7 @@ public class Frame_Progress extends JModelTestFrame implements Observer,
 	}
 
 	@Override
+	@SuppressWarnings("fallthrough")
 	public synchronized void update(Observable o, Object arg) {
 		
 		if (Math.abs(System.currentTimeMillis() - lockTimer) < lockTime) return;

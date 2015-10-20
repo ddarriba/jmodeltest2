@@ -107,8 +107,8 @@ public class TableSorter extends TableMap {
                 return 0;
             }
         } else if (type == String.class) {
-            String s1 = (String)data.getValueAt(row1, column).toString();
-            String s2    = (String)data.getValueAt(row2, column).toString();
+            String s1 = data.getValueAt(row1, column).toString();
+            String s2 = data.getValueAt(row2, column).toString();
             int result = s1.compareTo(s2);
 
             if (result < 0) {
@@ -188,7 +188,7 @@ public class TableSorter extends TableMap {
         checkModel();
 
         compares = 0;
-        shuttlesort((int[])indexes.clone(), indexes, 0, indexes.length);
+        shuttlesort(indexes.clone(), indexes, 0, indexes.length);
     }
 
     public void n2sort() {

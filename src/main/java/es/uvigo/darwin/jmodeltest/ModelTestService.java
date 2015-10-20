@@ -29,6 +29,7 @@ import parser.ParseException;
 import converter.Converter;
 import converter.DefaultFactory;
 import converter.Factory;
+import es.uvigo.darwin.jmodeltest.exception.AlignmentParseException;
 import es.uvigo.darwin.jmodeltest.io.NullPrintStream;
 import es.uvigo.darwin.jmodeltest.selection.AIC;
 import es.uvigo.darwin.jmodeltest.selection.AICc;
@@ -36,7 +37,6 @@ import es.uvigo.darwin.jmodeltest.selection.BIC;
 import es.uvigo.darwin.jmodeltest.selection.DT;
 import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
-import es.uvigo.darwin.prottest.util.exception.AlignmentParseException;
 
 public class ModelTestService {
 
@@ -50,9 +50,9 @@ public class ModelTestService {
      * @throws FileNotFoundException Signals that the input filename does not exist.
      * @throws IOException Signals that an I/O exception has occured.
      */
-	public static void readAlignment(File inputFile, File outputFile)
+	public static String readAlignment(File inputFile, File outputFile)
             throws AlignmentParseException, FileNotFoundException, IOException {
-		readAlignment(inputFile, outputFile, true);
+		return readAlignment(inputFile, outputFile, true);
 	}
 	
 	/**
@@ -61,13 +61,11 @@ public class ModelTestService {
      * @param inputFile the file to be read
      * @param outputFile the file to write in
      * 
-     * @return the alignment
-     * 
      * @throws AlignmentParseException the alignment parse exception.
      * @throws FileNotFoundException Signals that the input filename does not exist.
      * @throws IOException Signals that an I/O exception has occured.
      */
-    public static void readAlignment(File inputFile, File outputFile, boolean deleteOnExit)
+    public static String readAlignment(File inputFile, File outputFile, boolean deleteOnExit)
             throws AlignmentParseException, FileNotFoundException, IOException {
 
         StringBuilder text = new StringBuilder();
@@ -138,6 +136,8 @@ public class ModelTestService {
         FileWriter fw = new FileWriter(outputFile);
         fw.write(out);
         fw.close();
+        
+        return out;
     }
     
 	public InformationCriterion doIC(int ic, boolean writePAUPblock, boolean doImportances,

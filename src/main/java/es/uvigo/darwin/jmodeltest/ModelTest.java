@@ -29,6 +29,8 @@ import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.PushbackReader;
+import java.io.StringReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -48,12 +50,12 @@ import es.uvigo.darwin.jmodeltest.exe.RunPhymlHybrid;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlMPJ;
 import es.uvigo.darwin.jmodeltest.exe.RunPhymlThread;
 import es.uvigo.darwin.jmodeltest.gui.XManager;
+import es.uvigo.darwin.jmodeltest.io.AlignmentReader;
 import es.uvigo.darwin.jmodeltest.io.HtmlReporter;
 import es.uvigo.darwin.jmodeltest.io.TextInputStream;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ConsoleProgressObserver;
-import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.selection.AIC;
 import es.uvigo.darwin.jmodeltest.selection.AICc;
 import es.uvigo.darwin.jmodeltest.selection.BIC;
@@ -64,7 +66,6 @@ import es.uvigo.darwin.jmodeltest.tree.TreeSummary;
 import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Simulation;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
-import es.uvigo.darwin.prottest.util.fileio.AlignmentReader;
 
 /**
  * ModelTest.java
@@ -95,7 +96,7 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.1.7 v20150220";
+	public static final String CURRENT_VERSION = "2.1.8 v20151020";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
@@ -1503,13 +1504,15 @@ public class ModelTest {
 
 			try {
 				
-				ModelTestService.readAlignment(inputFile,
+				String alnString = ModelTestService.readAlignment(inputFile,
 						options.getAlignmentFile());
 				
-				options.setAlignment(AlignmentReader.readAlignment(
-						new PrintWriter(System.err), options.getAlignmentFile()
-								.getAbsolutePath(), true)); // file
-
+				PushbackReader pr = new PushbackReader(
+						new StringReader(alnString)
+						);
+				options.setAlignment(AlignmentReader.createAlignment(
+						new PrintWriter(System.err), pr, true)); // file
+				
 				MAIN_CONSOLE.println(" OK.");
 				MAIN_CONSOLE.println("  number of sequences: "
 						+ options.getNumTaxa());
