@@ -28,10 +28,10 @@ import mpi.MPI;
 import mpi.Request;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
+import es.uvigo.darwin.jmodeltest.exception.InternalException;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
-import es.uvigo.darwin.prottest.util.exception.ProtTestInternalException;
 
 /** 
  * RunPhymlMPJ.java
@@ -111,7 +111,7 @@ public class RunPhymlMPJ extends RunPhyml {
 					try {
 						Thread.sleep(200);
 					} catch (InterruptedException e) {
-						throw new ProtTestInternalException(
+						throw new InternalException(
 								"Thread interrupted");
 					}
 				}
@@ -127,7 +127,7 @@ public class RunPhymlMPJ extends RunPhyml {
 				runenv.addObserver(this);
 
 				if (!runenv.compute())
-					throw new ProtTestInternalException("Optimization error");
+					throw new InternalException("Optimization error");
 
 				phymlEstimatorList.add(runenv);
 				lastComputedModel[0] = runenv.getModel();

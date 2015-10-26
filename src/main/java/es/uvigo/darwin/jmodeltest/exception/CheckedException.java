@@ -18,29 +18,25 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 package es.uvigo.darwin.jmodeltest.exception;
 
 /**
- * The Class AlignmentParseException.
- * 
+ *
  * @author Diego Darriba
  */
-public class AlignmentParseException extends CheckedException {
+public class CheckedException extends Exception {
 
-    private static final String MESSAGE = "Alignment parse exception";
     /** The Constant serialVersionUID. */
-    private static final long serialVersionUID = 20090728L;
+	private static final long serialVersionUID = 20100525L;
 
-    /**
-     * Instantiates a new alignment format exception.
-     */
-    public AlignmentParseException() {
-        super(MESSAGE);
-    }
-
-    /**
-     * Instantiates a new alignment format exception.
-     * 
-     * @param description the description
-     */
-    public AlignmentParseException(String description) {
-        super(MESSAGE + ": " + description);
-    }
+	/**
+	 * Instantiates a new prot test internal exception.
+	 */
+	public CheckedException() {}
+	
+	/**
+	 * Instantiates a new prot test internal exception.
+	 * 
+	 * @param description the description
+	 */
+	public CheckedException(String description) {
+		super(description);
+	}
 }
