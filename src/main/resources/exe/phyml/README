@@ -1,0 +1,10 @@
+Standard installation:
+
+  Place PhyML binary here, named 'phyml'
+
+  For multi-platform jModelTest distribution use the following names:
+
+    PhyML_3.0_linux32
+    PhyML_3.0_linux64
+    PhyML_3.0_macOS_i386
+    PhyML_3.0_win32.exe

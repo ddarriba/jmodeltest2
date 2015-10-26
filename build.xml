@@ -5,7 +5,7 @@
 	<property name="bin.dir" location="build/classes" />
 	<property name="lib.dir" location="lib" />
 	<property name="dist.dir" location="dist" />
-	<property name="exe.dir" location="${dist.dir}/exe/phyml" />
+  <property name="exe.dir" location="${dist.dir}/exe/phyml" />
 	<property name="log.dir" location="${dist.dir}/log" />
 	<property name="manual.dir" location="manual" />
 	<property name="src.resources.dir" location="src/main/resources" />
@@ -62,7 +62,7 @@
 		</copy>
 		<mkdir dir="${log.dir}" />
 		<chmod perm="755" dir="${dist.dir}" includes="*.sh *.bat" />
-		<chmod perm="755" dir="${exe.dir}" includes="*" />
+    <chmod perm="644" dir="${exe.dir}" includes="*" />
 	</target>
 
 	<target name="run" depends="jar" description="Run jar file">

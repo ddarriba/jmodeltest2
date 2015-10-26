@@ -1,3 +1,20 @@
+/*
+Copyright (C) 1997 Philip Milne
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 /**
  * A sorter for TableModels. The sorter has a model (conforming to TableModel) 
  * and itself implements TableModel. TableSorter does not store or copy 
@@ -15,7 +32,6 @@
  * @version 1.5 12/17/97
  * @author Philip Milne
  */
-
 package es.uvigo.darwin.jmodeltest.utilities;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
