@@ -2,7 +2,8 @@
 <project name="jModelTest" default="jar" basedir=".">
 
 	<property name="src.dir" location="src/main/java" />
-	<property name="bin.dir" location="build/classes" />
+	<property name="build.base.dir" location="build" />
+  <property name="build.dir" location="${build.base.dir}/classes" />
 	<property name="lib.dir" location="lib" />
 	<property name="dist.dir" location="dist" />
   <property name="exe.dir" location="${dist.dir}/exe/phyml" />
@@ -28,26 +29,23 @@
 	</target>
 
 	<target name="compile" description="Compile code">
-		<mkdir dir="${bin.dir}" />
+		<mkdir dir="${build.dir}" />
 		<mkdir dir="${lib.dir}" />
 		<property environment="env" />
 		<property name="java6.boot.classpath" value="${env.JAVA6_BOOTCLASSES}" />
-		<javac srcdir="${src.dir}" destdir="${bin.dir}" includeAntRuntime="no" 
+		<javac srcdir="${src.dir}" destdir="${build.dir}" includeAntRuntime="no" 
 			target="1.6" source="1.6" bootclasspath="${java5.boot.classpath}"
 			classpathref="lib.path" debug="${compile.debug}">
 			<compilerarg value="-Xlint:all"/>
 		</javac>
-		<copy todir="${bin.dir}/es">
-			<fileset dir="${src.resources.dir}/es" includes="**/*.xml,**/*.properties,**/*.gif,**/*.ico" />
-		</copy>
-
 	</target>
 
 	<target name="jar" depends="compile" description="Build jar">
 		<mkdir dir="${dist.dir}" />
-		<jar jarfile="${jarfile}" basedir="${bin.dir}" manifest="Manifest">
+		<jar jarfile="${jarfile}" basedir="${build.dir}" manifest="Manifest">
+			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties,**/*.gif,**/*.ico" />
 			<!-- Merge library jars into final jar file
-            <zipgroupfileset refid="lib.jars"/>-->
+      <zipgroupfileset refid="lib.jars"/>-->
 		</jar>
 		<mkdir dir="${dist.dir}/lib" />
 		<copy todir="${dist.dir}/lib">
@@ -70,7 +68,7 @@
 	</target>
 
 	<target name="clean" description="Remove build and dist directories">
-		<delete dir="${bin.dir}" />
+		<delete dir="${build.base.dir}" />
 		<delete dir="${dist.dir}" />
 		<delete dir="${manual.dir}" includes="*.aux *.bbl *.out *.toc *.log *.blg *.dvi" />
 	</target>
