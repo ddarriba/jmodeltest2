@@ -537,7 +537,7 @@ public class FrameMain extends JModelTestFrame {
 		// getContentPane().setLayout(null);
 		getContentPane().setLayout(new BorderLayout());
 		setTitle("jModelTest " + ModelTest.CURRENT_VERSION);
-		setSize(new java.awt.Dimension(630, 695));
+		setSize(new java.awt.Dimension(780, 695));
 		setResizable(true);
 
 		// event handling

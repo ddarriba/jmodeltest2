@@ -17,7 +17,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package es.uvigo.darwin.jmodeltest.exe;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -60,7 +64,8 @@ public abstract class RunPhyml extends Observable implements Observer {
 	protected Model[] models;
 	protected Model gtrModel = null;
 
-	public static final String PHYML_VERSION = "3.0";
+	public static final String[] COMPATIBLE_VERSIONS = {"20130103", "20131022", "20141009", "20141029"};
+	public static String PHYML_VERSION = "3.0";
 
 	public static String PHYML_TREE_SUFFIX = "_phyml_tree_";
 	public static String PHYML_STATS_SUFFIX = "_phyml_stats_";
@@ -68,16 +73,93 @@ public abstract class RunPhyml extends Observable implements Observer {
 	public static File phymlBinary;
 	public static String phymlBinaryStr;
 	private static String CURRENT_DIRECTORY = ModelTestConfiguration.PATH;
-	private static boolean PHYML_GLOBAL = false;
+	private static boolean PHYML_GLOBAL = ModelTestConfiguration.isGlobalPhymlBinary();
 	public static String PHYML_PATH = CURRENT_DIRECTORY + "exe/phyml/";
-
+	private static boolean compatiblePhyml = false;
 	
 	protected Observer progress;
 
+	public static boolean isCompatible() {
+		return compatiblePhyml;
+	}
+	
+	public static boolean checkBinary() {
+		boolean canExecute = false;
+		if (!ModelTestConfiguration.isGlobalPhymlBinary()) {
+			if (!RunPhyml.phymlBinary.exists()) {
+				Utilities
+				.printRed("ERROR: PhyML binary cannot be found: " + RunPhyml.phymlBinary.getAbsolutePath() + "\n");
+			} else if (!RunPhyml.phymlBinary.canExecute()) {
+				Utilities
+				.printRed("ERROR: PhyML binary exists, but it cannot be executed: " + RunPhyml.phymlBinary.getAbsolutePath() + "\n");
+			} else if (!RunPhyml.isCompatible()){
+				Utilities
+				.printRed("WARNING: PhyML binary is not in the list of compatibility: \n");
+				Utilities
+				.printRed(RunPhyml.phymlBinary.getAbsolutePath() + " v" + RunPhyml.PHYML_VERSION +"\n");
+				Utilities.printRed("Compatible versions: ");
+				for (int i=0; i<RunPhyml.COMPATIBLE_VERSIONS.length; i++)
+					Utilities.printBlue(RunPhyml.COMPATIBLE_VERSIONS[i] + " ");
+				Utilities.printBlue("\n");
+				Utilities
+				.printRed("jModelTest will try to continue execution anyway, but it might fail.\n");
+				canExecute = true;
+			} else {
+				Utilities
+				.printBlue("PhyML binary: " + RunPhyml.phymlBinary.getAbsolutePath() + " v" + RunPhyml.PHYML_VERSION + "\n");
+				canExecute = true;
+			}
+		}
+		return canExecute;
+	}
+	private static boolean checkPhymlCompatibility(String binary) {
+		boolean binaryFound = false;
+		if (Utilities.findCurrentOS() != Utilities.OS_LINUX)
+			return false;
+		// get process and execute command line
+		String cmd[] = {binary, "--version"};
+		Runtime rt = Runtime.getRuntime();
+		Process proc;
+		try {
+			proc = rt.exec(cmd, null, null);
+			InputStream stdin = proc.getInputStream();
+			InputStreamReader isr = new InputStreamReader(stdin);
+			BufferedReader br = new BufferedReader(isr);
+
+			String line = null;
+			while ( (line = br.readLine()) != null) {
+				if (line.toLowerCase().contains("phyml version")) {
+					String[] linesplit = line.trim().replace(".", "").split(" ");
+					String version = linesplit[linesplit.length - 1];
+					PHYML_VERSION = version;
+					if (Arrays.asList(COMPATIBLE_VERSIONS).contains(version)) {
+						compatiblePhyml = true;
+					} else {
+						compatiblePhyml = false;
+					}
+					binaryFound = true;
+				}
+			}
+			br.close();
+			isr.close();
+			stdin.close();
+			proc.destroy();
+		} catch (IOException e) {
+			return false;
+		}
+		return binaryFound;
+	}
+	
+	public static boolean isPhymlGlobal() {
+		return PHYML_GLOBAL;
+	}
+	
 	static {
 		if (PHYML_GLOBAL) {
 			PHYML_PATH = "";
+			phymlBinaryStr = "phyml";
 		} else {
+			/* check the local paths */
 			String path = ModelTestConfiguration.getExeDir();
 			if (!path.startsWith(File.separator)) {
 				PHYML_PATH = CURRENT_DIRECTORY + File.separator + path;
@@ -87,18 +169,26 @@ public abstract class RunPhyml extends Observable implements Observer {
 			if (!PHYML_PATH.endsWith(File.separator)) {
 				PHYML_PATH += File.separator;
 			}
-		}
-		if (PHYML_GLOBAL) {
-			phymlBinaryStr = "phyml";
-		} else {
 			phymlBinary = new File(PHYML_PATH + "phyml");
 			if (phymlBinary.exists() && phymlBinary.canExecute()) {
 				phymlBinaryStr = phymlBinary.getAbsolutePath();
+				compatiblePhyml = true;
 			} else {
 				phymlBinaryStr = PHYML_PATH + Utilities.getBinaryVersion();
 			}
-			/* Check if binary exists */
+			/* Check if binary exists and is compatible */
 			phymlBinary = new File(phymlBinaryStr);
+			if (!checkPhymlCompatibility(phymlBinaryStr)) {
+				/* Check for system wide PhyML */
+				if (!(phymlBinary.exists() && phymlBinary.canExecute()))
+				{
+					if(checkPhymlCompatibility("/usr/bin/phyml")) {
+						PHYML_PATH = "/usr/bin";
+						phymlBinary = new File(PHYML_PATH + "/phyml");
+						phymlBinaryStr = phymlBinary.getAbsolutePath();						
+					}
+				}
+			}
 		}
 	}
 	public RunPhyml(Observer progress, ApplicationOptions options,

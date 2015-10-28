@@ -59,6 +59,7 @@ public class XManager {
 	
 	public static final Point MAIN_LOCATION = new Point(281, 80);
 	
+	public static SimpleAttributeSet blueText;
 	public static SimpleAttributeSet redText;
 	public static SimpleAttributeSet blackText;
 
@@ -82,9 +83,11 @@ public class XManager {
 		FONT_STATUS = new Font("Dialog", 0, 9);
 		FONT_TABULAR = new java.awt.Font("Verdana", 0, 12);
 
-		redText = new SimpleAttributeSet();
 		blackText = new SimpleAttributeSet();
+		redText = new SimpleAttributeSet();
+		blueText = new SimpleAttributeSet();
 
+		StyleConstants.setForeground(blueText, Color.blue);
 		StyleConstants.setForeground(redText, Color.red);
 		StyleConstants.setForeground(blackText, Color.black);
 	}

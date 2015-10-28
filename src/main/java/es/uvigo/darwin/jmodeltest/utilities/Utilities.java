@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
 
 import pal.alignment.Alignment;
 import es.uvigo.darwin.jmodeltest.ModelTest;
@@ -263,20 +264,36 @@ public final class Utilities {
 		}
 	}
 
+	private static void printColor(String text, SimpleAttributeSet color) {
+		if (ModelTest.buildGUI) {
+			try {
+				Document doc = XManager.getInstance().getPane().getDocument();
+				doc.insertString(doc.getLength(), text, color);
+			} catch (javax.swing.text.BadLocationException e) {
+				System.err.println("Bad Location Exception");
+			}
+		} else {
+			System.out.print(text);
+		}
+	}
+	
 	/**
 	 * printRed
 	 * 
 	 * Prints to the main console text in red
 	 */
-
 	public static void printRed(String text) {
-		if (ModelTest.buildGUI) {
-			try {
-				Document doc = XManager.getInstance().getPane().getDocument();
-				doc.insertString(doc.getLength(), text, XManager.redText);
-			} catch (javax.swing.text.BadLocationException e) {
-			}
-		}
+		printColor(text, XManager.redText);
+	}
+	
+	/**
+	 * printBlue
+	 * 
+	 * Prints to the main console text in blue
+	 */
+
+	public static void printBlue(String text) {
+		printColor(text, XManager.blueText);
 	}
 
 	/******************

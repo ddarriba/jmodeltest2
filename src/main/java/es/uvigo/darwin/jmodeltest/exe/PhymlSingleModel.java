@@ -23,12 +23,9 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Observable;
 
-import javax.sql.rowset.spi.SyncResolver;
-
 import pal.tree.TreeParseException;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
-import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
 import es.uvigo.darwin.jmodeltest.io.TextInputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
@@ -218,7 +215,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 	private void executeCommandLine() {
 		String[] executable = new String[1];
 		try {
-			if (!ModelTestConfiguration.isGlobalPhymlBinary()) {
+			if (!RunPhyml.isPhymlGlobal()) {
 				if (!RunPhyml.phymlBinary.exists()) {
 					notifyObservers(
 							ProgressInfo.ERROR_BINARY_NOEXISTS, index, model, RunPhyml.phymlBinary.getAbsolutePath());

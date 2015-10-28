@@ -165,15 +165,7 @@ public class ModelTest {
 			execMode = ExecMode.GUI;
 			XManager.getInstance();
 			// Check binary
-	    	if (!ModelTestConfiguration.isGlobalPhymlBinary()) {
-				if (!RunPhyml.phymlBinary.exists()) {
-					Utilities
-					.printRed("ERROR: PhyML binary cannot be found: " + RunPhyml.phymlBinary.getAbsolutePath() + "\n");
-				} else if (!RunPhyml.phymlBinary.canExecute()) {
-					Utilities
-					.printRed("ERROR: PhyML binary exists, but it cannot be executed: " + RunPhyml.phymlBinary.getAbsolutePath() + "\n");
-				}
-			}
+	    	RunPhyml.checkBinary();
 		} else {
 			System.err.println("");
 			System.err.println("ERROR: You are trying to run a GUI interface in a headless server.");
@@ -189,17 +181,21 @@ public class ModelTest {
 			execMode = ExecMode.CONSOLE;
 			ParseArguments();
 			
+			if (MPJ_ME == 0) {
+				// print header information
+				printHeader(MAIN_CONSOLE);
+
+				// print citation information
+				printCitation(MAIN_CONSOLE);
+
+				// print notice information
+				printNotice(MAIN_CONSOLE);
+			}
+			
 			// Check binary
-        	if (!ModelTestConfiguration.isGlobalPhymlBinary()) {
-				if (!RunPhyml.phymlBinary.exists()) {
-					System.err.println(" ");
-					System.err.println("ERROR: PhyML binary cannot be found: " + RunPhyml.phymlBinary.getAbsolutePath());
-					finalize(-1);
-				} else if (!RunPhyml.phymlBinary.canExecute()) {
-					System.err.println(" ");
-					System.err.println("ERROR: PhyML binary exists, but it cannot be executed: " + RunPhyml.phymlBinary.getAbsolutePath());
-					finalize(-1);
-				}
+			if (!RunPhyml.checkBinary())
+			{
+				finalize(-1);
 			}
         	
 			options.createLogFile();
@@ -300,15 +296,6 @@ public class ModelTest {
 	public void runCommandLine() {
 
 		if (MPJ_ME == 0) {
-			// print header information
-			printHeader(MAIN_CONSOLE);
-
-			// print citation information
-			printCitation(MAIN_CONSOLE);
-
-			// print notice information
-			printNotice(MAIN_CONSOLE);
-
 			// print the command line
 			MAIN_CONSOLE.println(" ");
 			MAIN_CONSOLE.print("Arguments =");
@@ -1389,7 +1376,8 @@ public class ModelTest {
 		stream.println("jModelTest " + CURRENT_VERSION);
 		stream.println("Copyright (C) 2011 D. Darriba, G.L. Taboada, R. Doallo and D. Posada");
 		stream.println("This program comes with ABSOLUTELY NO WARRANTY");
-		stream.println("This is free software, and you are welcome to redistribute it under certain conditions");
+		stream.println("This is free software, and you are welcome to redistribute it under certain");
+		stream.println("conditions");
 		stream.println(" ");
 		stream.println("Notice: This program may contain errors. Please inspect results carefully.");
 		stream.println(" ");
