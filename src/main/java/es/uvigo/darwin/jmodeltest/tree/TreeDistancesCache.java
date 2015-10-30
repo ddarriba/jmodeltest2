@@ -28,7 +28,7 @@ import pal.tree.Tree;
  * 
  * This cache support both euclidean and RF distances.
  * 
- * @author Diego Darriba López
+ * @author Diego Darriba
  * 
  * @since 3.0
  */

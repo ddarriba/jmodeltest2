@@ -1142,7 +1142,7 @@ public class FrameMain extends JModelTestFrame {
 	private void menuAboutCreditsActionPerformed(java.awt.event.ActionEvent e) {
 		try {
 			String credits = "Likelihood calculations with Phyml by Stephane Guindon et al.\n";
-			credits += "Alignment conversion with ALTER by Daniel Glez-Peña et al.\n";
+			credits += "Alignment conversion with ALTER by Daniel Glez-Pena et al.\n";
 			credits += "Phylogenetic trees management with PAL: Phylogenetic Analysis Library by A. Drummond and K. Strimmer\n";
 			credits += "Table utilities by Philip Milne\n";
 			credits += "BrowserLauncher by Eric Albert and Jeff Chapman\n";

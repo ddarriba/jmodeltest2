@@ -20,7 +20,7 @@ package es.uvigo.darwin.jmodeltest.exception;
 /**
  * The Class ProtTestInternalException.
  * 
- * @author Diego Darriba López
+ * @author Diego Darriba
  */
 public class InternalException extends RuntimeException {
 
