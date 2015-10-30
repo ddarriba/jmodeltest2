@@ -114,9 +114,9 @@ public abstract class ModelTestConfiguration {
             }
             
         	if (!existsKey(LOG_DIR)) {
-        		APPLICATION_PROPERTIES.setProperty(HTML_LOG, "disabled");
-        		APPLICATION_PROPERTIES.setProperty(PHYML_LOG, "disabled");
-        		APPLICATION_PROPERTIES.setProperty(CKP_LOG, "disabled");
+        		disableHtmlLog();
+        		disablePhymlLog();
+        		disableCkpLog();
         	}
         	
         } catch (IOException e) {

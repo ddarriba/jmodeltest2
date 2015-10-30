@@ -214,6 +214,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 	private void executeCommandLine() {
 		String[] executable = new String[1];
+		boolean printLog = options.getLogFile() != null;
 		try {
 			if (!RunPhyml.isPhymlGlobal()) {
 				if (!RunPhyml.phymlBinary.exists()) {
@@ -243,12 +244,16 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			// any output?
 			FileOutputStream logFile = new FileOutputStream(
 					options.getLogFile(), true);
-			StreamGobbler outputGobbler = new StreamGobbler(
+			StreamGobbler outputGobbler = null;
+			
+			if (printLog)
+				outputGobbler = new StreamGobbler(
 					proc.getInputStream(), "PHYML", logFile, ModelTest.getPhymlConsole());
 
 			// kick them off
 			errorGobbler.start();
-			outputGobbler.start();
+			if (printLog)
+				outputGobbler.start();
 
 			// any error???
 			int exitVal = proc.waitFor();
@@ -277,7 +282,7 @@ public class PhymlSingleModel extends Observable implements Runnable {
 			if (ModelTest.getPhymlConsole() != null) {
 				synchronized (ModelTest.getPhymlConsole()) {
 					ModelTest.getPhymlConsole().println(" ");
-					ModelTest.getPhymlConsole().println("Command line used for process "+ outputGobbler.getRunId() +":");
+					ModelTest.getPhymlConsole().println("Command line used for process "+ errorGobbler.getRunId() +":");
 					ModelTest.getPhymlConsole().println("    " + RunPhyml.phymlBinary.getAbsolutePath() + " "
 							+ uCommand);
 					ModelTest.getPhymlConsole().println(" ");
@@ -285,7 +290,6 @@ public class PhymlSingleModel extends Observable implements Runnable {
 					ModelTest.getPhymlConsole().close();
 				}
 			}
-
 		} catch (InterruptedException e) {
 			notifyObservers(ProgressInfo.INTERRUPTED, index, model, null);
 			interrupted = true;

@@ -169,7 +169,12 @@ public class ApplicationOptions implements Serializable {
 			if (ModelTestConfiguration.isPhymlLogEnabled() && getInputFile() != null) {
 				logFile = new File(ModelTestConfiguration.getLogDir() + File.separator + getInputFile().getName() 
 						+ ".phyml." + executionName + ".log");
-			} else {
+				if (!logFile.canWrite())
+				{
+					logFile = null;
+				}
+			} 
+			if (logFile == null) {
 				logFile = File.createTempFile("jmodeltest-phyml", ".log");
 				logFile.deleteOnExit();
 			}
