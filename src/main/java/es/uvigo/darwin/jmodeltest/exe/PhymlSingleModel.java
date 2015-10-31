@@ -61,9 +61,9 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		this.ignoreGaps = ignoreGaps;
 		
 		this.phymlStatFileName = options.getAlignmentFile().getAbsolutePath()
-				+ RunPhyml.PHYML_STATS_SUFFIX + model.getName() + ".txt";
+				+ RunPhyml.PHYML_STATS_SUFFIX + model.getName();
 		this.phymlTreeFileName = options.getAlignmentFile().getAbsolutePath()
-				+ RunPhyml.PHYML_TREE_SUFFIX + model.getName() + ".txt";
+				+ RunPhyml.PHYML_TREE_SUFFIX + model.getName();
 	}
 
 	public PhymlSingleModel(Model model, int index, boolean justGetJCTree,
@@ -315,11 +315,13 @@ public class PhymlSingleModel extends Observable implements Runnable {
 
 		boolean showParsing = false;
 
-		// Get model likelihood
-		// TextInputStream phymlLkFile = new TextInputStream(phymlLkFileName);
-		// currentModel.lnL = (-1.0) * phymlLkFile.readFloat();
-		// phymlLkFile.close();
-
+		File f = new File(phymlStatFileName);
+		if (!f.exists())
+		{
+			phymlStatFileName += ".txt";
+			phymlTreeFileName += ".txt";
+		}
+		
 		// Get model likelihood and parameter estimates
 		try {
 			TextInputStream phymlStatFile = new TextInputStream(
