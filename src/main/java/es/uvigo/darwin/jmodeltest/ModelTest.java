@@ -96,7 +96,7 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.1.8 v20151020";
+	public static final String CURRENT_VERSION = "2.1.9 v20160115";
 	public static final String programName = ("jModeltest");
 	public static final String URL = "http://code.google.com/p/jmodeltest2";
 	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";

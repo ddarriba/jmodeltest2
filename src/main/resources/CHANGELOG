@@ -1,3 +1,10 @@
+15 Jan 2016 Version 2.1.9 Revision 20160115
+
+  * Added automatic search for PhyML binary in /usr/bin
+  * Removed non-ASCII characters
+  * Disable logging if writing is not possible
+  * Merge GUI images into jarfile
+
 20 Oct 2015 Version 2.1.8 Revision 20151020
 
   * Removed ReadSeq dependency
