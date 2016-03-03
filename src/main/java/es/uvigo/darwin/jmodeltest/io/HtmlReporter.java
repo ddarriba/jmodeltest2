@@ -47,8 +47,6 @@ import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
 import es.uvigo.darwin.jmodeltest.tree.TreeSummary;
 import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
-import es.uvigo.darwin.prottest.facade.TreeFacade;
-import es.uvigo.darwin.prottest.facade.TreeFacadeImpl;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -60,7 +58,6 @@ public abstract class HtmlReporter {
 			"resources" + File.separator + "homeIcon.gif",
 			"resources" + File.separator + "topIcon.gif",
 			"resources" + File.separator + "logo0.png" };
-	private static TreeFacade treeFacade = new TreeFacadeImpl();
 	private static Map<String, Object> datamodel;
 	private static File LOG_DIR;
 	private static File IMAGES_DIR;
@@ -244,7 +241,7 @@ public abstract class HtmlReporter {
 				ModelTest.getConsensusAIC() != null ? new Integer(1)
 						: new Integer(0));
 		if (ModelTest.getConsensusAIC() != null) {
-			datamodel.put("aicConsensusTree", treeFacade.toNewick(ModelTest
+			datamodel.put("aicConsensusTree", TreeUtilities.toNewick(ModelTest
 					.getConsensusAIC().getConsensus(), true, true, true));
 			datamodel.put("consensusType", ModelTest.getConsensusAIC()
 					.getConsensusType());
@@ -253,7 +250,7 @@ public abstract class HtmlReporter {
 				ModelTest.getConsensusAICc() != null ? new Integer(1)
 						: new Integer(0));
 		if (ModelTest.getConsensusAICc() != null) {
-			datamodel.put("aiccConsensusTree", treeFacade.toNewick(ModelTest
+			datamodel.put("aiccConsensusTree", TreeUtilities.toNewick(ModelTest
 					.getConsensusAICc().getConsensus(), true, true, true));
 			datamodel.put("consensusType", ModelTest.getConsensusAICc()
 					.getConsensusType());
@@ -262,7 +259,7 @@ public abstract class HtmlReporter {
 				ModelTest.getConsensusBIC() != null ? new Integer(1)
 						: new Integer(0));
 		if (ModelTest.getConsensusBIC() != null) {
-			datamodel.put("bicConsensusTree", treeFacade.toNewick(ModelTest
+			datamodel.put("bicConsensusTree", TreeUtilities.toNewick(ModelTest
 					.getConsensusBIC().getConsensus(), true, true, true));
 			datamodel.put("consensusType", ModelTest.getConsensusBIC()
 					.getConsensusType());
@@ -271,7 +268,7 @@ public abstract class HtmlReporter {
 				ModelTest.getConsensusDT() != null ? new Integer(1)
 						: new Integer(0));
 		if (ModelTest.getConsensusDT() != null) {
-			datamodel.put("dtConsensusTree", treeFacade.toNewick(ModelTest
+			datamodel.put("dtConsensusTree", TreeUtilities.toNewick(ModelTest
 					.getConsensusDT().getConsensus(), true, true, true));
 			datamodel.put("consensusType", ModelTest.getConsensusDT()
 					.getConsensusType());

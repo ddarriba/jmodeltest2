@@ -209,8 +209,6 @@ public class MultipleDistributor extends Observable implements Runnable {
 					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-					// throw new
-					// ProtTestInternalException("Thread interrupted");
 				}
 
 			}
@@ -228,7 +226,6 @@ public class MultipleDistributor extends Observable implements Runnable {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-				// throw new ProtTestInternalException("Thread interrupted");
 			}
 		}
 		caller.rootModel = null;

@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 package es.uvigo.darwin.jmodeltest.exception;
 
 /**
- * The Class ProtTestInternalException.
+ * The Class InternalException.
  * 
  * @author Diego Darriba
  */
@@ -28,12 +28,12 @@ public class InternalException extends RuntimeException {
 	private static final long serialVersionUID = 20090728L;
 
 	/**
-	 * Instantiates a new prot test internal exception.
+	 * Instantiates a new internal exception.
 	 */
 	public InternalException() {}
 	
 	/**
-	 * Instantiates a new prot test internal exception.
+	 * Instantiates a new internal exception.
 	 * 
 	 * @param description the description
 	 */

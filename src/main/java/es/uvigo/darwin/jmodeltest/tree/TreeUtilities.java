@@ -23,7 +23,9 @@ import java.io.StringWriter;
 
 import pal.io.FormattedOutput;
 import pal.misc.IdGroup;
+import pal.misc.Identifier;
 import pal.tree.Node;
+import pal.tree.NodeUtils;
 import pal.tree.ReadTree;
 import pal.tree.SplitSystem;
 import pal.tree.SplitUtils;
@@ -32,7 +34,10 @@ import pal.tree.TreeParseException;
 
 public class TreeUtilities {
 
-	public static final String TREE_CLADE_SUPPORT_ATTRIBUTE = "support";
+    public static final int DEFAULT_COLUMN_WIDTH = 70;
+    public static final String TREE_WEIGHT_ATTRIBUTE = "weight";
+    public static final String TREE_CLADE_SUPPORT_ATTRIBUTE = "support";
+    public static final String TREE_NAME_ATTRIBUTE = "treeName";
 
 	public TreeUtilities() {
 	}
@@ -60,6 +65,195 @@ public class TreeUtilities {
 		return tree;
 	}
 
+	/**
+     * Make sure subtree below node has consistent heights, i.e. node height is higher than it's descendants
+     * 
+     * @param tree the tree
+     * @param node the node
+     * 
+     * @return height of node
+     */
+    public static double insureConsistency(Tree tree, Node node) {
+        double height = TreeUtilities.safeNodeHeight(tree, node);
+        if (node.isLeaf()) {
+            return height;
+        } else {
+            for (int i = 0; i < node.getChildCount(); i++) {
+                Node n = node.getChild(i);
+                final double childHeight = insureConsistency(tree, n);
+                height = Math.max(height, childHeight);
+            }
+        }
+
+        node.setNodeHeight(height);
+        return height;
+    }
+    
+    /**
+     * Calculates the number of branches from node to most remote tip.
+     * 
+     * @param node the starting node
+     * 
+     * @return the node distance
+     */
+    public static int nodeDistance(final Node node) {
+        if (node.isLeaf()) {
+            return 0;
+        }
+
+        int d = 0;
+        for (int i = 0; i < node.getChildCount(); i++) {
+            Node n = node.getChild(i);
+            d = Math.max(d, nodeDistance(n));
+        }
+        return d + 1;
+    }
+    /**
+     * Calculates the safe node height.
+     * 
+     * @param tree the tree
+     * @param node the node
+     * 
+     * @return the height of the node
+     */
+    public static double safeNodeHeight(final Tree tree, final Node node) {
+        if (node.getNodeHeight() > 0.0) {
+            return node.getNodeHeight();
+        }
+        return TreeUtilities.nodeDistance(node);
+    }
+    
+	private static void putCharAtLevel(PrintWriter out, int level, char c,
+            int[] position) {
+        int n = position[level] - 1;
+        for (int i = 0; i < n; i++) {
+            out.print(' ');
+        }
+        out.print(c);
+    }
+	
+	private static void printlnNodeWithNumberAndLabel(PrintWriter out, Node node, int level,
+            int numExternalNodes, boolean[] umbrella, int[] position) {
+        for (int i = 0; i < level - 1; i++) {
+            if (umbrella[i]) {
+                putCharAtLevel(out, i, '|', position);
+            } else {
+                putCharAtLevel(out, i, ' ', position);
+            }
+        }
+
+        putCharAtLevel(out, level - 1, '+', position);
+
+        int branchNumber;
+        if (node.isLeaf()) {
+            branchNumber = node.getNumber() + 1;
+        } else {
+            branchNumber = node.getNumber() + 1 + numExternalNodes;
+        }
+
+        String numberAsString = Integer.toString(branchNumber);
+
+        int numDashs = position[level] - numberAsString.length();
+
+        for (int i = 0; i < numDashs ; i++) {
+            out.print('-');
+        }
+        out.print(numberAsString);
+
+        if (node.isLeaf()) {
+            out.println(" " + node.getIdentifier());
+        } else {
+            if (!node.getIdentifier().equals(Identifier.ANONYMOUS)) {
+                out.print("(" + node.getIdentifier() + ")");
+            }
+            out.println();
+        }
+    }
+	private static void printNodeInASCII(PrintWriter out, Node node, int level, int m, int maxm,
+            int numExternalNodes, boolean[] umbrella, int[] position, double proportion, int minLength) {
+        position[level] = (int) (node.getBranchLength() * proportion);
+
+        if (position[level] < minLength) {
+            position[level] = minLength;
+        }
+
+        if (node.isLeaf()) // external branch
+        {
+            if (m == maxm - 1) {
+                umbrella[level - 1] = true;
+            }
+
+            printlnNodeWithNumberAndLabel(out, node, level, numExternalNodes, umbrella, position);
+
+            if (m == 0) {
+                umbrella[level - 1] = false;
+            }
+        } else // internal branch
+        {
+            for (int n = node.getChildCount() - 1; n > -1; n--) {
+                printNodeInASCII(out, node.getChild(n), level + 1, n, node.getChildCount(),
+                        numExternalNodes, umbrella, position, proportion, minLength);
+
+                if (m == maxm - 1 && n == node.getChildCount() / 2) {
+                    umbrella[level - 1] = true;
+                }
+
+                if (n != 0) {
+                    if (n == node.getChildCount() / 2) {
+                        printlnNodeWithNumberAndLabel(out, node, level, numExternalNodes, umbrella, position);
+                    } else {
+                        for (int i = 0; i < level + 1; i++) {
+                            if (umbrella[i]) {
+                                putCharAtLevel(out, i, '|', position);
+                            } else {
+                                putCharAtLevel(out, i, ' ', position);
+                            }
+                        }
+                        out.println();
+                    }
+                }
+
+                if (m == 0 && n == node.getChildCount() / 2) {
+                    umbrella[level - 1] = false;
+                }
+            }
+        }
+    }
+	
+	// Print picture of current tree in ASCII
+    public static void printASCII(Tree tree, PrintWriter out) {
+        tree.createNodeList();
+
+        int numExternalNodes = tree.getExternalNodeCount();
+        int numInternalNodes = tree.getInternalNodeCount();
+        int numBranches = numInternalNodes + numExternalNodes - 1;
+
+        boolean[] umbrella = new boolean[numExternalNodes];
+        int[] position = new int[numExternalNodes];
+
+        int minLength = (Integer.toString(numBranches)).length() + 1;
+
+        int MAXCOLUMN = 40;
+        Node root = tree.getRoot();
+        if (root.getNodeHeight() == 0.0) {
+            NodeUtils.lengths2Heights(root);
+        }
+        double proportion = (double) MAXCOLUMN / root.getNodeHeight();
+
+        for (int n = 0; n < numExternalNodes; n++) {
+            umbrella[n] = false;
+        }
+
+        position[0] = 1;
+        for (int i = root.getChildCount() - 1; i > -1; i--) {
+            printNodeInASCII(out, root.getChild(i), 1, i, root.getChildCount(),
+                    numExternalNodes, umbrella, position, proportion, minLength);
+            if (i != 0) {
+                putCharAtLevel(out, 0, '|', position);
+                out.println();
+            }
+        }
+    }
 	public static void printNH(PrintWriter out, Tree tree, Node node,
 			boolean printLengths, boolean printInternalLabels,
 			boolean printCladeSupport) {

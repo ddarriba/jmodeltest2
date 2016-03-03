@@ -50,12 +50,12 @@ import javax.swing.plaf.BorderUIResource;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.ModelTest;
 import es.uvigo.darwin.jmodeltest.ModelTestConfiguration;
+import es.uvigo.darwin.jmodeltest.exe.ExternalExecutionManager;
 import es.uvigo.darwin.jmodeltest.exe.ProcessManager;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.observer.ProgressInfo;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
-import es.uvigo.darwin.prottest.exe.ExternalExecutionManager;
 
 public class Frame_Progress extends JModelTestFrame implements Observer,
 		ActionListener {

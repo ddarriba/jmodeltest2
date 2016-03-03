@@ -17,8 +17,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 package es.uvigo.darwin.jmodeltest.exe;
 
+import java.io.PrintWriter;
 import java.io.PushbackReader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -34,12 +36,11 @@ import es.uvigo.darwin.jmodeltest.gui.XManager;
 import es.uvigo.darwin.jmodeltest.io.TextOutputStream;
 import es.uvigo.darwin.jmodeltest.model.Model;
 import es.uvigo.darwin.jmodeltest.selection.InformationCriterion;
+import es.uvigo.darwin.jmodeltest.tree.Consensus;
+import es.uvigo.darwin.jmodeltest.tree.TreeUtilities;
+import es.uvigo.darwin.jmodeltest.tree.WeightedTree;
+import es.uvigo.darwin.jmodeltest.utilities.FixedBitSet;
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
-import es.uvigo.darwin.prottest.consensus.Consensus;
-import es.uvigo.darwin.prottest.facade.TreeFacade;
-import es.uvigo.darwin.prottest.facade.TreeFacadeImpl;
-import es.uvigo.darwin.prottest.tree.WeightedTree;
-import es.uvigo.darwin.prottest.util.FixedBitSet;
 
 public class RunConsense {
 	
@@ -242,7 +243,6 @@ public class RunConsense {
 	private void printConsensus() {
 		
 		double consensusThreshold = consensusType.equals("50% majority rule")?0.5:1.0;
-		TreeFacade treeFacade = new TreeFacadeImpl();
 		
 		// print results for best AIC model
 		stream.println(" ");stream.println(" ");stream.println(" ");
@@ -306,9 +306,13 @@ public class RunConsense {
         stream.println(" ");
         
         Tree consensusTree = consensus.getConsensusTree();
-        stream.println(treeFacade.toASCII(consensusTree));
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        TreeUtilities.printASCII(consensusTree, pw);
+        pw.flush();
+        stream.println(sw);
         stream.println(" ");
-        String newickTree = treeFacade.toNewick(consensusTree, true, true, true);
+        String newickTree = TreeUtilities.toNewick(consensusTree, true, true, true);
         stream.println(newickTree);
         stream.println(" ");
         stream.println("Note: this tree is unrooted. Branch lengths are the expected number of "

@@ -54,12 +54,14 @@ public class RFHistogram {
 		List<Model> models = ic.getConfidenceModels();
 		
 		Tree bestTree = ic.getMinModel().getTree();
+		int maxRF = 2 * (bestTree.getIdCount()-3);
 		double values[] = new double[models.size()-1];
 		int i = 0;
 		for (Model model : models) {
 			if (!model.equals(ic.getMinModel())) {
 				double distance = distances.getDistance(bestTree, model.getTree());
-				values[i] = distance;
+				/* make relative RF distance */
+				values[i] = 1.0 * distance / maxRF;
 				i++;
 			}
 		}
