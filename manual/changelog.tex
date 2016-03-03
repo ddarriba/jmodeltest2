@@ -1,0 +1,141 @@
+\subsection{Last Updates}
+
+\begin{itemize}
+
+  \item 3 Mar 2016 Version 2.1.10 Revision 20160303
+  \begin{itemize}
+    \item Fixed bug with sequences where the 8-char name prefixes are equal
+    \item Added warning when the logging is disabled on runtime
+    \item Added win32 PhyML binary version to compatibility list
+  \end{itemize}
+
+  \item 15 Jan 2016 - Version 2.1.9
+  \begin{itemize}
+    \item Added automatic search for PhyML binary in /usr/bin
+    \item Removed non-ASCII characters
+    \item Disable logging if writing is not possible
+    \item Merge GUI images into jarfile
+  \end{itemize}
+
+  \item 20 Oct 2015 - Version 2.1.8
+  \begin{itemize}
+    \item Removed ReadSeq dependency
+    \item Fixed warnings
+    \item Updated prottest jarfile to v3.4
+  \end{itemize}
+
+
+	\item 20 Feb 2015 - Version 2.1.7
+	\begin{itemize}
+  		\item Fixed bug in ML tree search operation. Console version was using NNI moves instead of "BEST" by default.
+	\end{itemize}
+
+	\item 20 Nov 2014 - Version 2.1.7
+	\begin{itemize}
+		\item Fixed bug with special characters in paths
+		\item Added initial check of PhyML binaries
+		\item Added notification in case AICc produces negative values
+	\end{itemize}
+
+	\item 06 Aug 2014 - Version 2.1.6
+	\begin{itemize}
+		\item Added confirmation window when cancelling running jobs in the GUI
+		\item Added automatic checkpointing files generation
+		\item Added ``-ckp'' argument for loading checkpointing files
+	\end{itemize}
+
+	\item 05 Apr 2014 - Version 2.1.5
+	\begin{itemize}
+		\item Updated OS X binary
+		\item Fixed bug with computation of JC model for ``fixed'' topology
+		\item Fixed bug with DT criterion computation
+		\item Added ``-n'' argument for naming executions (the name is included in the log filenames)
+		\item Added ``-getphylip'' argument for converting alignments into PHYLIP format with ALTER
+		\item Fixed bug in PhyML logging in GUI. Added a unique ID for every model in the log file
+		\item Added PAUP* block into log files if required (``-w'' argument)
+		\item Added more verbose error messages 
+	\end{itemize}
+
+	\item 10 Jul 2013 - Version 2.1.4
+	\begin{itemize}
+		\item Added phyml auto-logging.
+		\item Added phyml command lines for best-fit models.
+		\item Added phyml log tab in the GUI.
+		\item Removed sample size modes (and ``-n'' argument). Sample size is fixed to alignment size.
+		\item Fixed bug with relative paths when calling from a different path.
+		\item Fixed typos in the GUI. 
+	\end{itemize}
+
+	\item 05 Mar 2013 - Version 2.1.3
+	\begin{itemize}
+		\item Fixed bug with PAUP`*` command block.
+		\item Added the possibility to change Inforation Criterion used with the clustering algorithm for the 203 matrices.
+		\item Changed ``-o'' argument for the hypothesis order into ``-O''
+		\item Added ``-o'' argument for forwarding the standard output to a file: -o FILENAME 
+	\end{itemize}
+
+	\item 01 Jan 2013 Version 2.1.2 - Revision 20130103
+	\begin{itemize}
+		\item Fixed bug in paths with whitespaces.
+		\item Updated PhyML binaries. 
+	\end{itemize}
+
+	\item 31 Jul 2012 Version 2.1.1 - Revision 20120731
+	\begin{itemize}
+		\item Fixed bug with hLRT selection when attempting to use a user-defined topology. 
+	\end{itemize}
+
+	\item 11 Mar 2012 Version 2.1 - Revision 20120511
+	\begin{itemize}
+		\item Major updates:
+		\begin{itemize}
+			\item Exhaustive GTR submodels: All the 203 different partitions of the GTR rate matrix can be included in the candidate set of models. When combined with rate variation (+I,+G, +I+G) and equal/unequal base frequencies the total number of possible models is 203 x 8 = 1624. 
+			\item Hill climbing hierarchical clustering: Calculating the likelihood score for a large number of models can be extremely time-consuming. This hill-climbing algorithm implements a hierarchical clustering to search for the best-fit models within the full set of 1624 models, but optimizing at most 288 models while maintaining model selection accuracy. 
+			\item Heuristic filtering: Heuristic reduction of the candidate models set based on a similarity filtering threshold among the GTR rates and the estimates of among-site rate variation. 
+			\item Absolute model fit: Information criterion distances can be calculated for the best-fit model against the unconstrained multinomial model (based on site pattern frequencies). This is computed by default when the alignment does not contain missing data/ambiguities, but can also be approximated otherwise. 
+			\item Topological summary: Tree topologies supported by the different candidate models are summarized in the html log, including confidence intervals constructed from cumulative models weights, plus Robinson-Foulds and Euclidean distances to the best-fit tree for each. 
+		\end{itemize}
+		\item Minor updates:
+		\begin{itemize}
+			\item Corrected a bug in the fixed BIONJ-JC starting topology. F81+I+G was executed instead of JC.
+			\item ``Best'' is now the default tree search operation instead of NNI. ``Best'' computes both NNI and SPR algorithms and selects the best of them.
+			\item User can select the number of threads from GUI. 
+		\end{itemize}
+	\end{itemize}
+
+
+	\item 1 Feb 2012 - Version 2.0.2
+
+	\begin{itemize}
+		\item Added a selection summary at the end of the console output.
+		\item Corrected the table header in the DT results frame (sorting).
+		\item Corrected a bug in DT Criterion where selection could not take place with large alignments.
+		\item Corrected a bug with command console version, where the execution crashed with certain arguments.
+		\item Unified LOCALE for English format. 
+	\end{itemize}
+
+	\item 2 Nov 2011 - Version 2.0.1
+
+	\begin{itemize}
+		\item Improved thread scheduling algorithm.
+		\item OpenMP phyml patch for hybrid execution.
+		\item New argument (machinesfile) for hybrid execution on heterogeneous architectures, or heterogeneous resources distribution. 
+	\end{itemize}
+
+	\item 13 Oct 2011 - Revision 20111013
+
+	\begin{itemize}
+		\item Added conf/jmodeltest.conf file, where you can:
+			Enable/Disable the automatic logging:
+
+			    You might be running a huge dataset and you don't want to generate hundreds or thousands of log files. 
+
+			Set the PhyML binaries location:
+
+			    If you already have installed PhyML in your machine, you can setup jModelTest for use your own binaries. 
+
+		\item Enhanced the html log output. 
+	\end{itemize}
+
+\end{itemize}
+
