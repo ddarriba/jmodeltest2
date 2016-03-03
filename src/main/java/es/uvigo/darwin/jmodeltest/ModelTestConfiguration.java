@@ -28,6 +28,17 @@ import java.util.regex.Pattern;
 
 import es.uvigo.darwin.jmodeltest.utilities.Utilities;
 
+/**
+ * ModelTestConfiguration.java
+ * 
+ * Description: Configuration parameters
+ * 
+ * @author Diego Darriba, University of Vigo / University of A Coruna, Spain
+ *         ddarriba@udc.es
+ * @author David Posada, University of Vigo, Spain dposada@uvigo.es |
+ *         darwin.uvigo.es
+ * @version 2.1.10 (Mar 2016)
+ */
 public abstract class ModelTestConfiguration {
 
 	private static String convertPathToAbsolute(String path) {
@@ -113,7 +124,22 @@ public abstract class ModelTestConfiguration {
             	}
             }
             
-        	if (!existsKey(LOG_DIR)) {
+        	if (existsKey(LOG_DIR)) {
+        		/* test writing */
+        		File logDir = new File(getLogDir());
+        		if ((isCkpEnabled() || isPhymlLogEnabled() || isHtmlLogEnabled()) 
+        				&& !(logDir.exists() && logDir.canWrite()))
+        		{
+        			System.err.println("WARNING: Cannot write in 'log' directory ("
+        					+ getLogDir() + "): All logging will be disabled");
+        			System.err.println("         If you want to fix this warning, check 'conf/jmodeltest.conf'");
+        			System.err.println("         Change the logging directory to where you have writing permission");
+        			System.err.println("         or disable 'checkpointing', 'html-logging' and 'phyml-logging' properties\n");
+        			disableHtmlLog();
+            		disablePhymlLog();
+            		disableCkpLog();
+        		}
+        	} else {
         		disableHtmlLog();
         		disablePhymlLog();
         		disableCkpLog();
