@@ -64,7 +64,10 @@ public abstract class RunPhyml extends Observable implements Observer {
 	protected Model[] models;
 	protected Model gtrModel = null;
 
-	public static final String[] COMPATIBLE_VERSIONS = {"20130103", "20131022", "20141009", "20141029", "20150501"};
+	public static final String[] COMPATIBLE_VERSIONS = {
+		"20130103", "20131022", 
+		"20141009", "20141029", 
+		"20150501", "20151222"};
 	public static String PHYML_VERSION = "3.0";
 
 	public static String PHYML_TREE_SUFFIX = "_phyml_tree_";
