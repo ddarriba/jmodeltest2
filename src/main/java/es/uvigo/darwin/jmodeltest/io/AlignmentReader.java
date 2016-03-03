@@ -33,6 +33,17 @@ import pal.alignment.ReadAlignment;
 import es.uvigo.darwin.jmodeltest.ApplicationOptions;
 import es.uvigo.darwin.jmodeltest.exception.AlignmentParseException;
 
+/**
+ * AlignmentReader.java
+ * 
+ * Description: Class for parsing MSA files
+ * 
+ * @author Diego Darriba, University of Vigo / University of A Coruna, Spain
+ *         ddarriba@udc.es
+ * @author David Posada, University of Vigo, Spain dposada@uvigo.es |
+ *         darwin.uvigo.es
+ * @version 2.1.10 (Mar 2016)
+ */
 public abstract class AlignmentReader {
 	private static ApplicationOptions options = ApplicationOptions
 			.getInstance();;
@@ -106,19 +117,6 @@ public abstract class AlignmentReader {
 				alignment.getSequenceCount());
 		for (int i = 0; i < alignment.getSequenceCount(); i++) {
 			seqNames.add(alignment.getIdentifier(i).getName());
-		}
-
-		String currString;
-		int size = alignment.getSequenceCount();
-		for (int i = 0; i < size; i++) {
-			currString = seqNames.get(i);
-			for (int j = i + 1; j < size; j++) {
-				if (seqNames.get(j).equals(currString)) {
-					throw new AlignmentParseException(
-							"ERROR: There are duplicated taxa names in the alignment: "
-									+ currString);
-				}
-			}
 		}
 		
 		if (debug) {

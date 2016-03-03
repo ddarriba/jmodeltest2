@@ -6,11 +6,15 @@ jModelTest is a tool to carry out statistical selection of best-fit models of nu
 Download
 --------
 
-New distributions of jModelTest will be hosted in google drive: https://drive.google.com/folderview?id=0ByrkKOPtF_n_OUs3d0dNcnJPYXM#list
+Check 'releases' section for the latest distributions.
+
+New revisions of jModelTest will also be hosted in google drive: https://drive.google.com/folderview?id=0ByrkKOPtF_n_OUs3d0dNcnJPYXM#list
 
 --------
 NEWS!
 --------
+
+03/03/2016 - New revision fixed bug with equal taxa name prefixes. Fixed minor bugs.
 
 20/02/2015 - New revision Fixed minor bug in console version. NNI tree search operation was taken as default for ML starting tree, instead of BEST.
 

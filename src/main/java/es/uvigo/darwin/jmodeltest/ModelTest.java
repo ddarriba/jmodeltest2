@@ -96,10 +96,10 @@ public class ModelTest {
 	public static final double INFINITY = 9999;
 	public static final int MAX_NUM_MODELS = 88;
 	public static final int MAX_NAME = 60;
-	public static final String CURRENT_VERSION = "2.1.9 v20160115";
+	public static final String CURRENT_VERSION = "2.1.10 v20160303";
 	public static final String programName = ("jModeltest");
-	public static final String URL = "http://code.google.com/p/jmodeltest2";
-	public static final String WIKI = "http://code.google.com/p/jmodeltest2/wiki/GettingStarted";
+	public static final String URL = "https://github.com/ddarriba/jmodeltest2";
+	public static final String WIKI = "https://github.com/ddarriba/jmodeltest2";
 	public static final String DISCUSSION_GROUP = "http://groups.google.com/group/jmodeltest";
 	public static String CONFIG_FILE = "conf/jmodeltest.conf";
 	public static final String UNKNOWN_HOSTNAME = "UNKNOWN";

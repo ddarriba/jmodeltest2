@@ -1,3 +1,9 @@
+3 Mar 2016 Version 2.1.10 Revision 20160303
+
+  * Fixed bug with sequences where the 8-char name prefixes are equal
+  * Added warning when the logging is disabled on runtime
+  * Added win32 PhyML binary version to compatibility list
+
 15 Jan 2016 Version 2.1.9 Revision 20160115
 
   * Added automatic search for PhyML binary in /usr/bin
