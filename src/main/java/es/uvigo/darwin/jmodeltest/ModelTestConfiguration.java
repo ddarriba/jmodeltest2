@@ -90,69 +90,82 @@ public abstract class ModelTestConfiguration {
     public static final String U_THREADS = "uniform-threads";
     
     static {
-        APPLICATION_PROPERTIES = new Properties();
-        
-        try {
-        	try {
-        		File f = new File(ModelTest.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-        		JAR_PATH = f.getAbsolutePath();
-        		PATH = JAR_PATH.replaceFirst(new File(JAR_PATH).getName(),"");
-        		DEFAULT_EXE_DIR = PATH + "exe" + File.separator + "phyml";
-        		DEFAULT_LOG_DIR = PATH + "log";
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        	FileInputStream prop = new FileInputStream(convertPathToAbsolute(ModelTest.CONFIG_FILE));
-            APPLICATION_PROPERTIES.load(prop);
-            /* load also user definitions */
-            for (Object key : ModelTest.USERDEF_PROPERTIES.keySet()) {
-            	String strKey = (String) key;
-            	if (strKey.equals(LOG_DIR) || strKey.equals(EXE_DIR)) {
-            		File fDir = new File(ModelTest.USERDEF_PROPERTIES.getProperty(strKey));
-            		if (!fDir.exists()) {
-            			System.err.println("\nCOMMAND LINE ERROR: Unexistent directory " + fDir.getAbsolutePath());
-            			ModelTest.CommandLineError();
-            		} else if (!(fDir.isDirectory() && fDir.canRead()) || (strKey.equals(LOG_DIR) && !fDir.canWrite())) {
-            			System.err.println("\nCOMMAND LINE ERROR: Argument " + fDir.getAbsolutePath() 
-            					+ " is not a directory or you have not the required permissions on it");
-            			ModelTest.CommandLineError();
-        			}
-            		APPLICATION_PROPERTIES.setProperty(strKey, fDir.getAbsolutePath());
-            	} else {
-            		APPLICATION_PROPERTIES.setProperty(strKey, ModelTest.USERDEF_PROPERTIES.getProperty(strKey));
-            	}
-            }
-            
-        	if (existsKey(LOG_DIR)) {
-        		/* test writing */
-        		File logDir = new File(getLogDir());
-        		if ((isCkpEnabled() || isPhymlLogEnabled() || isHtmlLogEnabled()) 
-        				&& !(logDir.exists() && logDir.canWrite()))
-        		{
-        			System.err.println("WARNING: Cannot write in 'log' directory ("
-        					+ getLogDir() + "): All logging will be disabled");
-        			System.err.println("         If you want to fix this warning, check 'conf/jmodeltest.conf'");
-        			System.err.println("         Change the logging directory to where you have writing permission");
-        			System.err.println("         or disable 'checkpointing', 'html-logging' and 'phyml-logging' properties\n");
-        			disableHtmlLog();
-            		disablePhymlLog();
-            		disableCkpLog();
-        		}
-        	} else {
-        		disableHtmlLog();
-        		disablePhymlLog();
-        		disableCkpLog();
-        	}
-        	
-        } catch (IOException e) {
-            System.err.println("Configuration file ("+ convertPathToAbsolute(ModelTest.CONFIG_FILE) +") cannot be resolved");
-            System.exit(-1);
+      APPLICATION_PROPERTIES = new Properties();
+      try {
+        if (ModelTest.MPJ_RUN)
+          PATH = System.getProperty("user.dir") + File.separator;
+        else {
+          File f = new File(ModelTest.class.getProtectionDomain().getCodeSource()
+              .getLocation().toURI());
+          JAR_PATH = f.getAbsolutePath();
+          PATH = JAR_PATH.replaceFirst(new File(JAR_PATH).getName(), "");
         }
+      } catch (URISyntaxException e) {
+        PATH = System.getProperty("user.dir") + File.separator;
+      }
+      DEFAULT_EXE_DIR = PATH + "exe" + File.separator + "phyml";
+      DEFAULT_LOG_DIR = PATH + "log";
+      try {
+        FileInputStream prop = new FileInputStream(
+            convertPathToAbsolute(ModelTest.CONFIG_FILE));
+        APPLICATION_PROPERTIES.load(prop);
+        /* load also user definitions */
+        for (Object key : ModelTest.USERDEF_PROPERTIES.keySet()) {
+          String strKey = (String) key;
+          if (strKey.equals(LOG_DIR) || strKey.equals(EXE_DIR)) {
+            File fDir = new File(
+                ModelTest.USERDEF_PROPERTIES.getProperty(strKey));
+            if (!fDir.exists()) {
+              System.err.println("\nCOMMAND LINE ERROR: Unexistent directory "
+                  + fDir.getAbsolutePath());
+              ModelTest.CommandLineError();
+            } else if (!(fDir.isDirectory() && fDir.canRead())
+                || (strKey.equals(LOG_DIR) && !fDir.canWrite())) {
+              System.err.println("\nCOMMAND LINE ERROR: Argument "
+                  + fDir.getAbsolutePath()
+                  + " is not a directory or you have not the required permissions on it");
+              ModelTest.CommandLineError();
+            }
+            APPLICATION_PROPERTIES.setProperty(strKey, fDir.getAbsolutePath());
+          } else {
+            APPLICATION_PROPERTIES.setProperty(strKey,
+                ModelTest.USERDEF_PROPERTIES.getProperty(strKey));
+          }
+        }
+
+        if (existsKey(LOG_DIR)) {
+          /* test writing */
+          File logDir = new File(getLogDir());
+          if ((isCkpEnabled() || isPhymlLogEnabled() || isHtmlLogEnabled())
+              && !(logDir.exists() && logDir.canWrite())) {
+            System.err.println("WARNING: Cannot write in 'log' directory ("
+                + getLogDir() + "): All logging will be disabled");
+            System.err.println(
+                "         If you want to fix this warning, check 'conf/jmodeltest.conf'");
+            System.err.println(
+                "         Change the logging directory to where you have writing permission");
+            System.err.println(
+                "         or disable 'checkpointing', 'html-logging' and 'phyml-logging' properties\n");
+            disableHtmlLog();
+            disablePhymlLog();
+            disableCkpLog();
+          }
+        } else {
+          disableHtmlLog();
+          disablePhymlLog();
+          disableCkpLog();
+        }
+
+      } catch (IOException e) {
+        System.err.println(
+            "Configuration file (" + convertPathToAbsolute(ModelTest.CONFIG_FILE)
+                + ") cannot be resolved");
+        System.exit(-1);
+      }
     }
     
     public static boolean existsKey(String key) {
-	return !(getProperty(key).equals("n/a"));
+      return !(getProperty(key).equals("n/a"));
     }
 
     public static String getProperty(String key) {

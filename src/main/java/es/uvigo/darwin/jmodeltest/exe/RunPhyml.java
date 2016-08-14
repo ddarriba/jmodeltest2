@@ -68,6 +68,7 @@ public abstract class RunPhyml extends Observable implements Observer {
 		"20130103", "20131022", 
 		"20141009", "20141029", 
 		"20150501", "20151222"};
+
 	public static String PHYML_VERSION = "3.0";
 
 	public static String PHYML_TREE_SUFFIX = "_phyml_tree_";
@@ -88,31 +89,38 @@ public abstract class RunPhyml extends Observable implements Observer {
 	
 	public static boolean checkBinary() {
 		boolean canExecute = false;
-		if (!ModelTestConfiguration.isGlobalPhymlBinary()) {
-			if (!RunPhyml.phymlBinary.exists()) {
-				Utilities
-				.printRed("ERROR: PhyML binary cannot be found: " + RunPhyml.phymlBinary.getAbsolutePath() + "\n");
-			} else if (!RunPhyml.phymlBinary.canExecute()) {
-				Utilities
-				.printRed("ERROR: PhyML binary exists, but it cannot be executed: " + RunPhyml.phymlBinary.getAbsolutePath() + "\n");
-			} else if (!RunPhyml.isCompatible()){
-				Utilities
-				.printRed("WARNING: PhyML binary is not in the list of compatibility: \n");
-				Utilities
-				.printRed(RunPhyml.phymlBinary.getAbsolutePath() + " v" + RunPhyml.PHYML_VERSION +"\n");
-				Utilities.printRed("Compatible versions: ");
-				for (int i=0; i<RunPhyml.COMPATIBLE_VERSIONS.length; i++)
-					Utilities.printBlue(RunPhyml.COMPATIBLE_VERSIONS[i] + " ");
-				Utilities.printBlue("\n");
-				Utilities
-				.printRed("jModelTest will try to continue execution anyway, but it might fail.\n");
-				canExecute = true;
-			} else {
-				Utilities
-				.printBlue("PhyML binary: " + RunPhyml.phymlBinary.getAbsolutePath() + " v" + RunPhyml.PHYML_VERSION + "\n");
-				canExecute = true;
-			}
-		}
+    if (!ModelTestConfiguration.isGlobalPhymlBinary()) {
+      if (!RunPhyml.phymlBinary.exists()) {
+        if (ModelTest.MPJ_ME == 0)
+          Utilities.printRed("ERROR: PhyML binary cannot be found: "
+              + RunPhyml.phymlBinary.getAbsolutePath() + "\n");
+      } else if (!RunPhyml.phymlBinary.canExecute()) {
+        if (ModelTest.MPJ_ME == 0)
+          Utilities.printRed(
+              "ERROR: PhyML binary exists, but it cannot be executed: "
+                  + RunPhyml.phymlBinary.getAbsolutePath() + "\n");
+      } else if (!RunPhyml.isCompatible()) {
+        if (ModelTest.MPJ_ME == 0) {
+          Utilities.printRed(
+              "WARNING: PhyML binary is not in the list of compatibility: \n");
+          Utilities.printRed(RunPhyml.phymlBinary.getAbsolutePath() + " v"
+              + RunPhyml.PHYML_VERSION + "\n");
+          Utilities.printRed("Compatible versions: ");
+          for (int i = 0; i < RunPhyml.COMPATIBLE_VERSIONS.length; i++)
+            Utilities.printBlue(RunPhyml.COMPATIBLE_VERSIONS[i] + " ");
+          Utilities.printBlue("\n");
+          Utilities.printRed(
+              "jModelTest will try to continue execution anyway, but it might fail.\n");
+        }
+        canExecute = true;
+      } else {
+        if (ModelTest.MPJ_ME == 0)
+          Utilities.printBlue(
+              "PhyML binary: " + RunPhyml.phymlBinary.getAbsolutePath() + " v"
+                  + RunPhyml.PHYML_VERSION + "\n");
+        canExecute = true;
+      }
+    }
 		return canExecute;
 	}
 	private static boolean checkPhymlCompatibility(String binary) {

@@ -245,10 +245,10 @@ public class ModelTest {
 				+ ")");
 		try {
 			arguments = MPI.Init(args);
-			System.err.println("[MPI] ... OK! [" + hostname + " (" + MPJ_ME
-					+ ")]");
 			MPJ_ME = MPI.COMM_WORLD.Rank();
 			MPJ_SIZE = MPI.COMM_WORLD.Size();
+			System.err.println("[MPI] ... OK! [" + hostname + " (" + MPJ_ME
+          + ")]");
 			MPJ_RUN = true;
 		} catch (MPIException e) {
 			System.err.println("[MPI] Proceed without MPI");
