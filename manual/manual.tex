@@ -179,7 +179,7 @@ In case there is something wrong in the input file, it will exit with the descri
 
 \subsection{Basic Model Selection}
 
-Although jModelTest have many options, most of the users would like to perform a model selection among the 11 substitution schemes, including models with unequal frequencies, gamma rate variation and a proportion of invariable sites. The following command produces this operation, shows the selection results under the 4 available criteria, computes the model-averaged phylogenies (``-a''), computes the parameters importance (``-v'' and ``-p'') and writes the PAUP* block for the best-fit models (``-w''):
+Although jModelTest has many options, most of the users would like to perform a model selection among the 11 substitution schemes, including models with unequal frequencies, gamma rate variation and a proportion of invariable sites. The following command produces this operation, shows the selection results under the 4 available criteria, computes the model-averaged phylogenies (``-a''), computes the parameters importance (``-v'' and ``-p'') and writes the PAUP* block for the best-fit models (``-w''):
 
 \begin{lstlisting}
 $ java -jar jModelTest -d example-data/aP6.fas -s 11 -f -i -g 4 -AIC -BIC -AICc -DT -p -a -w

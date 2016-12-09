@@ -60,7 +60,6 @@
 		</copy>
 		<mkdir dir="${log.dir}" />
 		<chmod perm="755" dir="${dist.dir}" includes="*.sh *.bat" />
-    <chmod perm="644" dir="${exe.dir}" includes="*" />
 	</target>
 
 	<target name="run" depends="jar" description="Run jar file">

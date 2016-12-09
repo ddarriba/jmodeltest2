@@ -170,6 +170,9 @@ public class PhymlSingleModel extends Observable implements Runnable {
 		// avoid memory warning
 		sb.append(" --no_memory_check");
 
+    // set RNG seed
+    sb.append(" --r_seed ").append(options.getRngSeed());
+
 		/*
 		 * params=tlr: tree topology (t), branch length (l) and substitution
 		 * rate parameters (r) are optimised. params = tlr or tl: optimize tree

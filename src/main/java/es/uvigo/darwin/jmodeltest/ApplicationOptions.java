@@ -48,6 +48,7 @@ public class ApplicationOptions implements Serializable {
 
 	private static final long serialVersionUID = -3961572952922591321L;
 	private static final int AMBIGUOUS_DATATYPE_STATE = 4;
+	private static final int DEFAULT_SEED = 12345;
 
 	/** Tree topology search algorithms */
 	public static enum TreeSearch {
@@ -127,6 +128,8 @@ public class ApplicationOptions implements Serializable {
 	private int numBranches;
 	private int numInvariableSites;
 	private int numModels;
+
+  private int rngSeed = DEFAULT_SEED;
 
 	private String executionName;
 	
@@ -766,4 +769,12 @@ public class ApplicationOptions implements Serializable {
 	public void setNumModels(int numModels) {
 		this.numModels = numModels;
 	}
+
+  public int getRngSeed() {
+    return rngSeed;
+  }
+
+  public void setRngSeed(int rngSeed) {
+    this.rngSeed = rngSeed;
+  }
 }

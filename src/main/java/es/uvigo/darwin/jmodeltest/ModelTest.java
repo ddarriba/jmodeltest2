@@ -696,6 +696,26 @@ public class ModelTest {
 					options.doI = true;
 				}
 
+				else if (arg.equals("-seed")) {
+					if (i < arguments.length) {
+						try {
+							int rngSeed;
+							String type = arguments[i++];
+							rngSeed = Integer.parseInt(type);
+              options.setRngSeed(rngSeed);
+						} catch (NumberFormatException e) {
+							System.err
+									.println(error
+											+ "-seed option requires a RNG seed number.");
+							CommandLineError();
+						}
+					} else {
+						System.err
+								.println(error
+										+ "-g option requires a number of gamma categories.");
+						CommandLineError();
+					}
+				}
 				else if (arg.equals("-g")) {
 					if (i < arguments.length) {
 						try {
@@ -1303,6 +1323,8 @@ public class ModelTest {
 					+ "\n         backward selection for the hLRT (e.g., -r) (default is forward)"
 					+ "\n\n     -s numberOfSubstitutionSchemes"
 					+ "\n         number of substitution schemes (e.g., -s 11) (it has to be 3,5,7,11,203; default is 3)"
+					+ "\n\n     -seed RNG_seed"
+					+ "\n         set the seed for the random number generator (default is 12345; use -1 for a random one)"
 					+ "\n\n     --set-local-config localConfigurationFile"
 					+ "\n         set a local configuration file in replacement of conf/jmodeltest.conf"
 					+ "\n\n     --set-property propertyName=propertyValue"
