@@ -633,7 +633,7 @@ public class ModelTest {
 								outFile));
 					} catch (FileNotFoundException e1) {
 						System.err
-								.println("An error has ocurred while trying to open the output file \""
+								.println("An error has occurred while trying to open the output file \""
 										+ outFile + "\" for writing");
 						e1.printStackTrace();
 						System.exit(-1);

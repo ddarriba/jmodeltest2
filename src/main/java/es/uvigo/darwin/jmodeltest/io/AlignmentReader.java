@@ -96,7 +96,7 @@ public abstract class AlignmentReader {
 	 * @throws AlignmentParseException
 	 *             the alignment parse exception
 	 * @throws IOException
-	 *             Signals that an I/O exception has occured.
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static Alignment createAlignment(PrintWriter out, PushbackReader pr,
 			boolean debug) throws AlignmentParseException, IOException {

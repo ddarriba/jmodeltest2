@@ -356,7 +356,7 @@ public class ApplicationOptions implements Serializable {
 		}
 
 		/*
-		 * find out first wich models in phyml give titv if
+		 * find out first which models in phyml give titv if
 		 * (Model.numTransitions[modelNo] == 2 ||
 		 * Model.numTransversions[modelNo] == 2) { pV = true; }
 		 */

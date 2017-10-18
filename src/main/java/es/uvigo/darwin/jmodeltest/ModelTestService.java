@@ -48,7 +48,7 @@ public class ModelTestService {
      * 
      * @throws AlignmentParseException the alignment parse exception.
      * @throws FileNotFoundException Signals that the input filename does not exist.
-     * @throws IOException Signals that an I/O exception has occured.
+     * @throws IOException Signals that an I/O exception has occurred.
      */
 	public static String readAlignment(File inputFile, File outputFile)
             throws AlignmentParseException, FileNotFoundException, IOException {
@@ -63,7 +63,7 @@ public class ModelTestService {
      * 
      * @throws AlignmentParseException the alignment parse exception.
      * @throws FileNotFoundException Signals that the input filename does not exist.
-     * @throws IOException Signals that an I/O exception has occured.
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public static String readAlignment(File inputFile, File outputFile, boolean deleteOnExit)
             throws AlignmentParseException, FileNotFoundException, IOException {
