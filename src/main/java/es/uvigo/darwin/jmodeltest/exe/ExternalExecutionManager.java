@@ -58,7 +58,7 @@ public class ExternalExecutionManager {
      * 
      * @param proc the running process
      * 
-     * @return true, if succesfully added the process
+     * @return true, if successfully added the process
      */
     public boolean addProcess(Process proc) {
         boolean result = false;
@@ -73,7 +73,7 @@ public class ExternalExecutionManager {
      * 
      * @param proc the process to remove
      * 
-     * @return true, if succesfully removed the process
+     * @return true, if successfully removed the process
      */
     public boolean removeProcess(Process proc) {
         boolean result = false;

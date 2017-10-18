@@ -77,7 +77,7 @@ public class PhymlParallelModel extends Observable implements Observer {
 	     * 
 	     * @param estimator the model estimator to execute
 	     * 
-	     * @return if succesfully added the task
+	     * @return if successfully added the task
 	     */
 	    public boolean execute(PhymlSingleModel estimator) {
 	        estimator.addObserver(this);
