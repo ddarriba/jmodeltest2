@@ -6,9 +6,7 @@ jModelTest is a tool to carry out statistical selection of best-fit models of nu
 Download
 --------
 
-Check 'releases' section for the latest distributions.
-
-New revisions of jModelTest will also be hosted in google drive: https://drive.google.com/folderview?id=0ByrkKOPtF_n_OUs3d0dNcnJPYXM#list
+Check 'releases' section for the latest distributions: https://github.com/ddarriba/jmodeltest2/releases.
 
 --------
 NEWS!
