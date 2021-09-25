@@ -39,17 +39,17 @@ TPM3 & & 2 & equal & AC=AT;AG=GT;AG=CT & 012012 \\
 \hline
 TPM3uf & & 5 & unequal & AC=CG;AT=GT;AG=CT & 012012 \\
 \hline
-TIM1 & \citep{Posada-2003} & 3 & equal & AC=GT;AT=CG;AG;CT & 012230 \\
+TIM1ef & \citep{Posada-2003} & 3 & equal & AC=GT;AT=CG;AG;CT & 012230 \\
 \hline
-TIM1uf & \citep{Posada-2003} & 6 & unequal & AC=GT;AT=CG;AG;CT & 012230 \\
+TIM1 & \citep{Posada-2003} & 6 & unequal & AC=GT;AT=CG;AG;CT & 012230 \\
 \hline
-TIM2 & & 3 & equal & AC=AT;CG=GT;AG;CT & 010232 \\
+TIM2ef & & 3 & equal & AC=AT;CG=GT;AG;CT & 010232 \\
 \hline
-TIM2uf & & 6 & unequal & AC=AT;CG=GT;AG;CT & 010232 \\
+TIM2 & & 6 & unequal & AC=AT;CG=GT;AG;CT & 010232 \\
 \hline
-TIM3 & & 3 & equal & AC=CG;AT=GT;AG;CT & 012032 \\
+TIM3ef & & 3 & equal & AC=CG;AT=GT;AG;CT & 012032 \\
 \hline
-TIM3uf & & 6 & unequal & AC=CG;AT=GT;AG;CT & 012032 \\
+TIM3 & & 6 & unequal & AC=CG;AT=GT;AG;CT & 012032 \\
 \hline
 TVMef & \citep{Posada-2003} & 4 & equal & AC;CG;AT;GT;AG=CT & 012314 \\
 \hline
@@ -72,7 +72,7 @@ In traditional statistical theory, a widely accepted statistic for testing the g
 LRT=2(l_1-l_0)
 \]
 where $l_1$ is the maximum likelihood under the more parameter-rich, complex model (alternative hypothesis) and $l_0$ is the maximum likelihood under the less parameter-rich simple model (null hypothesis).
- When the models compared are nested (the null hypothesis is a special case of the alternative hypothesis) and the null hypothesis is correct, the LRT statistic is asymptotically distributed as a χ2 with q degrees of freedom, where q is the difference in number of free parameters between the two models \citep{Kendall-1979, Goldman-1993b}. Note that, to preserve the nesting of the models, the likelihood scores need to be estimated upon the same tree. When some parameter is fixed at its boundary (p-inv, α), a mixed χ2 is used instead \citep{Ohta-1992, Goldman-2000}. The behavior of the χ2 approximation for the LRT has been investigated with quite a bit of detail \citep{Goldman-1993a, Goldman-1993b, Yang-1995, Whelan-1999, Goldman-2000}.
+ When the models compared are nested (the null hypothesis is a special case of the alternative hypothesis) and the null hypothesis is correct, the LRT statistic is asymptotically distributed as a x2 with q degrees of freedom, where q is the difference in number of free parameters between the two models \citep{Kendall-1979, Goldman-1993b}. Note that, to preserve the nesting of the models, the likelihood scores need to be estimated upon the same tree. When some parameter is fixed at its boundary (p-inv, $\alpha$), a mixed x2 is used instead \citep{Ohta-1992, Goldman-2000}. The behavior of the x2 approximation for the LRT has been investigated with quite a bit of detail \citep{Goldman-1993a, Goldman-1993b, Yang-1995, Whelan-1999, Goldman-2000}.
 
 \subsection{Hierarchical Likelihood Ratio Tests (hLRT)}
 \label{sec:hlrt}
