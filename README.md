@@ -46,7 +46,7 @@ Guindon S and Gascuel O (2003). A simple, fast and accurate method to estimate l
 Discussion group
 --------
 
-Please use the jModelTest discussion group for any question: http://groups.google.com/group/jmodeltest
+Please use the jModelTest discussion group for any question: http://groups.google.com/group/modeltest-ng
 
 --------
 Disclaimer
